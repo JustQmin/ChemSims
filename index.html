@@ -50,6 +50,7 @@ h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:clamp(1.7r
 .card h2 a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
 .card .desc{margin:0;color:var(--muted);font-size:.95rem}
 .card .file{margin:0;font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
+.card .missing{margin:0;padding:8px 10px;border-left:4px solid var(--track);background:var(--bg);border-radius:0 4px 4px 0;font-size:.92rem}
 .card .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .state{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--track);border-radius:6px;padding:14px 16px}
 .state p{margin:0}
@@ -149,7 +150,7 @@ const CONFIG = {
     const info = { file, title: file.replace(/\.html?$/i, '').replace(/[-_]+/g, ' '), cat: '', desc: '' };
     try {
       const r = await fetch(encodeURI(file), { cache: 'no-cache' });
-      if (!r.ok) return info;
+      if (!r.ok){ info.missing = r.status; return info; }
       const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
       const h1 = doc.querySelector('h1'), eb = doc.querySelector('.eyebrow');
       const meta = doc.querySelector('meta[name="description"]'), cvs = doc.querySelector('canvas[aria-label]');
@@ -173,7 +174,8 @@ const CONFIG = {
         ${p.cat ? `<p class="cat">${esc(p.cat)}</p>` : ''}
         <h2><a href="${encodeURI(p.file)}">${esc(p.title)}</a></h2>
         ${p.desc ? `<p class="desc">${esc(p.desc)}</p>` : ''}
-        <div class="actions">
+        ${p.missing ? `<p class="missing"><strong>Noch nicht online.</strong> Die Datei liegt im Repository, ist aber noch nicht veröffentlicht. Meist dauert das nach dem Hochladen 1–2 Minuten, dann „Liste aktualisieren“. Bleibt es so, im Repository unter „Actions“ nachsehen, ob der letzte Lauf fehlgeschlagen ist.</p>` : ''}
+        <div class="actions"${p.missing ? ' hidden' : ''}>
           <a class="btn primary" href="${encodeURI(p.file)}">Öffnen</a>
           <a class="btn" href="${encodeURI(p.file)}" download="${esc(p.file)}">Herunterladen</a>
         </div>

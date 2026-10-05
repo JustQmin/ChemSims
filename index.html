@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chemie-Simulationen</title>
+<meta name="description" content="Übersicht über interaktive Teilchensimulationen für den Chemieunterricht.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Startseite im Stil der Simulationen: Kopfbereich, Suchfeld, Karten im Raster. Kästen mit farbigem linken Rand, keine Icons. */
+:root{
+  --bg:#f3f6f8; --panel:#ffffff; --fg:#1b2530; --muted:#56636f; --line:#d3dce3;
+  --accent:#0068a8; --accent-soft:#e1eef7; --on-accent:#ffffff; --track:#c98400;
+  --c1:#0072b2; --c2:#c98400; --c3:#007a5e; --c4:#9e4f86; --c5:#c85500;
+  --font-display:"Lexend", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Lexend", system-ui, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12181d; --panel:#1a2229; --fg:#e4ebf0; --muted:#9daab5; --line:#2e3b45;
+    --accent:#5fb0e6; --accent-soft:#1c3444; --on-accent:#0b1a24; --track:#f2b43a;
+    --c1:#56b4e9; --c2:#f2b43a; --c3:#1fa37f; --c4:#c77aaf; --c5:#e8742e;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:17px;line-height:1.5}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:calc(env(safe-area-inset-top,0px) + 28px) calc(env(safe-area-inset-bottom,0px) + 48px)}
+header{display:grid;gap:6px;margin-bottom:22px}
+.eyebrow{margin:0;font-family:var(--font-display);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.15;text-wrap:balance}
+.intro{margin:0;color:var(--muted);max-width:65ch}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:16px}
+.search{flex:1 1 260px;max-width:420px;font:inherit;font-size:1rem;padding:9px 12px;border:1.5px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)}
+.count{color:var(--muted);font-size:.95rem;font-variant-numeric:tabular-nums}
+.btn{font:inherit;font-family:var(--font-display);font-weight:500;font-size:.95rem;padding:8px 14px;border-radius:6px;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:3px solid var(--track);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:14px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--cat,var(--accent));border-radius:6px;padding:16px 18px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .cat{margin:0;font-family:var(--font-display);font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.card h2{margin:0;font-family:var(--font-display);font-size:1.2rem;font-weight:600;line-height:1.25;text-wrap:balance}
+.card h2 a{color:inherit;text-decoration:none}
+.card h2 a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.card .desc{margin:0;color:var(--muted);font-size:.95rem}
+.card .file{margin:0;font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
+.card .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.state{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--track);border-radius:6px;padding:14px 16px}
+.state p{margin:0}
+.state p+p{margin-top:6px}
+footer{margin-top:28px;color:var(--muted);font-size:.88rem;display:grid;gap:4px}
+footer p{margin:0}
+code{font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow" id="eyebrow">Chemie · Interaktive Simulationen</p>
+    <h1 id="title">Chemie-Simulationen</h1>
+    <p class="intro" id="intro">Teilchenmodelle zum Ausprobieren im Unterricht. Alle Simulationen laufen direkt im Browser, auch am Beamer und auf Tablets.</p>
+  </header>
+
+  <div class="bar">
+    <input class="search" id="search" type="search" placeholder="Suchen, z. B. Puffer oder Gleichgewicht" aria-label="Simulationen durchsuchen">
+    <span class="count" id="count" aria-live="polite"></span>
+    <button class="btn" id="reload" type="button">Liste aktualisieren</button>
+  </div>
+
+  <div class="state" id="state"><p>Simulationen werden geladen …</p></div>
+  <div class="grid" id="grid" aria-live="polite"></div>
+
+  <footer>
+    <p>Neue Simulationen erscheinen hier automatisch, sobald ihre HTML-Datei im Repository liegt.</p>
+    <p id="source"></p>
+  </footer>
+</div>
+
+<script>
+// ===== Einstellungen (normalerweise nichts ändern) ==========================
+const CONFIG = {
+  // Texte im Kopfbereich
+  eyebrow: 'Chemie · Interaktive Simulationen',
+  title: 'Chemie-Simulationen',
+  intro: 'Teilchenmodelle zum Ausprobieren im Unterricht. Alle Simulationen laufen direkt im Browser, auch am Beamer und auf Tablets.',
+  // Leer lassen: wird aus der Adresse NAME.github.io/REPO/ automatisch erkannt
+  owner: '', repo: '', branch: '', folder: '',
+  // Diese Dateien erscheinen nicht auf der Startseite
+  exclude: ['index.html', '404.html'],
+  // Notfall-Liste, falls die automatische Erkennung nicht klappt, z. B. ['puffer.html', 'gleichgewichtslabor.html']
+  pages: []
+};
+// ============================================================================
+
+(function(){
+  const $ = id => document.getElementById(id);
+  $('eyebrow').textContent = CONFIG.eyebrow; $('title').textContent = CONFIG.title; $('intro').textContent = CONFIG.intro;
+  document.title = CONFIG.title;
+
+  const CACHE_KEY = 'simliste-v1', CACHE_MIN = 10;
+  const isHtml = n => /\.html?$/i.test(n) && !CONFIG.exclude.map(x => x.toLowerCase()).includes(n.toLowerCase());
+  let pages = [], source = '';
+
+  // 1. seiten.json (wird vom GitHub-Workflow erzeugt)
+  async function fromJson(){
+    const r = await fetch('seiten.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('keine seiten.json');
+    const list = await r.json();
+    return list.map(x => typeof x === 'string' ? x : x.file).filter(Boolean);
+  }
+  // 2. GitHub-Schnittstelle (Ordnerinhalt des Repositorys)
+  function repoCandidates(){
+    if (CONFIG.owner && CONFIG.repo) return [{ owner: CONFIG.owner, repo: CONFIG.repo, folder: CONFIG.folder }];
+    const h = location.hostname.toLowerCase();
+    if (!h.endsWith('.github.io')) return [];
+    const owner = h.slice(0, -'.github.io'.length);
+    const parts = location.pathname.split('/').filter(Boolean);
+    if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+    const c = [];
+    if (parts.length) c.push({ owner, repo: parts[0], folder: CONFIG.folder || parts.slice(1).join('/') });
+    c.push({ owner, repo: h, folder: CONFIG.folder || parts.join('/') });
+    return c;
+  }
+  async function fromApi(){
+    try {
+      const c = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
+      if (c && Date.now() - c.t < CACHE_MIN * 60000) return c.list;
+    } catch (e) {}
+    for (const c of repoCandidates()){
+      const url = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.folder}` + (CONFIG.branch ? `?ref=${CONFIG.branch}` : '');
+      const r = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
+      if (r.status === 404) continue;
+      if (!r.ok) throw new Error(r.status === 403 ? 'Abruflimit der GitHub-Schnittstelle erreicht' : 'GitHub-Schnittstelle nicht erreichbar');
+      const list = (await r.json()).filter(x => x.type === 'file').map(x => x.name);
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), list })); } catch (e) {}
+      return list;
+    }
+    throw new Error('Repository nicht gefunden');
+  }
+
+  // Titel, Bereich und Beschreibung direkt aus der jeweiligen Seite lesen
+  async function describe(file){
+    const info = { file, title: file.replace(/\.html?$/i, '').replace(/[-_]+/g, ' '), cat: '', desc: '' };
+    try {
+      const r = await fetch(encodeURI(file), { cache: 'no-cache' });
+      if (!r.ok) return info;
+      const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
+      const h1 = doc.querySelector('h1'), eb = doc.querySelector('.eyebrow');
+      const meta = doc.querySelector('meta[name="description"]'), cvs = doc.querySelector('canvas[aria-label]');
+      info.title = (h1 && h1.textContent.trim()) || doc.title.trim() || info.title;
+      info.cat = eb ? eb.textContent.trim() : '';
+      info.desc = (meta && meta.content.trim()) || (cvs && cvs.getAttribute('aria-label').trim()) || '';
+    } catch (e) {}
+    return info;
+  }
+
+  const CATS = ['--c1', '--c2', '--c3', '--c4', '--c5'];
+  // jede Kategorie bekommt der Reihe nach eine eigene Farbe
+  function catColor(cat){ const cats = [...new Set(pages.map(p => p.cat))]; return `var(${CATS[Math.max(0, cats.indexOf(cat)) % CATS.length]})`; }
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function render(){
+    const q = $('search').value.trim().toLowerCase();
+    const shown = pages.filter(p => !q || (p.title + ' ' + p.cat + ' ' + p.desc + ' ' + p.file).toLowerCase().includes(q));
+    $('grid').innerHTML = shown.map(p => `
+      <article class="card" style="--cat:${catColor(p.cat)}">
+        ${p.cat ? `<p class="cat">${esc(p.cat)}</p>` : ''}
+        <h2><a href="${encodeURI(p.file)}">${esc(p.title)}</a></h2>
+        ${p.desc ? `<p class="desc">${esc(p.desc)}</p>` : ''}
+        <div class="actions">
+          <a class="btn primary" href="${encodeURI(p.file)}">Öffnen</a>
+          <a class="btn" href="${encodeURI(p.file)}" download="${esc(p.file)}">Herunterladen</a>
+        </div>
+        <p class="file">${esc(p.file)}</p>
+      </article>`).join('');
+    $('count').textContent = pages.length ? (q ? `${shown.length} von ${pages.length} Simulationen` : `${pages.length} Simulationen`) : '';
+    if (pages.length && !shown.length){ $('state').hidden = false; $('state').innerHTML = '<p>Keine Simulation passt zur Suche.</p>'; }
+    else if (pages.length) $('state').hidden = true;
+  }
+
+  function showError(msg){
+    const local = location.protocol === 'file:';
+    $('state').hidden = false;
+    $('state').innerHTML = local
+      ? '<p><strong>Die Startseite funktioniert erst online.</strong> Lade sie zusammen mit den Simulationen auf GitHub hoch und öffne sie über die GitHub-Pages-Adresse.</p>'
+      : `<p><strong>Die Liste der Simulationen konnte nicht geladen werden.</strong> ${esc(msg)}.</p><p>Abhilfe: In der Datei <code>index.html</code> unter <code>pages</code> die Dateinamen von Hand eintragen, oder den Workflow „Seiten veröffentlichen“ einrichten (siehe Anleitung).</p>`;
+  }
+
+  async function load(force){
+    if (force){ try { sessionStorage.removeItem(CACHE_KEY); } catch (e) {} }
+    $('state').hidden = false; $('state').innerHTML = '<p>Simulationen werden geladen …</p>'; $('grid').innerHTML = ''; $('count').textContent = '';
+    let files = null, err = '';
+    try { files = await fromJson(); source = 'Liste aus seiten.json (automatisch beim Hochladen erzeugt).'; }
+    catch (e1){
+      try { files = await fromApi(); source = 'Liste direkt aus dem GitHub-Repository.'; }
+      catch (e2){ err = e2.message; if (CONFIG.pages.length){ files = CONFIG.pages; source = 'Liste aus den Einstellungen in index.html.'; } }
+    }
+    if (!files){ showError(err || 'Keine Quelle gefunden'); return; }
+    files = [...new Set(files.filter(isHtml))];
+    pages = await Promise.all(files.map(describe));
+    pages.sort((a, b) => a.cat.localeCompare(b.cat, 'de') || a.title.localeCompare(b.title, 'de'));
+    $('source').textContent = source;
+    if (!pages.length){ $('state').innerHTML = '<p>Im Repository liegen noch keine Simulationen.</p>'; return; }
+    render();
+  }
+
+  $('search').addEventListener('input', render);
+  $('reload').addEventListener('click', () => load(true));
+  load(false);
+})();
+</script>
+</body>
+</html>

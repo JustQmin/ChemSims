@@ -203,7 +203,7 @@ const CONFIG = {
     files = [...new Set(files.filter(isHtml))];
     pages = await Promise.all(files.map(describe));
     pages.sort((a, b) => a.cat.localeCompare(b.cat, 'de') || a.title.localeCompare(b.title, 'de'));
-    $('source').textContent = source;
+    if ($('source')) $('source').textContent = source;   // Fußzeile ist optional
     if (!pages.length){ $('state').innerHTML = '<p>Im Repository liegen noch keine Simulationen.</p>'; return; }
     render();
   }

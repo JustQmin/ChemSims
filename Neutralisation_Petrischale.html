@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{margin:0}[hidden]{display:none!important}</style>
+<title>Neutralisation in der Petrischale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#edf1f2; --surface:#fbfcfc; --ink:#1b2428; --muted:#55646b; --line:#d3dbde; --line-strong:#aab8bd;
+  --accent:#1d5566; --accent-ink:#ffffff; --accent-soft:#dde9ec;
+  --bench:#e2e7e8; --bench-shadow:rgba(20,40,48,.22); --water:#e6eef0; --glass:rgba(110,140,150,.55); --glass-hi:rgba(255,255,255,.9);
+  --b-mess:#0072B2; --b-verlauf:#E69F00; --b-teil:#CC79A7; --b-ausw:#009E73;
+  --atom-o:#d9443a; --atom-h:#ffffff; --atom-h-stroke:#8d9aa0; --ion-na:#CC79A7; --ion-cit:#F0E442;
+  --sp-h3o:#D55E00; --sp-oh:#0072B2; --sp-h2o:#66757b; --sp-co2:#4f5a5f; --sp-na:#A8457F; --sp-cit:#7A6B00; --sp-text:#ffffff;
+  --font:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"Atkinson Hyperlegible Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1619; --surface:#162024; --ink:#e2eaec; --muted:#9aabb1; --line:#29373c; --line-strong:#40535a;
+    --accent:#86c0d2; --accent-ink:#0c1a1f; --accent-soft:#1d3238;
+    --bench:#141d20; --bench-shadow:rgba(0,0,0,.55); --water:#26363c; --glass:rgba(170,200,208,.38); --glass-hi:rgba(255,255,255,.55);
+    --b-mess:#56B4E9; --b-verlauf:#f0b43c; --b-teil:#e39cc3; --b-ausw:#3fc49b;
+    --atom-o:#e0584d; --atom-h:#eef2f3; --atom-h-stroke:#6b7a80;
+    --sp-h3o:#ff8a4c; --sp-oh:#56B4E9; --sp-h2o:#a3b1b7; --sp-co2:#c3ccd0; --sp-na:#e39cc3; --sp-cit:#d8c44a; --sp-text:#0f1619;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1619; --surface:#162024; --ink:#e2eaec; --muted:#9aabb1; --line:#29373c; --line-strong:#40535a;
+  --accent:#86c0d2; --accent-ink:#0c1a1f; --accent-soft:#1d3238;
+  --bench:#141d20; --bench-shadow:rgba(0,0,0,.55); --water:#26363c; --glass:rgba(170,200,208,.38); --glass-hi:rgba(255,255,255,.55);
+  --b-mess:#56B4E9; --b-verlauf:#f0b43c; --b-teil:#e39cc3; --b-ausw:#3fc49b;
+  --atom-o:#e0584d; --atom-h:#eef2f3; --atom-h-stroke:#6b7a80;
+    --sp-h3o:#ff8a4c; --sp-oh:#56B4E9; --sp-h2o:#a3b1b7; --sp-co2:#c3ccd0; --sp-na:#e39cc3; --sp-cit:#d8c44a; --sp-text:#0f1619;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45}
+.app{max-width:1500px;margin:0 auto;padding-inline:20px;padding-block:14px 24px;display:flex;flex-direction:column;gap:12px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(1.35rem,2.3vw,1.9rem);line-height:1.15;text-wrap:balance;font-weight:700}
+.sub{margin:2px 0 0;color:var(--muted)}
+.top-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.app{zoom:var(--z,1)}
+#zoomVal{min-width:4.2em;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.clock{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:1.15rem}
+.clock-label{font-family:var(--font);font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-right:4px}
+.toolbar,.below{display:flex;flex-wrap:wrap;gap:10px}
+.below{justify-content:center}
+.group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.group-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;margin-right:4px}
+button{font:inherit;font-size:.95rem;padding:7px 12px;border-radius:6px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer;line-height:1.2}
+button:hover{background:var(--accent-soft)}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+button.primary:hover{filter:brightness(1.08)}
+button:disabled{opacity:.42;cursor:default;background:var(--surface)}
+.seg{display:inline-flex}
+.seg button{border-radius:0;margin-left:-1px}
+.seg button:first-child{border-radius:6px 0 0 6px;margin-left:0}
+.seg button:last-child{border-radius:0 6px 6px 0}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);font-weight:700;position:relative;z-index:1}
+.chk{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:.95rem;padding-inline:4px}
+.chk input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,390px);gap:16px;align-items:start}
+.dish-panel{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+#dish{display:block;width:min(100%,max(300px,calc(100vh / var(--z, 1) - 262px)));max-width:100%;aspect-ratio:1;max-width:100%;touch-action:none;cursor:crosshair;border-radius:10px}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--bc,var(--accent));border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.box h2{margin:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+.box p{margin:0}
+.ph-readout{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ph-value{font-family:var(--mono);font-size:2.5rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.ph-class{font-weight:700;font-size:1.1rem}
+.swatch{width:30px;height:30px;border-radius:50%;border:1px solid var(--line-strong);flex:none}
+.scale-wrap{position:relative;padding-top:10px}
+.scale{position:relative;height:16px;border-radius:4px}
+.marker{position:absolute;top:-10px;bottom:-4px;width:0;transform:translateX(-50%)}
+.marker::before{content:"";position:absolute;left:-6px;top:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--ink)}
+.marker::after{content:"";position:absolute;left:-1px;top:6px;bottom:0;width:2px;background:var(--ink)}
+.ticks{position:relative;height:18px;font-family:var(--mono);font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ticks span{position:absolute;top:2px;transform:translateX(-50%)}
+.hint{font-size:.85rem;color:var(--muted)}
+canvas.chart{display:block;width:100%;height:200px}
+.level-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.seg.level button{font-size:1.05rem;padding:9px 16px}
+.seg.level button:disabled{opacity:.4}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend canvas{width:32px;height:26px}
+.legend [hidden]{display:none!important}
+.teil-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.9rem}
+#counter{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+details.box summary{cursor:pointer;font-weight:700;font-size:1rem}
+details.box[open] summary{margin-bottom:4px}
+.ausw h3{margin:10px 0 4px;font-size:.95rem}
+.ausw ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.eq-label{font-size:.85rem;color:var(--muted);margin-top:8px!important}
+.eq{font-size:1.02rem;padding:5px 9px;background:var(--bg);border-radius:4px;overflow-x:auto;white-space:nowrap}
+.small{font-size:.85rem;color:var(--muted)}
+.foot{margin:0;color:var(--muted);font-size:.85rem;text-align:center}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <header class="top">
+    <div>
+      <h1>Neutralisation in der Petrischale</h1>
+      <p class="sub">Wasser mit Universalindikator · Zitronensäure links · Soda rechts</p>
+    </div>
+    <div class="top-right">
+      <span class="clock"><span class="clock-label">Modellzeit</span><span id="clock">00:00</span></span>
+      <div class="seg" role="group" aria-label="Größe der Oberfläche">
+        <button id="zoomOut" type="button" aria-label="Oberfläche verkleinern">−</button>
+        <button id="zoomVal" type="button" title="Auf 100 % zurücksetzen">100 %</button>
+        <button id="zoomIn" type="button" aria-label="Oberfläche vergrößern">+</button>
+      </div>
+      <button id="btnFull" type="button">Vollbild</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="group">
+      <span class="group-label">Versuch</span>
+      <button id="btnInd" type="button">Indikator zutropfen</button>
+      <button id="btnSolids" type="button">Zitronensäure + Soda zugeben</button>
+    </div>
+    <div class="group">
+      <span class="group-label">Zeitraffer</span>
+      <button id="btnPlay" type="button">Pause</button>
+      <div class="seg" id="speedSeg" role="group" aria-label="Zeitraffer">
+        <button type="button" data-speed="1" aria-pressed="true">1×</button>
+        <button type="button" data-speed="2" aria-pressed="false">2×</button>
+        <button type="button" data-speed="5" aria-pressed="false">5×</button>
+        <button type="button" data-speed="10" aria-pressed="false">10×</button>
+        <button type="button" data-speed="20" aria-pressed="false">20×</button>
+      </div>
+    </div>
+    <div class="group">
+      <span class="group-label">Neu starten</span>
+      <button id="btnResetInd" type="button">Wasser + Indikator</button>
+      <button id="btnResetWater" type="button">Nur Wasser</button>
+    </div>
+  </div>
+
+  <main class="stage">
+    <section class="dish-panel">
+      <div class="level-bar">
+        <div class="seg level" id="levelSeg" role="group" aria-label="Betrachtungsebene">
+          <button type="button" data-level="stoff" aria-pressed="true">Stoffebene</button>
+          <button type="button" data-level="teilchen" aria-pressed="false">Teilchenebene</button>
+        </div>
+        <div class="seg level" id="repSeg" role="group" aria-label="Darstellung der Teilchen">
+          <button type="button" data-rep="kugel" aria-pressed="false">Kugelmodell</button>
+          <button type="button" data-rep="formel" aria-pressed="true">Formelschreibweise</button>
+        </div>
+      </div>
+      <canvas id="dish" aria-label="Petrischale von oben"></canvas>
+      <div class="below">
+        <div class="group">
+          <span class="group-label">Klick in die Schale</span>
+          <div class="seg" id="toolSeg" role="group" aria-label="Werkzeug">
+            <button type="button" data-tool="mess" aria-pressed="true">pH messen</button>
+            <button type="button" data-tool="cit" aria-pressed="false">Zitronensäure</button>
+            <button type="button" data-tool="soda" aria-pressed="false">Soda</button>
+            <button type="button" data-tool="ind" aria-pressed="false">Indikatortropfen</button>
+          </div>
+        </div>
+        <div class="group">
+          <span class="group-label">Anzeige</span>
+          <label class="chk"><input type="checkbox" id="optLine" checked> Messlinie</label>
+          <label class="chk"><input type="checkbox" id="optBubbles" checked> CO₂-Bläschen</label>
+          <label class="chk"><input type="checkbox" id="optFlow" checked> Strömung</label>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="box" style="--bc:var(--b-mess)">
+        <h2>pH-Messsonde</h2>
+        <div class="ph-readout">
+          <span class="swatch" id="swatch"></span>
+          <span class="ph-value" id="phValue">7,0</span>
+          <span class="ph-class" id="phClass">neutral</span>
+        </div>
+        <div class="scale-wrap">
+          <div class="scale" id="scale"><div class="marker" id="marker"></div></div>
+          <div class="ticks" id="ticks"></div>
+        </div>
+        <p class="hint">Werkzeug „pH messen“ wählen, dann in die Schale klicken oder die Sonde ziehen.</p>
+      </section>
+
+      <section class="box" style="--bc:var(--b-verlauf)">
+        <h2>pH-Verlauf entlang der Messlinie</h2>
+        <canvas id="chart" class="chart" aria-label="pH-Wert entlang der Messlinie"></canvas>
+      </section>
+
+      <section class="box" style="--bc:var(--b-teil)">
+        <h2>Teilchenebene</h2>
+        <div class="legend" id="legend">
+          <span><canvas data-mol="h3o"></canvas>Oxonium-Ion</span>
+          <span><canvas data-mol="oh"></canvas>Hydroxid-Ion</span>
+          <span><canvas data-mol="h2o"></canvas>Wassermolekül (neu gebildet)</span>
+          <span><canvas data-mol="co2"></canvas>Kohlenstoffdioxid</span>
+          <span class="sp"><canvas data-mol="na"></canvas>Natrium-Ion</span>
+          <span class="sp"><canvas data-mol="cit"></canvas>Citrat-Ion</span>
+        </div>
+        <div class="teil-foot">
+          <label class="chk"><input type="checkbox" id="optSpect"> Begleit-Ionen zeigen</label>
+        </div>
+        <p class="small">Je saurer eine Stelle ist, desto mehr Oxonium-Ionen zeigt die Schale, je alkalischer, desto mehr Hydroxid-Ionen. Treffen ein Oxonium- und ein Hydroxid-Ion aufeinander, richten sie sich aus: Ein H-Atom des Oxonium-Ions zeigt auf das O-Atom des Hydroxid-Ions, dann geht ein Proton (H⁺) über. Die Anzahl der Teilchen ist nicht maßstabsgetreu, die Wassermoleküle des Lösungsmittels sind weggelassen.</p>
+      </section>
+
+    </aside>
+  </main>
+  <p class="foot">Tastatur: Leertaste = Pause/Weiter · T = Stoff-/Teilchenebene · F = Kugelmodell/Formelschreibweise · R = Neustart · +/− = Größe</p>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const TAU = Math.PI * 2, LN10 = Math.LN10;
+const MONO = '"Atkinson Hyperlegible Mono", ui-monospace, Menlo, Consolas, monospace';
+const FONT = '"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif';
+
+/* ---------- Gitter ---------- */
+const N = 128, NN = N * N, C0 = N / 2, RC = C0 - 1.5;
+const MM = 45 / RC;                         // mm pro Zelle (Innendurchmesser 90 mm)
+const VCELL = MM * MM * 6 * 1e-6;           // Liter pro Zelle (Wassertiefe 6 mm)
+const DT = 0.1;                             // s Modellzeit pro Schritt
+const D_CELLS = 0.8 / (MM * MM);               // Zellen²/s
+const KD = D_CELLS * DT;            // effektive Diffusion 0,8 mm²/s
+const inside = new Uint8Array(NN), nearest = new Int32Array(NN);
+const tmpList = [], edgeList = [];
+for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+  const dx = x + .5 - C0, dy = y + .5 - C0, r2 = dx * dx + dy * dy, i = y * N + x;
+  if (r2 <= RC * RC) { inside[i] = 1; tmpList.push(i); }
+}
+const LIST = Int32Array.from(tmpList), NIN = LIST.length;
+for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+  const i = y * N + x;
+  if (inside[i]) { nearest[i] = i; continue; }
+  const dx = x + .5 - C0, dy = y + .5 - C0, r = Math.hypot(dx, dy) || 1;
+  let rr = RC - .3, j = -1;
+  while (rr > 0) {
+    const px = Math.floor(C0 + dx / r * rr), py = Math.floor(C0 + dy / r * rr), k = py * N + px;
+    if (inside[k]) { j = k; break; }
+    rr -= .5;
+  }
+  nearest[i] = j < 0 ? LIST[0] : j;
+  if (r < RC + 3) edgeList.push(i);
+}
+const EDGE = Int32Array.from(edgeList);
+const NBL = new Int32Array(NIN), NBR = new Int32Array(NIN), NBU = new Int32Array(NIN), NBD = new Int32Array(NIN);
+for (let k = 0; k < NIN; k++) {
+  const i = LIST[k];
+  NBL[k] = inside[i - 1] ? i - 1 : i; NBR[k] = inside[i + 1] ? i + 1 : i;
+  NBU[k] = inside[i - N] ? i - N : i; NBD[k] = inside[i + N] ? i + N : i;
+}
+
+/* ---------- Chemie ---------- */
+const Kw = 1e-14, Ka1 = 7.4e-4, Ka2 = 1.73e-5, Ka3 = 4.0e-7, Kk1 = 4.45e-7, Kk2 = 4.69e-11;
+const WATER_CAR = 1.0e-3, WATER_NA = 0.86e-3;   // Leitungswasser: etwas Hydrogencarbonat
+const CO2_SAT = 0.0015, BUB = 2.5e-7, BK = 4, BKN = N / BK;
+
+let F = { cit: new Float64Array(NN), car: new Float64Array(NN), na: new Float64Array(NN), ind: new Float64Array(NN) };
+let TMP = new Float64Array(NN);
+const PH = new Float64Array(NN).fill(7);
+const CO2A = new Float64Array(BKN * BKN);
+const FU = new Float64Array(NN), FV = new Float64Array(NN), VX = new Float64Array(NN), VY = new Float64Array(NN), PSI = new Float64Array(NN);
+let solids = [], bubbles = [], dirty = true, acidFrac = 0, baseFrac = 0;
+
+function bal(p, cit, car, na) {
+  const h = Math.exp(-p * LN10), h2 = h * h;
+  const dC = h2 * h + Ka1 * h2 + Ka1 * Ka2 * h + Ka1 * Ka2 * Ka3;
+  const citQ = cit * (Ka1 * h2 + 2 * Ka1 * Ka2 * h + 3 * Ka1 * Ka2 * Ka3) / dC;
+  const dK = h2 + Kk1 * h + Kk1 * Kk2;
+  const carQ = car * (Kk1 * h + 2 * Kk1 * Kk2) / dK;
+  return na + h - Kw / h - citQ - carQ;
+}
+function computePH() {
+  const cit = F.cit, car = F.car, na = F.na;
+  let acid = 0, base = 0;
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k], c1 = cit[i], c2 = car[i], n = na[i], p0 = PH[i];
+    let lo = p0 - .5, hi = p0 + .5;
+    if (bal(lo, c1, c2, n) < 0) lo = -1;
+    if (bal(hi, c1, c2, n) > 0) hi = 15;
+    while (hi - lo > .003) { const m = (lo + hi) * .5; if (bal(m, c1, c2, n) > 0) lo = m; else hi = m; }
+    const p = (lo + hi) * .5; PH[i] = p;
+    if (p < 5) acid++; else if (p > 9) base++;
+  }
+  acidFrac = acid / NIN; baseFrac = base / NIN;
+}
+
+/* ---------- Transport ---------- */
+function diffuse(name) {
+  const f = F[name], o = TMP;
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k], v = f[i];
+    o[i] = v + KD * (f[NBL[k]] + f[NBR[k]] + f[NBU[k]] + f[NBD[k]] - 4 * v);
+  }
+  F[name] = o; TMP = f;
+}
+function sample(f, sx, sy) {
+  const dx = sx - C0, dy = sy - C0, r2 = dx * dx + dy * dy, lim = RC - .6;
+  if (r2 > lim * lim) { const s = lim / Math.sqrt(r2); sx = C0 + dx * s; sy = C0 + dy * s; }
+  const fx = sx - .5, fy = sy - .5;
+  let ix = Math.floor(fx), iy = Math.floor(fy);
+  const tx = fx - ix, ty = fy - iy;
+  if (ix < 0) ix = 0; if (iy < 0) iy = 0;
+  const ix1 = Math.min(ix + 1, N - 1), iy1 = Math.min(iy + 1, N - 1);
+  const a = f[nearest[iy * N + ix]], b = f[nearest[iy * N + ix1]], c = f[nearest[iy1 * N + ix]], d = f[nearest[iy1 * N + ix1]];
+  return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+}
+function advect(name, dt) {
+  const f = F[name], o = TMP;
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k], x = (i % N) + .5, y = ((i / N) | 0) + .5;
+    o[i] = sample(f, x - VX[i] * dt, y - VY[i] * dt);
+  }
+  F[name] = o; TMP = f;
+}
+let vort = [];
+function seedFlow() {
+  vort = [];
+  for (let n = 0; n < 7; n++) {
+    const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * RC * .75;
+    vort.push({ x: C0 + Math.cos(a) * r, y: C0 + Math.sin(a) * r, s: 10 + Math.random() * 14,
+      w: .03 + Math.random() * .06, ph: Math.random() * TAU, amp: (Math.random() < .5 ? -1 : 1) * (.6 + Math.random() * .8) });
+  }
+}
+function updateFlow(t) {
+  PSI.fill(0);
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k], x = (i % N) + .5, y = ((i / N) | 0) + .5;
+    const dx = x - C0, dy = y - C0, w = 1 - (dx * dx + dy * dy) / (RC * RC), W = w * w;
+    let s = 0;
+    for (const v of vort) { const ex = x - v.x, ey = y - v.y; s += v.amp * v.s * Math.sin(v.w * t + v.ph) * Math.exp(-(ex * ex + ey * ey) / (v.s * v.s)); }
+    PSI[i] = W * s;
+  }
+  let mx = 1e-9;
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k];
+    FU[i] = (PSI[i + N] - PSI[i - N]) * .5; FV[i] = -(PSI[i + 1] - PSI[i - 1]) * .5;
+    const sp = Math.hypot(FU[i], FV[i]); if (sp > mx) mx = sp;
+  }
+  const sc = .35 / mx;   // max. 0,35 Zellen/s
+  for (let k = 0; k < NIN; k++) { const i = LIST[k]; FU[i] *= sc; FV[i] *= sc; }
+}
+
+/* ---------- Feststoffe, Tropfen ---------- */
+function addSolid(type, gx, gy) {
+  const dx0 = gx - C0, dy0 = gy - C0, r0 = Math.hypot(dx0, dy0), lim = RC - 6;
+  if (r0 > lim) { gx = C0 + dx0 / r0 * lim; gy = C0 + dy0 / r0 * lim; }
+  const rad = 4.5, cells = [];
+  for (let y = Math.floor(gy - rad); y <= gy + rad; y++) for (let x = Math.floor(gx - rad); x <= gx + rad; x++) {
+    if (x < 0 || y < 0 || x >= N || y >= N) continue;
+    const i = y * N + x;
+    if (inside[i] && Math.hypot(x + .5 - gx, y + .5 - gy) <= rad) cells.push(i);
+  }
+  if (!cells.length) return;
+  const cit = type === 'cit', grains = [], n = cit ? 26 : 44;
+  for (let j = 0; j < n; j++) {
+    const a = Math.random() * TAU, rr = Math.sqrt(Math.random()) * rad * .85;
+    grains.push({ x: gx + Math.cos(a) * rr, y: gy + Math.sin(a) * rr, s: cit ? .55 + Math.random() * .6 : .3 + Math.random() * .3,
+      rot: Math.random() * Math.PI, thr: Math.random() * .97 });
+  }
+  const m0 = cit ? 1.56e-3 : 2.83e-3;   // je 0,3 g
+  solids.push({ type, gx, gy, center: nearest[Math.floor(gy) * N + Math.floor(gx)], cells: Int32Array.from(cells),
+    m0, m: m0, tau: cit ? 6 : 10, csat: cit ? 3 : 2, grains, label: cit ? 'Zitronensäure' : 'Soda' });
+  dirty = true;
+}
+function dissolve(dt) {
+  for (const s of solids) {
+    if (s.m <= 0) continue;
+    const f = s.type === 'cit' ? F.cit : F.car;
+    const sat = Math.max(0, 1 - f[s.center] / s.csat);
+    let dm = s.m * (1 - Math.exp(-dt / s.tau)) * sat;
+    if (s.m < 2e-7) dm = s.m;
+    if (dm <= 0) continue;
+    const dc = dm / (s.cells.length * VCELL);
+    if (s.type === 'cit') { const c = F.cit; for (const i of s.cells) c[i] += dc; }
+    else { const c = F.car, na = F.na; for (const i of s.cells) { c[i] += dc; na[i] += 2 * dc; } }
+    s.m -= dm;
+  }
+}
+function addDrop(gx, gy) {
+  const sig = 2.2, amp = (NIN / 5) / (TAU * sig * sig), R = Math.ceil(sig * 4);
+  const f = F.ind;
+  for (let y = Math.floor(gy) - R; y <= gy + R; y++) for (let x = Math.floor(gx) - R; x <= gx + R; x++) {
+    if (x < 0 || y < 0 || x >= N || y >= N) continue;
+    const i = y * N + x; if (!inside[i]) continue;
+    const dx = x + .5 - gx, dy = y + .5 - gy;
+    f[i] += amp * Math.exp(-(dx * dx + dy * dy) / (2 * sig * sig));
+  }
+  indPresent = true; dirty = true;
+}
+function co2Escape(dt) {
+  const car = F.car, fac = Math.min(1, .5 * dt);
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k], c = car[i];
+    if (c < CO2_SAT || PH[i] > 7) continue;   // Gas nur dort, wo Säure auf Carbonat trifft
+    const h = Math.exp(-PH[i] * LN10), a0 = h * h / (h * h + Kk1 * h + Kk1 * Kk2), ex = c * a0 - CO2_SAT;
+    if (ex > 0) { const d = ex * fac; car[i] = c - d; CO2A[(((i / N) | 0) >> 2) * BKN + ((i % N) >> 2)] += d * VCELL; }
+  }
+}
+function relax() {
+  for (const name of ['cit', 'car', 'na', 'ind']) {
+    const f = F[name]; let s = 0;
+    for (let k = 0; k < NIN; k++) s += f[LIST[k]];
+    const m = s / NIN;
+    for (let k = 0; k < NIN; k++) { const i = LIST[k]; f[i] += (m - f[i]) * .012; }
+  }
+}
+function step(dt, swirl) {
+  dissolve(dt);
+  const flow = optFlow.checked;
+  if (flow || swirl) {
+    for (let k = 0; k < NIN; k++) {
+      const i = LIST[k];
+      let vx = flow ? FU[i] : 0, vy = flow ? FV[i] : 0;
+      if (swirl) {
+        const dx = (i % N) + .5 - C0, dy = ((i / N) | 0) + .5 - C0, r = Math.hypot(dx, dy), om = 1.8 * (1.25 - r / RC);
+        vx += -om * dy; vy += om * dx;
+      }
+      VX[i] = vx; VY[i] = vy;
+    }
+    advect('cit', dt); advect('car', dt); advect('na', dt); advect('ind', dt);
+  }
+  diffuse('cit'); diffuse('car'); diffuse('na'); diffuse('ind');
+  if (swirl) relax();
+  co2Escape(dt);
+  dirty = true;
+}
+
+/* ---------- Blasen ---------- */
+function spawnBubbles() {
+  const show = optBubbles.checked;
+  let nCO2 = 0; for (const p of P) if (p.sp === 'co2') nCO2++;
+  for (let k = 0; k < CO2A.length; k++) {
+    if (CO2A[k] < BUB) continue;
+    let n = Math.floor(CO2A[k] / BUB); CO2A[k] -= n * BUB;
+    const bx = (k % BKN) * BK, by = ((k / BKN) | 0) * BK;
+    if (level === 'teilchen') {   // Teilchenebene: CO2-Moleküle statt Bläschen
+      for (let m = Math.min(n, 4); m > 0; m--) {
+        if (nCO2 >= 25 || Math.random() > .25) continue;
+        const x = bx + Math.random() * BK, y = by + Math.random() * BK;
+        if (Math.hypot(x - C0, y - C0) > RC - 1) continue;
+        spawn('co2', x, y, 0).life = 8 + Math.random() * 4; nCO2++;
+      }
+      continue;
+    }
+    if (!show) continue;
+    n = Math.min(n, 4);
+    while (n-- > 0 && bubbles.length < 420) {
+      const x = bx + Math.random() * BK, y = by + Math.random() * BK;
+      if (Math.hypot(x - C0, y - C0) > RC - 1) continue;
+      bubbles.push({ x, y, mol: Math.random() < .2, r: .3 + Math.random() * .55, age: 0, life: 2.5 + Math.random() * 3, vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6 });
+    }
+  }
+}
+function updateBubbles(dt) {
+  for (const b of bubbles) { b.age += dt; b.x += b.vx * dt; b.y += b.vy * dt; }
+  bubbles = bubbles.filter(b => b.age < b.life);
+  if (!optBubbles.checked) bubbles.length = 0;
+}
+
+/* ---------- Indikatorfarben ---------- */
+const ANCH = [[180,25,60],[200,30,55],[222,45,45],[236,90,38],[243,138,35],[246,186,45],[228,214,60],
+  [128,190,72],[45,160,112],[34,128,168],[42,84,168],[72,56,150],[98,42,134],[112,36,116],[118,32,104]];
+const LR = new Float32Array(701), LG = new Float32Array(701), LB = new Float32Array(701);
+for (let j = 0; j <= 700; j++) {
+  const p = j / 50, a = Math.min(13, Math.floor(p)), t = p - a, A = ANCH[a], B = ANCH[a + 1];
+  LR[j] = A[0] + (B[0] - A[0]) * t; LG[j] = A[1] + (B[1] - A[1]) * t; LB[j] = A[2] + (B[2] - A[2]) * t;
+}
+const lutIdx = p => p <= 0 ? 0 : p >= 14 ? 700 : (p * 50 + .5) | 0;
+const rgbAt = p => { const j = lutIdx(p); return `rgb(${LR[j] | 0},${LG[j] | 0},${LB[j] | 0})`; };
+{ const stops = []; for (let p = 0; p <= 14; p++) stops.push(`${rgbAt(p)} ${(p / 14 * 100).toFixed(2)}%`);
+  $('scale').style.background = `linear-gradient(90deg, ${stops.join(',')})`;
+  const t = $('ticks'); for (let p = 0; p <= 14; p += 2) { const s = document.createElement('span'); s.textContent = p; s.style.left = (p / 14 * 100) + '%'; t.appendChild(s); } }
+
+/* ---------- Theme ---------- */
+let tok = {};
+function hexRGB(s) { s = s.replace('#', ''); if (s.length === 3) s = s.split('').map(c => c + c).join(''); const n = parseInt(s, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function readTok() {
+  const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+  tok = { bench: g('--bench'), shadow: g('--bench-shadow'), waterStr: g('--water'), water: hexRGB(g('--water') || '#e6eef0'),
+    glass: g('--glass'), glassHi: g('--glass-hi'), ink: g('--ink'), muted: g('--muted'), line: g('--line'), surface: g('--surface'),
+    bg: g('--bg'), accent: g('--accent'), o: g('--atom-o'), h: g('--atom-h'), hs: g('--atom-h-stroke'), na: g('--ion-na'), cit: g('--ion-cit'),
+    sp: { h3o: g('--sp-h3o'), oh: g('--sp-oh'), h2o: g('--sp-h2o'), co2: g('--sp-co2'), na: g('--sp-na'), cit: g('--sp-cit') }, spText: g('--sp-text') };
+  tok.sp.hplus = tok.sp.h3o;
+  drawLegend();
+}
+
+/* ---------- DOM ---------- */
+const dishC = $('dish'), chartC = $('chart');
+const dctx = dishC.getContext('2d'), cctx = chartC.getContext('2d');
+const optLine = $('optLine'), optBubbles = $('optBubbles'), optFlow = $('optFlow'), optSpect = $('optSpect');
+const img = new ImageData(N, N), off = document.createElement('canvas'); off.width = off.height = N;
+const octx = off.getContext('2d');
+let dpr = 1, uiZoom = 1;
+function resize() {
+  // Schale so groß wie möglich, aber ohne dass sie unter den Bildschirmrand ragt
+  const top = dishC.getBoundingClientRect().top + window.scrollY, below = document.querySelector('.below').getBoundingClientRect().height;
+  const avail = (window.innerHeight - top - below - 24) / uiZoom;
+  const want = Math.max(300, Math.floor(avail)) + 'px';
+  if (dishC.style.width !== want) dishC.style.width = want;
+  dpr = Math.min(window.devicePixelRatio || 1, 2) * uiZoom;
+  for (const c of [dishC, chartC]) {
+    const w = Math.round(c.clientWidth * dpr), h = Math.round(c.clientHeight * dpr);
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+  }
+}
+new ResizeObserver(resize).observe(document.body);
+window.addEventListener('resize', resize);
+
+/* ---------- Zustand ---------- */
+let running = true, speed = 1, modelT = 0, acc = 0, swirlLeft = 0, flowT = -99, indPresent = true, solidsAdded = false;
+let tool = 'mess', probe = { x: C0, y: C0 }, dragging = false;
+
+function reset(withInd) {
+  F.cit.fill(0); F.car.fill(0); F.na.fill(0); F.ind.fill(0); CO2A.fill(0); PH.fill(7);
+  for (let k = 0; k < NIN; k++) { const i = LIST[k]; F.car[i] = WATER_CAR; F.na[i] = WATER_NA; F.ind[i] = withInd ? 1 : 0; }
+  solids = []; bubbles = []; P = []; flashes = []; pairs = []; nCount = 0;
+  modelT = 0; acc = 0; swirlLeft = 0; flowT = -99; indPresent = withInd; solidsAdded = false;
+  probe = { x: C0, y: C0 }; running = true;
+  seedFlow(); computePH(); dirty = true; updateUI();
+}
+
+/* ---------- Teilchenebene ---------- */
+let level = 'stoff', rep = 'formel';
+let P = [], flashes = [], nCount = 0, binT = 0;
+const NB = 14, BS = N / NB, MAXB = 1.36, SPECIES = ['h3o', 'oh', 'na', 'cit'];
+const BINS = [], BINIDX = new Int32Array(NB * NB).fill(-1);
+for (let by = 0; by < NB; by++) for (let bx = 0; bx < NB; bx++) {
+  const cells = [];
+  for (let y = Math.floor(by * BS); y < Math.floor((by + 1) * BS); y++) for (let x = Math.floor(bx * BS); x < Math.floor((bx + 1) * BS); x++) {
+    const i = y * N + x; if (inside[i] && Math.hypot(x + .5 - C0, y + .5 - C0) < RC - 1.5) cells.push(i);
+  }
+  if (cells.length > BS * BS * .35) { BINIDX[by * NB + bx] = BINS.length; BINS.push({ bi: by * NB + bx, cells: Int32Array.from(cells), t: { h3o: 0, oh: 0, na: 0, cit: 0 } }); }
+}
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const binOf = (x, y) => Math.min(NB - 1, Math.max(0, Math.floor(y / BS))) * NB + Math.min(NB - 1, Math.max(0, Math.floor(x / BS)));
+function binTargets() {
+  const spect = optSpect.checked;
+  for (const b of BINS) {
+    const c = b.cells, n = c.length, st = Math.max(1, Math.floor(n / 12));
+    let ph = 0, na = 0, cit = 0, m = 0;
+    for (let k = 0; k < n; k += st) { const i = c[k]; ph += PH[i]; na += F.na[i]; cit += F.cit[i]; m++; }
+    ph /= m; na /= m; cit /= m;
+    b.t.h3o = MAXB * clamp01((6.5 - ph) / 4.5);
+    b.t.oh = MAXB * clamp01((ph - 7.5) / 4);
+    b.t.na = spect ? 2 * clamp01(Math.log10(na / 2e-3) / 2.5) : 0;
+    b.t.cit = spect ? 2 * clamp01(Math.log10(cit / 1e-3) / 2.5) : 0;
+  }
+}
+function spawn(sp, x, y, a) {
+  const p = { sp, x, y, vx: 0, vy: 0, ang: Math.random() * TAU, va: (Math.random() < .5 ? -1 : 1) * (1.5 + Math.random() * 2.5), age: 0, life: 27 + Math.random() * 6, a: a || 0, out: false, dead: false };
+  P.push(p); return p;
+}
+function binUpdate() {
+  const cnt = {}; for (const sp of SPECIES) cnt[sp] = new Int16Array(NB * NB);
+  for (const p of P) if (!p.out && cnt[p.sp]) cnt[p.sp][binOf(p.x, p.y)]++;
+  for (const b of BINS) for (const sp of SPECIES) {
+    const t = b.t[sp], c = cnt[sp][b.bi];
+    if (c < t - .6 && Math.random() < .06) {
+      for (let tr = 0; tr < 6; tr++) {
+        const i = b.cells[(Math.random() * b.cells.length) | 0], ph = PH[i];
+        if ((sp === 'h3o' && ph > 6.5) || (sp === 'oh' && ph < 7.5)) continue;
+        spawn(sp, (i % N) + Math.random(), ((i / N) | 0) + Math.random()); break;
+      }
+    }
+  }
+}
+const HASH = 4, HN = Math.ceil(N / HASH);
+/* Reaktionspaar: ausrichten und annähern (T1), Wasserstoffbrücke (T2), Protonenübergang (T3), Umordnung zu H2O (T4).
+   Läuft in Echtzeit, damit der Ablauf auch im Zeitraffer erkennbar bleibt. */
+let pairs = [];
+const MAXPAIRS = 12, T1 = .15, T2 = 0, T3 = .15, T4 = .1, TP = T1 + T2 + T3 + T4;
+const smooth = t => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+const angTo = (a0, a1, k) => a0 + ((((a1 - a0 + Math.PI) % TAU) + TAU) % TAU - Math.PI) * k;
+function startPair(a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const pr = { a, b, t: 0, cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, u: Math.atan2(dy, dx), d0: Math.hypot(dx, dy), a0: a.ang, b0: b.ang, k: 0, r: 0 };
+  a.pair = b.pair = pr; a.a = b.a = 1; pairs.push(pr);
+}
+function updatePairs(dt) {
+  for (const pr of pairs) {
+    pr.t += dt;
+    const DC = rep === 'formel' ? 7.5 : 5.2, k1 = smooth(pr.t / T1), d = pr.d0 + (DC - pr.d0) * k1;
+    const ux = Math.cos(pr.u), uy = Math.sin(pr.u);
+    pr.d = d;
+    pr.a.x = pr.cx - ux * d / 2; pr.a.y = pr.cy - uy * d / 2;
+    pr.b.x = pr.cx + ux * d / 2; pr.b.y = pr.cy + uy * d / 2;
+    pr.a.ang = angTo(pr.a0, pr.u, k1);   // ein H-Atom des Oxonium-Ions zeigt zum Hydroxid-Ion
+    pr.b.ang = angTo(pr.b0, pr.u, k1);   // das H-Atom des Hydroxid-Ions zeigt weg, das O-Atom zum Oxonium-Ion
+    pr.k = smooth((pr.t - T1 - T2) / T3);
+    pr.r = smooth((pr.t - T1 - T2 - T3) / T4);
+    if (pr.t >= TP) finishPair(pr);
+  }
+  pairs = pairs.filter(pr => !pr.done);
+}
+function finishPair(pr) {
+  const { a, b, u } = pr, ux = Math.cos(u), uy = Math.sin(u);
+  a.sp = b.sp = 'h2o'; a.pair = b.pair = null; a.age = b.age = 0;
+  a.ang = u + Math.PI; b.ang = u + Math.PI - .91;
+  a.vx = -ux * 2.5; a.vy = -uy * 2.5; b.vx = ux * 2.5; b.vy = uy * 2.5;
+  flashes.push({ x: pr.cx, y: pr.cy, age: 0 }); nCount++; pr.done = true;
+}
+function pUpdate(dtr, active) {
+  for (const f of flashes) f.age += dtr;
+  flashes = flashes.filter(f => f.age < .4);
+  if (!active || level !== 'teilchen') return;
+  updatePairs(dtr);
+  const pdt = dtr * speed, ns = Math.max(1, Math.ceil(pdt / .05));   // Zeitraffer gilt auch für die Teilchen
+  for (let n = 0; n < ns; n++) pStep(pdt / ns);
+}
+function pStep(dt) {
+  binT += dt; if (binT > .12) { binT = 0; binTargets(); binUpdate(); }
+  const th = 3, sig = Math.sqrt(2 * th * th * D_CELLS * dt) * 3.46, lim = RC - 1.2, swirl = swirlLeft > 0, flow = optFlow.checked && running && !swirl;
+  for (const p of P) {
+    if (p.pair) continue;
+    p.age += dt;
+    p.vx += -th * p.vx * dt + (Math.random() - .5) * sig;
+    p.vy += -th * p.vy * dt + (Math.random() - .5) * sig;
+    p.x += p.vx * dt; p.y += p.vy * dt; p.ang += p.va * dt / speed;
+    const i = nearest[Math.max(0, Math.min(N - 1, Math.floor(p.y))) * N + Math.max(0, Math.min(N - 1, Math.floor(p.x)))];
+    if (flow) { p.x += FU[i] * dt; p.y += FV[i] * dt; }
+    if (p.sp === 'h3o' || p.sp === 'oh') {   // Diffusion entlang des Konzentrationsgefälles
+      const gx = (PH[nearest[i + 1]] - PH[nearest[i - 1]]) * .5, gy = (PH[nearest[i + N]] - PH[nearest[i - N]]) * .5, gm = Math.hypot(gx, gy);
+      const own = p.sp === 'h3o' ? PH[i] < 6.8 : PH[i] > 7.2;
+      if (own && gm > .02) { const f = Math.min(1, gm / .25) * .3 / gm * (p.sp === 'h3o' ? 1 : -1) * dt; p.x += gx * f; p.y += gy * f; }
+    }
+    if (swirl) {
+      const dx = p.x - C0, dy = p.y - C0, om = 1.8 * (1.25 - Math.hypot(dx, dy) / RC) * 3 * DT;
+      p.x += -om * dy; p.y += om * dx;
+    }
+    const dx = p.x - C0, dy = p.y - C0, r = Math.hypot(dx, dy);
+    if (r > lim) { p.x = C0 + dx / r * lim; p.y = C0 + dy / r * lim; p.vx *= -1; p.vy *= -1; }
+    if (p.age > p.life) p.out = true;
+    p.a = p.out ? p.a - dt * .8 : Math.min(1, p.a + dt * 1.5);
+  }
+  // Neutralisation: Oxonium- und Hydroxid-Ion kommen sich nahe und bilden ein Reaktionspaar
+  if (pairs.length < MAXPAIRS) {
+    const grid = new Map();
+    for (const q of P) if (q.sp === 'oh' && !q.pair && !q.out) { const k = ((q.y / HASH) | 0) * HN + ((q.x / HASH) | 0); let l = grid.get(k); if (!l) grid.set(k, l = []); l.push(q); }
+    const CAPTURE = rep === 'formel' ? 7.5 : 5.5, R2 = CAPTURE * CAPTURE, RH = Math.ceil(CAPTURE / HASH);
+    for (const p of P) {
+      if (p.sp !== 'h3o' || p.pair || p.out || pairs.length >= MAXPAIRS) continue;
+      const hx = (p.x / HASH) | 0, hy = (p.y / HASH) | 0;
+      let hit = null, best = R2;
+      for (let oy = -RH; oy <= RH; oy++) for (let ox = -RH; ox <= RH; ox++) {
+        const l = grid.get((hy + oy) * HN + hx + ox); if (!l) continue;
+        for (const q of l) { if (q.pair) continue; const ex = q.x - p.x, ey = q.y - p.y, d2 = ex * ex + ey * ey; if (d2 < best) { best = d2; hit = q; } }
+      }
+      if (hit) startPair(p, hit);
+    }
+  }
+  {
+    const grid = new Map();
+    for (const q of P) if (q.sp === 'oh' && !q.pair && !q.dead) { const k = ((q.y / HASH) | 0) * HN + ((q.x / HASH) | 0); let l = grid.get(k); if (!l) grid.set(k, l = []); l.push(q); }
+    for (const p of P) {
+      if (p.sp !== 'h3o' || p.pair || p.dead) continue;
+      const hx = (p.x / HASH) | 0, hy = (p.y / HASH) | 0;
+      let hit = null;
+      for (let oy = -1; oy <= 1 && !hit; oy++) for (let ox = -1; ox <= 1 && !hit; ox++) {
+        const l = grid.get((hy + oy) * HN + hx + ox); if (!l) continue;
+        for (const q of l) { if (q.dead) continue; const ex = q.x - p.x, ey = q.y - p.y; if (ex * ex + ey * ey < 6.8) { hit = q; break; } }
+      }
+      if (hit) {
+        p.dead = hit.dead = true;
+        const mx = (p.x + hit.x) / 2, my = (p.y + hit.y) / 2;
+        spawn('h2o', mx - .9, my, 1).vx = -2.5; spawn('h2o', mx + .9, my, 1).vx = 2.5;
+        flashes.push({ x: mx, y: my, age: 0 }); nCount++;
+      }
+    }
+  }
+  P = P.filter(p => !p.dead && !(p.out && p.a <= 0));
+  let w = 0; for (const p of P) if (p.sp === 'h2o') w++;
+  if (w > 50) { let k = w - 50; P = P.filter(p => !(p.sp === 'h2o' && k-- > 0)); }
+}
+
+/* ---------- Teilchen zeichnen ---------- */
+const FORM = { hplus: 'H^+', h3o: 'H3O^+', oh: 'OH^−', h2o: 'H2O', co2: 'CO2', na: 'Na^+', cit: 'C6H5O7^3−' };
+const FPARTS = {};
+for (const k in FORM) { const out = []; let sup = false; for (const ch of FORM[k]) { if (ch === '^') { sup = true; continue; } out.push([ch, sup ? 'sup' : /[0-9]/.test(ch) ? 'sub' : 'n']); } FPARTS[k] = out; }
+const FW = new Map();
+function formulaWidth(c, type, fs) {
+  const key = type + '|' + fs.toFixed(1); let w = FW.get(key);
+  if (w == null) { w = 0; for (const [ch, k] of FPARTS[type]) { c.font = `700 ${k === 'n' ? fs : fs * .68}px ${FONT}`; w += c.measureText(ch).width; } FW.set(key, w); }
+  return w;
+}
+function drawFormula(c, type, x, y, a, s) {
+  const fs = 10 * s, w = formulaWidth(c, type, fs), padX = 4 * s, h = fs * 1.55;
+  c.globalAlpha = a;
+  const x0 = x - w / 2 - padX;
+  c.beginPath(); if (c.roundRect) c.roundRect(x0, y - h / 2, w + 2 * padX, h, h / 2); else c.rect(x0, y - h / 2, w + 2 * padX, h);
+  c.fillStyle = tok.sp[type]; c.fill(); c.lineWidth = 1.2 * s; c.strokeStyle = tok.surface; c.stroke();
+  c.fillStyle = tok.spText; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  let px = x - w / 2; const base = y + fs * .34;
+  for (const [ch, k] of FPARTS[type]) {
+    c.font = `700 ${k === 'n' ? fs : fs * .68}px ${FONT}`;
+    c.fillText(ch, px, base + (k === 'sub' ? fs * .26 : k === 'sup' ? -fs * .42 : 0));
+    px += c.measureText(ch).width;
+  }
+  c.globalAlpha = 1;
+}
+function drawMol(c, type, x, y, ang, a, s) {
+  if (rep === 'formel') return drawFormula(c, type, x, y, a, s);
+  c.globalAlpha = a;
+  if (type === 'na' || type === 'cit') {
+    const r = (type === 'na' ? 7 : 10) * s;
+    c.beginPath(); c.arc(x, y, r, 0, TAU); c.fillStyle = type === 'na' ? tok.na : tok.cit; c.fill();
+    c.lineWidth = Math.max(1, s); c.strokeStyle = 'rgba(0,0,0,.35)'; c.stroke();
+    c.fillStyle = '#1b2428'; c.font = `700 ${7.5 * s}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(type === 'na' ? 'Na⁺' : 'Cit³⁻', x, y + .5 * s);
+    c.globalAlpha = 1; return;
+  }
+  c.lineWidth = Math.max(.8, s * .9);
+  if (type === 'co2') {
+    const ro = 6 * s, dx = Math.cos(ang) * 9.5 * s, dy = Math.sin(ang) * 9.5 * s;
+    for (const sg of [-1, 1]) { c.beginPath(); c.arc(x + sg * dx, y + sg * dy, ro, 0, TAU); c.fillStyle = tok.o; c.fill(); c.strokeStyle = 'rgba(0,0,0,.3)'; c.stroke(); }
+    c.beginPath(); c.arc(x, y, 6.2 * s, 0, TAU); c.fillStyle = '#3b4347'; c.fill(); c.strokeStyle = 'rgba(0,0,0,.4)'; c.stroke();
+    c.globalAlpha = 1; return;
+  }
+  const ro = 7 * s, rh = 4.3 * s, dist = (type === 'h2o' ? 6.4 : 7.2) * s;
+  if (type !== 'h2o') {   // Farbhof: Oxonium orange, Hydroxid blau
+    c.globalAlpha = a * .45; c.beginPath(); c.arc(x, y, 12.5 * s, 0, TAU); c.fillStyle = tok.sp[type]; c.fill(); c.globalAlpha = a;
+  }
+  const hs = type === 'h2o' ? [ang - .91, ang + .91] : type === 'h3o' ? [ang, ang + 2.094, ang + 4.189] : [ang];
+  for (const h of hs) {
+    c.beginPath(); c.arc(x + Math.cos(h) * dist, y + Math.sin(h) * dist, rh, 0, TAU);
+    c.fillStyle = tok.h; c.fill(); c.strokeStyle = tok.hs; c.stroke();
+  }
+  c.beginPath(); c.arc(x, y, ro, 0, TAU); c.fillStyle = tok.o; c.fill(); c.strokeStyle = 'rgba(0,0,0,.3)'; c.stroke();
+  if (type !== 'h2o') {
+    const bx = x + 7 * s, by = y - 7.5 * s;
+    c.beginPath(); c.arc(bx, by, 4.8 * s, 0, TAU); c.fillStyle = tok.ink; c.fill();
+    c.fillStyle = tok.surface; c.font = `700 ${9 * s}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(type === 'h3o' ? '+' : '−', bx, by + .5 * s);
+  }
+  c.globalAlpha = 1;
+}
+function drawLegend() {
+  const d = Math.min(window.devicePixelRatio || 1, 2) * uiZoom;
+  document.querySelectorAll('canvas[data-mol]').forEach(cv => {
+    const type = cv.dataset.mol, c = cv.getContext('2d');
+    const W = rep === 'formel' ? Math.ceil(formulaWidth(c, type, 10 * .95) + 14) : 32, H = 26;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px'; cv.width = W * d; cv.height = H * d;
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
+    drawMol(c, type, rep === 'formel' ? W / 2 : 14, 14, type === 'h2o' ? -Math.PI / 2 : type === 'co2' ? 0 : -Math.PI / 2 - .4, 1, .95);
+  });
+  document.querySelectorAll('#legend .sp').forEach(el => { el.hidden = !optSpect.checked; });
+}
+function drawBadge(c, x, y, sign, a, s) {
+  if (a <= .01) return;
+  c.globalAlpha = a;
+  const bx = x + 7 * s, by = y - 7.5 * s;
+  c.beginPath(); c.arc(bx, by, 4.8 * s, 0, TAU); c.fillStyle = tok.ink; c.fill();
+  c.fillStyle = tok.surface; c.font = `700 ${9 * s}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(sign, bx, by + .5 * s);
+  c.globalAlpha = 1;
+}
+function atom(c, x, y, r, fill, stroke, lw) {
+  c.beginPath(); c.arc(x, y, r, 0, TAU); c.fillStyle = fill; c.fill(); c.lineWidth = lw; c.strokeStyle = stroke; c.stroke();
+}
+function drawPair(c, pr, X, s) {
+  const ax = X(pr.a.x), ay = X(pr.a.y), bx = X(pr.b.x), by = X(pr.b.y), u = pr.u, ux = Math.cos(u), uy = Math.sin(u);
+  const k = pr.k, r = pr.r, ion = 1 - k;
+  const dOH = 7.2 * s;
+  if (rep === 'formel') {
+    const ka = Math.min(1, k / .3), kb = Math.max(0, Math.min(1, (k - .7) / .3));
+    if (ka < 1) drawFormula(c, 'h3o', ax, ay, 1 - ka, s);
+    if (ka > 0) drawFormula(c, 'h2o', ax, ay, ka, s);
+    if (kb < 1) drawFormula(c, 'oh', bx, by, 1 - kb, s);
+    if (kb > 0) drawFormula(c, 'h2o', bx, by, kb, s);
+    if (k > 0 && k < 1) {
+      const px = ax + (bx - ax) * k, py = ay + (by - ay) * k - Math.sin(Math.PI * k) * 6 * s;
+      drawFormula(c, 'hplus', px, py, Math.min(1, k * 8, (1 - k) * 8), s * .95);
+    }
+    return;
+  }
+  // Kugelmodell
+  const lw = Math.max(.8, s * .9), rh = 4.3 * s, ro = 7 * s, dW = 6.4 * s;
+  if (ion > .01) {
+    c.globalAlpha = .45 * ion;
+    c.beginPath(); c.arc(ax, ay, 12.5 * s, 0, TAU); c.fillStyle = tok.sp.h3o; c.fill();
+    c.beginPath(); c.arc(bx, by, 12.5 * s, 0, TAU); c.fillStyle = tok.sp.oh; c.fill();
+    c.globalAlpha = 1;
+  }
+  const dA = dOH + (dW - dOH) * r, off = 2.094 + (2.23 - 2.094) * r;
+  for (const h of [u + off, u - off]) atom(c, ax + Math.cos(h) * dA, ay + Math.sin(h) * dA, rh, tok.h, tok.hs, lw);
+  const hOld = u + 1.32 * r;
+  atom(c, bx + Math.cos(hOld) * dA, by + Math.sin(hOld) * dA, rh, tok.h, tok.hs, lw);
+  atom(c, ax, ay, ro, tok.o, 'rgba(0,0,0,.3)', lw);
+  atom(c, bx, by, ro, tok.o, 'rgba(0,0,0,.3)', lw);
+  // das übergehende H-Atom (Proton)
+  const sx = ax + ux * dOH, sy = ay + uy * dOH, ex = bx - ux * dA, ey = by - uy * dA;
+  atom(c, sx + (ex - sx) * k, sy + (ey - sy) * k, rh, tok.h, tok.hs, lw);
+  drawBadge(c, ax, ay, '+', ion, s);
+  drawBadge(c, bx, by, '−', ion, s);
+}
+function drawParticles(c, X, sc, S) {
+  const s = S / 640;
+  for (const f of flashes) {
+    const t = f.age / .4;
+    c.globalAlpha = .45 * (1 - t); c.lineWidth = 1.5 * s; c.strokeStyle = tok.ink;
+    c.beginPath(); c.arc(X(f.x), X(f.y), (10 + t * 12) * s, 0, TAU); c.stroke();
+  }
+  c.globalAlpha = 1;
+  const order = { h2o: 0, na: 1, cit: 1, co2: 1.5, h3o: 2, oh: 2 };
+  const list = P.filter(p => !p.pair).sort((a, b) => order[a.sp] - order[b.sp]);
+  for (const p of list) drawMol(c, p.sp, X(p.x), X(p.y), p.ang, Math.max(0, p.a), s);
+  for (const pr of pairs) drawPair(c, pr, X, s);
+}
+
+/* ---------- Zeichnen: Schale ---------- */
+let geo = { S: 0, cx: 0, Rp: 0, sc: 1 };
+function drawDish() {
+  const S = dishC.width; if (!S) return;
+  const c = dctx, d = img.data, ind = F.ind, [wr, wg, wb] = tok.water, tf = level === 'teilchen' ? .42 : 1;
+  for (let k = 0; k < NIN; k++) {
+    const i = LIST[k], j = lutIdx(PH[i]), I = ind[i];
+    const t = I > 0 ? (1 - Math.exp(-I * 2.2)) * tf : 0;
+    const m = 1 - (I > 1.4 ? Math.min(.35, (I - 1.4) * .05) : 0), o = i * 4;
+    d[o] = (wr + (LR[j] - wr) * t) * m; d[o + 1] = (wg + (LG[j] - wg) * t) * m; d[o + 2] = (wb + (LB[j] - wb) * t) * m; d[o + 3] = 255;
+  }
+  for (let k = 0; k < EDGE.length; k++) {
+    const i = EDGE[k], o = i * 4, s = nearest[i] * 4;
+    d[o] = d[s]; d[o + 1] = d[s + 1]; d[o + 2] = d[s + 2]; d[o + 3] = 255;
+  }
+  octx.putImageData(img, 0, 0);
+
+  const cx = S / 2, Rp = S * .43, rimW = S * .022, sc = Rp / RC;
+  geo = { S, cx, Rp, sc };
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.fillStyle = tok.bench; c.fillRect(0, 0, S, S);
+  c.save(); c.shadowColor = tok.shadow; c.shadowBlur = S * .035; c.shadowOffsetY = S * .01;
+  c.beginPath(); c.arc(cx, cx, Rp + rimW, 0, TAU); c.fillStyle = tok.waterStr; c.fill(); c.restore();
+
+  c.save(); c.beginPath(); c.arc(cx, cx, Rp, 0, TAU); c.clip();
+  c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  const o0 = cx - C0 * sc; c.drawImage(off, o0, o0, N * sc, N * sc);
+  const g = c.createRadialGradient(cx, cx, Rp * .8, cx, cx, Rp);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.16)');
+  c.fillStyle = g; c.fillRect(0, 0, S, S);
+  const X = gx => cx + (gx - C0) * sc;
+
+  for (const s of solids) {
+    const frac = s.m / s.m0;
+    for (const gr of s.grains) {
+      if (frac <= gr.thr) continue;
+      const px = X(gr.x), py = X(gr.y), r = gr.s * sc * (.6 + .4 * frac);
+      c.save(); c.translate(px, py); c.rotate(gr.rot);
+      if (s.type === 'cit') {
+        c.beginPath(); c.moveTo(0, -r); c.lineTo(r * .7, 0); c.lineTo(0, r); c.lineTo(-r * .7, 0); c.closePath();
+        c.fillStyle = 'rgba(250,252,255,.88)'; c.fill(); c.lineWidth = Math.max(1, S * .0012); c.strokeStyle = 'rgba(90,105,115,.6)'; c.stroke();
+      } else {
+        c.beginPath(); c.arc(0, 0, r, 0, TAU); c.fillStyle = '#fbfbf7'; c.fill(); c.lineWidth = Math.max(1, S * .001); c.strokeStyle = 'rgba(100,100,90,.5)'; c.stroke();
+      }
+      c.restore();
+    }
+  }
+  const tm = level === 'teilchen';
+  let nm = 0;
+  for (const b of bubbles) {
+    if (tm) { continue; const a = b.age > b.life - .3 ? (b.life - b.age) / .3 : Math.min(1, b.age / .2);
+      drawMol(c, 'co2', X(b.x), X(b.y), b.x * 3.1, Math.max(0, a), S / 640); continue; }
+    const grow = .6 + .4 * Math.min(1, b.age / .3), a = b.age > b.life - .3 ? (b.life - b.age) / .3 : 1;
+    const r = b.r * sc * grow, px = X(b.x), py = X(b.y);
+    c.globalAlpha = Math.max(0, a);
+    c.beginPath(); c.arc(px, py, r, 0, TAU); c.fillStyle = 'rgba(255,255,255,.2)'; c.fill();
+    c.lineWidth = Math.max(1, S * .0014); c.strokeStyle = 'rgba(255,255,255,.85)'; c.stroke();
+    c.beginPath(); c.arc(px - r * .35, py - r * .35, r * .25, 0, TAU); c.fillStyle = 'rgba(255,255,255,.9)'; c.fill();
+  }
+  c.globalAlpha = 1;
+  if (tm) drawParticles(c, X, sc, S);
+  if (optLine.checked) {
+    c.save(); c.setLineDash([S * .012, S * .01]); c.lineWidth = Math.max(1.5, S * .003);
+    c.strokeStyle = 'rgba(255,255,255,.9)'; c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = S * .004;
+    c.beginPath(); c.moveTo(cx - Rp, cx); c.lineTo(cx + Rp, cx); c.stroke(); c.restore();
+  }
+  c.font = `700 ${S * .024}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'top'; c.lineJoin = 'round';
+  for (const s of solids) {
+    const frac = s.m / s.m0; if (frac < .03) continue;
+    c.globalAlpha = Math.min(1, frac * 4);
+    const px = X(s.gx), py = X(s.gy) + 6.5 * sc;
+    c.lineWidth = S * .007; c.strokeStyle = 'rgba(0,0,0,.55)'; c.strokeText(s.label, px, py);
+    c.fillStyle = '#fff'; c.fillText(s.label, px, py);
+  }
+  c.globalAlpha = 1;
+  c.restore();
+
+  c.lineWidth = rimW; c.strokeStyle = tok.glass; c.beginPath(); c.arc(cx, cx, Rp + rimW / 2, 0, TAU); c.stroke();
+  c.lineWidth = Math.max(1, S * .002); c.strokeStyle = tok.glassHi;
+  c.beginPath(); c.arc(cx, cx, Rp + .5, 0, TAU); c.stroke();
+  c.beginPath(); c.arc(cx, cx, Rp + rimW, 0, TAU); c.stroke();
+  c.globalAlpha = .7; c.lineWidth = rimW * .35; c.lineCap = 'round';
+  c.beginPath(); c.arc(cx, cx, Rp + rimW * .5, Math.PI * 1.08, Math.PI * 1.38); c.stroke();
+  c.globalAlpha = 1; c.lineCap = 'butt';
+
+  // Sonde
+  const px = X(probe.x), py = X(probe.y), pr = S * .016;
+  c.lineWidth = S * .006; c.strokeStyle = 'rgba(0,0,0,.6)'; c.beginPath(); c.arc(px, py, pr, 0, TAU); c.stroke();
+  c.lineWidth = S * .003; c.strokeStyle = '#fff'; c.beginPath(); c.arc(px, py, pr, 0, TAU); c.stroke();
+  c.beginPath(); c.moveTo(px - pr * .45, py); c.lineTo(px + pr * .45, py); c.moveTo(px, py - pr * .45); c.lineTo(px, py + pr * .45); c.stroke();
+  const txt = 'pH ' + fmt(probePH());
+  c.font = `600 ${S * .03}px ${MONO}`; c.textBaseline = 'middle'; c.textAlign = 'left';
+  const tw = c.measureText(txt).width, pad = S * .01, bh = S * .045;
+  let bx = px + pr + S * .012; if (bx + tw + 2 * pad > S - 4) bx = px - pr - S * .012 - tw - 2 * pad;
+  const by = py - pr - bh * .6;
+  c.fillStyle = 'rgba(12,22,26,.85)';
+  c.beginPath(); c.roundRect ? c.roundRect(bx, by, tw + 2 * pad, bh, S * .008) : c.rect(bx, by, tw + 2 * pad, bh); c.fill();
+  c.fillStyle = '#fff'; c.fillText(txt, bx + pad, by + bh / 2);
+}
+
+/* ---------- Zeichnen: pH-Verlauf ---------- */
+function drawChart() {
+  const c = cctx, w = chartC.width, h = chartC.height; if (!w) return;
+  const d = dpr, L = 36 * d, R = 12 * d, T = 8 * d, B = 52 * d, pw = w - L - R, ph = h - T - B;
+  const yOf = p => T + (14 - p) / 14 * ph, xOf = mm => L + (mm + 45) / 90 * pw;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, w, h);
+  c.font = `${11 * d}px ${MONO}`; c.textBaseline = 'middle'; c.textAlign = 'right';
+  for (const p of [1, 4, 7, 10, 13]) {
+    const y = yOf(p);
+    c.strokeStyle = tok.line; c.lineWidth = d; c.setLineDash(p === 7 ? [4 * d, 3 * d] : []);
+    if (p === 7) c.strokeStyle = tok.muted;
+    c.beginPath(); c.moveTo(L, y); c.lineTo(L + pw, y); c.stroke();
+    c.fillStyle = tok.muted; c.fillText(String(p), L - 6 * d, y);
+  }
+  c.setLineDash([]);
+
+  // Werte entlang der Linie
+  const r1 = (C0 - 1) * N, r2 = C0 * N, pts = [], dd = img.data;
+  const sy = T + ph + 6 * d, sh = 12 * d;
+  for (let x = 0; x < N; x++) {
+    const a = r1 + x, b = r2 + x; if (!inside[a] || !inside[b]) continue;
+    const mm = (x + .5 - C0) * MM, p = (PH[a] + PH[b]) / 2;
+    pts.push([xOf(mm), yOf(Math.max(0, Math.min(14, p)))]);
+    c.fillStyle = `rgb(${(dd[a * 4] + dd[b * 4]) >> 1},${(dd[a * 4 + 1] + dd[b * 4 + 1]) >> 1},${(dd[a * 4 + 2] + dd[b * 4 + 2]) >> 1})`;
+    c.fillRect(xOf(mm - MM / 2), sy, pw / 90 * MM + 1, sh);
+  }
+  c.strokeStyle = tok.line; c.lineWidth = d; c.strokeRect(L, sy, pw, sh);
+
+  c.strokeStyle = tok.ink; c.lineWidth = 2.5 * d; c.lineJoin = 'round';
+  c.beginPath(); pts.forEach(([x, y], k) => k ? c.lineTo(x, y) : c.moveTo(x, y)); c.stroke();
+  c.fillStyle = tok.muted; c.font = `${11 * d}px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'top';
+  for (const mm of [-40, -20, 0, 20, 40]) c.fillText(String(mm).replace('-', '−'), xOf(mm), sy + sh + 4 * d);
+  c.font = `${11 * d}px ${FONT}`; c.fillText('Position auf der Messlinie in mm', L + pw / 2, sy + sh + 19 * d);
+  c.save(); c.translate(11 * d, T + ph / 2); c.rotate(-Math.PI / 2); c.textBaseline = 'middle'; c.fillText('sauer  ·  pH  ·  alkalisch', 0, 0); c.restore();
+}
+
+/* ---------- Anzeige ---------- */
+const fmt = p => Math.max(0, Math.min(14, p)).toFixed(1).replace('.', ',');
+function probePH() { const i = nearest[Math.floor(probe.y) * N + Math.floor(probe.x)]; return PH[i]; }
+function classify(p) { return p < 4 ? 'stark sauer' : p < 6.5 ? 'schwach sauer' : p <= 7.5 ? 'neutral' : p <= 10 ? 'schwach alkalisch' : 'stark alkalisch'; }
+let lastTxt = '';
+function updateReadout() {
+  const p = probePH(), t = fmt(p);
+  if (t !== lastTxt) {
+    lastTxt = t; $('phValue').textContent = t; $('phClass').textContent = classify(p);
+    $('swatch').style.background = rgbAt(p); $('marker').style.left = (Math.max(0, Math.min(14, p)) / 14 * 100) + '%';
+  }
+  const s = Math.floor(modelT), ct = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  const cl = $('clock'); if (cl.textContent !== ct) cl.textContent = ct;
+}
+function updateUI() {
+  const bi = $('btnInd'), bs = $('btnSolids');
+  bi.classList.toggle('primary', !indPresent);
+  bs.classList.toggle('primary', indPresent && !solidsAdded);
+  bs.disabled = solidsAdded;
+  $('btnPlay').textContent = running ? 'Pause' : 'Weiter';
+  document.querySelectorAll('#speedSeg button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.speed === speed)));
+  document.querySelectorAll('#toolSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === tool)));
+  document.querySelectorAll('#levelSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.level === level)));
+  document.querySelectorAll('#repSeg button').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.rep === rep)); b.disabled = level !== 'teilchen'; });
+}
+
+/* ---------- Bedienung ---------- */
+$('btnInd').onclick = () => {
+  for (let n = 0; n < 5; n++) { const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * RC * .65; addDrop(C0 + Math.cos(a) * r, C0 + Math.sin(a) * r); }
+  updateUI();
+};
+$('btnSolids').onclick = () => { addSolid('cit', C0 - RC * .68, C0); addSolid('soda', C0 + RC * .68, C0); solidsAdded = true; running = true; updateUI(); };
+function togglePlay() { running = !running; updateUI(); }
+$('btnPlay').onclick = togglePlay;
+$('btnResetInd').onclick = () => reset(true);
+$('btnResetWater').onclick = () => reset(false);
+document.querySelectorAll('#speedSeg button').forEach(b => b.onclick = () => { speed = +b.dataset.speed; updateUI(); });
+document.querySelectorAll('#toolSeg button').forEach(b => b.onclick = () => { tool = b.dataset.tool; updateUI(); });
+optSpect.onchange = () => { if (!optSpect.checked) P = P.filter(p => p.sp !== 'na' && p.sp !== 'cit'); drawLegend(); };
+document.querySelectorAll('#levelSeg button').forEach(b => b.onclick = () => { level = b.dataset.level; if (level === 'stoff') { P = []; flashes = []; pairs = []; } updateUI(); });
+document.querySelectorAll('#repSeg button').forEach(b => b.onclick = () => { rep = b.dataset.rep; drawLegend(); updateUI(); });
+
+function toGrid(e) {
+  const r = dishC.getBoundingClientRect(), S = geo.S || dishC.width;
+  const px = (e.clientX - r.left) * dishC.width / r.width, py = (e.clientY - r.top) * dishC.height / r.height;
+  return { x: C0 + (px - geo.cx) / geo.sc, y: C0 + (py - geo.cx) / geo.sc };
+}
+function clampIn(g) { const dx = g.x - C0, dy = g.y - C0, r = Math.hypot(dx, dy), lim = RC - 1; if (r > lim) { g.x = C0 + dx / r * lim; g.y = C0 + dy / r * lim; } return g; }
+dishC.addEventListener('pointerdown', e => {
+  const g = toGrid(e);
+  if (Math.hypot(g.x - C0, g.y - C0) > RC + 2) return;
+  clampIn(g);
+  if (tool === 'mess') { probe = g; dragging = true; dishC.setPointerCapture(e.pointerId); }
+  else if (tool === 'cit' || tool === 'soda') { addSolid(tool, g.x, g.y); updateUI(); }
+  else if (tool === 'ind') { addDrop(g.x, g.y); updateUI(); }
+});
+dishC.addEventListener('pointermove', e => { if (dragging) probe = clampIn(toGrid(e)); });
+const endDrag = () => { dragging = false; };
+dishC.addEventListener('pointerup', endDrag); dishC.addEventListener('pointercancel', endDrag);
+
+function setZoom(z) {
+  uiZoom = Math.round(Math.max(.6, Math.min(2, z)) * 10) / 10;
+  document.documentElement.style.setProperty('--z', uiZoom);
+  $('zoomVal').textContent = Math.round(uiZoom * 100) + ' %';
+  try { localStorage.setItem('neutralisation-zoom', String(uiZoom)); } catch (e) {}
+  resize(); drawLegend();
+}
+$('zoomIn').onclick = () => setZoom(uiZoom + .1);
+$('zoomOut').onclick = () => setZoom(uiZoom - .1);
+$('zoomVal').onclick = () => setZoom(1);
+$('btnFull').onclick = () => {
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+  else document.documentElement.requestFullscreen?.().catch(() => {});
+};
+document.addEventListener('fullscreenchange', () => { $('btnFull').textContent = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild'; });
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('button,input,summary,select,textarea')) return;
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'r' || e.key === 'R') reset(true);
+  else if (e.key === '+') setZoom(uiZoom + .1);
+  else if (e.key === '-') setZoom(uiZoom - .1);
+  else if (e.key === 't' || e.key === 'T') { level = level === 'stoff' ? 'teilchen' : 'stoff'; if (level === 'stoff') { P = []; flashes = []; pairs = []; } updateUI(); }
+  else if (e.key === 'f' || e.key === 'F') { rep = rep === 'kugel' ? 'formel' : 'kugel'; drawLegend(); updateUI(); }
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', readTok);
+new MutationObserver(readTok).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* ---------- Schleife ---------- */
+let last = performance.now(), wasSwirl = false;
+function frame(now) {
+  const dtr = Math.min(.05, (now - last) / 1000); last = now;
+  if (modelT - flowT >= 1) { updateFlow(modelT); flowT = modelT; }
+  if (swirlLeft > 0) {
+    for (let n = 0; n < 3; n++) { step(DT, true); modelT += DT; }
+    swirlLeft -= dtr; wasSwirl = true;
+  } else {
+    if (wasSwirl) { wasSwirl = false; updateUI(); }
+    if (running) {
+      acc += dtr * speed; let n = 0;
+      while (acc >= DT && n < 24) { step(DT, false); acc -= DT; modelT += DT; n++; }
+      if (n === 24) acc = 0;
+    }
+  }
+  if (dirty) { computePH(); spawnBubbles(); dirty = false; }
+  updateBubbles(running || swirlLeft > 0 ? dtr : 0);
+  pUpdate(dtr, running || swirlLeft > 0);
+  drawDish(); drawChart(); updateReadout();
+  requestAnimationFrame(frame);
+}
+readTok(); resize(); reset(true);
+try { const z = parseFloat(localStorage.getItem('neutralisation-zoom')); if (z) setZoom(z); } catch (e) {}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>London-Wechselwirkung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: Vorführwerkzeug – Kopfzeile mit Modul-Tabs, große Bühne (Canvas) als Projektionsfläche, Bedienspalte rechts (auf schmalen Bildschirmen darunter) */
+:root{
+  --bg:#eef2f7; --surface:#ffffff; --stage:#fbfcfe; --ink:#162033; --muted:#566278; --line:#d5dce7;
+  --neg:#2a62c9; --pos:#d2670a; --attr:#7a3db0; --focus:#2a62c9;
+  --f-display:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c111b; --surface:#151c29; --stage:#101724; --ink:#e6ebf3; --muted:#9ba7bb; --line:#283244;
+    --neg:#6fa3ff; --pos:#ff9a4a; --attr:#c59cff; --focus:#6fa3ff; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c111b; --surface:#151c29; --stage:#101724; --ink:#e6ebf3; --muted:#9ba7bb; --line:#283244;
+  --neg:#6fa3ff; --pos:#ff9a4a; --attr:#c59cff; --focus:#6fa3ff; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:12px 24px}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.35rem,2.4vw,1.9rem);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:2px 0 0;font-size:.95rem}
+.tools{display:flex;gap:8px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.tab{flex:0 0 auto;font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab .n{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tab[aria-selected="true"] .n{color:var(--surface);opacity:.75}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.stagecol{display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:14px;overflow:hidden;height:clamp(340px,calc(100dvh - 190px),960px)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:manipulation}
+.caption{margin:0;max-width:75ch;color:var(--ink);font-size:1.02rem}
+.caption[hidden]{display:none}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:18px}
+.panel h2{font-family:var(--f-body);font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.panel section{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:10px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);min-width:7.5em}
+button:focus-visible,input:focus-visible+.track,input[type=range]:focus-visible,.seg button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.switch{display:flex;align-items:center;gap:10px;cursor:pointer;padding:3px 0;user-select:none}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.track{flex:0 0 auto;width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;transition:background .15s}
+.track::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked+.track{background:var(--neg)}
+.switch input:checked+.track::after{transform:translateX(16px)}
+.range label{display:block;font-size:.95rem}
+.range input{width:100%;accent-color:var(--neg)}
+.ends{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1 1 auto;font:inherit;font-size:.92rem;background:var(--surface);color:var(--ink);border:0;border-right:1px solid var(--line);padding:7px 8px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--neg);color:#fff}
+.seglabel{font-size:.95rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.88rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.keys{font-size:.82rem;color:var(--muted)}
+kbd{font-family:var(--f-mono);font-size:.78rem;border:1px solid var(--line);border-radius:5px;padding:0 5px;background:var(--bg)}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);max-width:min(720px,calc(100vw - 32px));padding:0}
+dialog::backdrop{background:rgba(10,15,25,.55)}
+.dlg{padding:22px 24px;display:flex;flex-direction:column;gap:14px;max-height:80dvh;overflow:auto}
+.dlg h2{font-family:var(--f-display);font-size:1.35rem;margin:0}
+.dlg h3{font-size:1rem;margin:6px 0 0}
+.dlg p,.dlg li{max-width:68ch;margin:0}
+.dlg ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.dlg .close{align-self:flex-end}
+@media (max-width:960px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .stage{height:min(118vw,72dvh)}
+}
+@media (prefers-reduced-motion: reduce){.track,.track::after{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>London-Wechselwirkung</h1>
+      <p class="sub">Wechselwirkung zwischen temporären Dipolen am Beispiel Helium</p>
+    </div>
+    <div class="tools">
+      <button class="btn" id="infoBtn" type="button">Begriffe &amp; Modellgrenzen</button>
+      <button class="btn" id="fsBtn" type="button">Vollbild</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs" aria-label="Module"></nav>
+
+  <main class="app">
+    <div class="stagecol">
+      <div class="stage" id="stageBox"><canvas id="stage" aria-label="Simulation"></canvas></div>
+    </div>
+    <aside class="panel" aria-label="Bedienung">
+      <section>
+        <h2>Ablauf</h2>
+        <div class="row">
+          <button class="btn primary" id="playBtn" type="button">Pause</button>
+          <button class="btn" id="resetBtn" type="button">Neu starten</button>
+        </div>
+        <div class="range">
+          <label for="speed">Tempo</label>
+          <input type="range" id="speed" min="0.1" max="2" step="0.05" value="0.5">
+          <div class="ends"><span>Zeitlupe</span><span>schnell</span></div>
+        </div>
+      </section>
+      <section id="optsSec"><h2>Darstellung</h2><div id="opts" style="display:flex;flex-direction:column;gap:2px"></div></section>
+      <section id="setSec"><h2>Einstellungen</h2><div id="settings" style="display:flex;flex-direction:column;gap:12px"></div></section>
+      <section>
+        <h2>Legende</h2>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--neg)"></i>Elektron / δ−</span>
+          <span><i class="dot" style="background:var(--pos)"></i>Kern / δ+</span>
+          <span><i class="dot" style="background:var(--attr)"></i>Anziehung</span>
+        </div>
+        <p class="keys"><kbd>Leertaste</kbd> Start/Pause · <kbd>1</kbd>–<kbd>3</kbd> Module</p>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<dialog id="info">
+  <div class="dlg">
+    <h2>Begriffe &amp; Modellgrenzen</h2>
+    <h3>Begriffe</h3>
+    <p>Der Bildungsplan Baden-Württemberg spricht von der <strong>Wechselwirkung zwischen temporären Dipolen</strong>. Kurz und fachlich korrekt heißt sie <strong>London-Wechselwirkung</strong> (auch London-Kräfte oder Dispersionswechselwirkung).</p>
+    <p><strong>Van-der-Waals-Kräfte</strong> ist in der Fachliteratur der Oberbegriff, der auch Wechselwirkungen mit permanenten Dipolen einschließt. In älteren Schulbüchern wird der Begriff oft gleichbedeutend mit London-Kräften verwendet.</p>
+    <h3>Modellgrenzen</h3>
+    <ul>
+      <li><strong>Elektronen:</strong> Die Elektronen bewegen sich hier zufällig und frei in der Hülle. Reale Elektronen haben keine Bahnen; man kann nur angeben, wo sie sich wahrscheinlich aufhalten.</li>
+      <li><strong>Zeit:</strong> Die Bewegung läuft real in weniger als 10<sup>−15</sup> s ab. Die Animation ist um viele Größenordnungen verlangsamt.</li>
+      <li><strong>Trennlinie:</strong> Sie steht senkrecht zur Verschiebung der Elektronen. Als Dipol gilt das Atom, wenn beide Elektronen auf einer Seite liegen und gemeinsam deutlich vom Kern weg verschoben sind. Die Grenze ist eine Festlegung der Simulation.</li>
+      <li><strong>Ursache und Wirkung:</strong> In Modul 2 beeinflusst nur das linke Atom das rechte. Tatsächlich beeinflussen sich beide gleichzeitig und gegenseitig.</li>
+      <li><strong>Darstellung:</strong> Zweidimensional, Atomkerne ruhen, Größenverhältnisse von Kern und Hülle sind nicht maßstäblich.</li>
+      <li><strong>Pfeile und Balken</strong> zeigen Tendenzen, keine Messwerte.</li>
+    </ul>
+    <h3>Bedienung</h3>
+    <p>Leertaste: Start/Pause (Pause = Momentaufnahme). Tasten 1–3: Module. In Modul 3 schiebt ein Klick auf ein Atom dessen Elektronen in Richtung der angeklickten Stelle.</p>
+    <button class="btn close" id="infoClose" type="button">Schließen</button>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const cv=$('#stage'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1,FS=14;
+const T={};
+const FONT='"Atkinson Hyperlegible",system-ui,sans-serif',MONO='"JetBrains Mono",ui-monospace,monospace';
+function readTheme(){const cs=getComputedStyle(document.documentElement);['bg','surface','stage','ink','muted','line','neg','pos','attr'].forEach(k=>T[k]=cs.getPropertyValue('--'+k).trim());}
+function rgba(hex,a){let h=(hex||'#000').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+let spare=null;
+function gauss(){if(spare!==null){const s=spare;spare=null;return s;}let u,v,s;do{u=Math.random()*2-1;v=Math.random()*2-1;s=u*u+v*v}while(s>=1||s===0);const m=Math.sqrt(-2*Math.log(s)/s);spare=v*m;return u*m;}
+
+/* ---------- Helium-Atom: Kern 2+, zwei frei bewegliche Elektronen in der Hülle ----------
+   Längen in Einheiten des Hüllenradius. Elektronen: gedämpfte Zufallsbewegung, zum Kern gezogen,
+   an der Hüllengrenze zurückgestoßen, untereinander abstoßend (Stärke P.kr). */
+const P={g:4,kc:4,sig:2.2,kr:.6,thr:.6};
+function heAtom(){const a=Math.random()*Math.PI*2;
+  return {e:[[.45*Math.cos(a),.45*Math.sin(a),0,0],[-.45*Math.cos(a),-.45*Math.sin(a),0,0]],sp:[0,0],n:[1,0],kx:0,ky:0,ks:0};}
+function stepAtom(a,dt,fx=0,fy=0){
+  const kx=a.ks*a.kx,ky=a.ks*a.ky,sq=P.sig*Math.sqrt(dt);
+  for(let i=0;i<2;i++){const e=a.e[i],o=a.e[1-i];const dx=e[0]-o[0],dy=e[1]-o[1],inv=P.kr/Math.pow(dx*dx+dy*dy+.02,1.5);
+    let Fx=-P.kc*e[0]+dx*inv+fx+kx,Fy=-P.kc*e[1]+dy*inv+fy+ky;const r=Math.hypot(e[0],e[1]);
+    if(r>.92){Fx-=60*(r-.92)*e[0]/r;Fy-=60*(r-.92)*e[1]/r;}
+    e[2]+=(Fx-P.g*e[2])*dt+sq*gauss();e[3]+=(Fy-P.g*e[3])*dt+sq*gauss();}
+  for(const e of a.e){e[0]+=e[2]*dt;e[1]+=e[3]*dt;}
+  a.ks*=Math.exp(-dt/1);
+}
+const dip=a=>[a.e[0][0]+a.e[1][0],a.e[0][1]+a.e[1][1]];
+// Trennlinie: Normale n folgt (geglättet) der Verschiebung der Elektronen oder bleibt waagrecht
+function updateLine(a,dt,rot){const p=dip(a),f=1-Math.exp(-dt/.12);a.sp[0]+=(p[0]-a.sp[0])*f;a.sp[1]+=(p[1]-a.sp[1])*f;
+  if(!rot){a.n=[1,0];return;}const m=Math.hypot(a.sp[0],a.sp[1]);if(m>.08)a.n=[a.sp[0]/m,a.sp[1]/m];}
+// +1/−1: beide Elektronen auf der +n/−n-Seite und deutlich verschoben; 0: kein Dipol
+function state(a){const [nx,ny]=a.n,p=dip(a),pn=p[0]*nx+p[1]*ny,s0=a.e[0][0]*nx+a.e[0][1]*ny,s1=a.e[1][0]*nx+a.e[1][1]*ny;
+  if(s0>0&&s1>0&&pn>P.thr)return 1;if(s0<0&&s1<0&&pn<-P.thr)return -1;return 0;}
+function counts(a){const [nx,ny]=a.n;let p=0;for(const e of a.e)if(e[0]*nx+e[1]*ny>0)p++;return [2-p,p];}
+// Einheitsvektor zur δ−-Seite (oder 0)
+function D(a){const s=state(a);return [s*a.n[0],s*a.n[1]];}
+// Wechselwirkung zweier Dipole auf der Verbindungsachse u: >0 Anziehung, <0 Abstoßung
+function inter(A,B,ux=1,uy=0){return 3*(A[0]*ux+A[1]*uy)*(B[0]*ux+B[1]*uy)-(A[0]*B[0]+A[1]*B[1]);}
+
+/* ---------- Zeichnen ---------- */
+function text(c,s,x,y,o={}){c.font=`${o.w||400} ${o.size||FS}px ${o.mono?MONO:FONT}`;c.fillStyle=o.col||T.ink;c.textAlign=o.align||'left';c.textBaseline=o.base||'alphabetic';c.fillText(s,x,y);}
+function drawHe(c,x,y,R,a,o){
+  // Hülle
+  c.fillStyle=rgba(T.neg,.07);c.strokeStyle=rgba(T.neg,.4);c.lineWidth=1.5;c.beginPath();c.arc(x,y,R,0,Math.PI*2);c.fill();c.stroke();
+  const [nx,ny]=a.n,tx=-ny,ty=nx,s=state(a);
+  if(o.line){c.save();c.setLineDash([6,6]);c.strokeStyle=rgba(T.muted,.75);c.lineWidth=1.5;c.beginPath();c.moveTo(x-tx*R*1.15,y-ty*R*1.15);c.lineTo(x+tx*R*1.15,y+ty*R*1.15);c.stroke();c.restore();}
+  if(o.delta&&s!==0){const sz=clamp(R*.3,FS*1.05,FS*2.3);c.save();c.font=`700 ${sz}px ${FONT}`;c.textAlign='center';c.textBaseline='middle';
+    c.lineJoin='round';c.lineWidth=sz*.22;c.strokeStyle=T.stage;
+    const put=(t,k,col)=>{const xx=x+k*nx*R*.6,yy=y+k*ny*R*.6;c.strokeText(t,xx,yy);c.fillStyle=col;c.fillText(t,xx,yy);};
+    put('δ−',s,T.neg);put('δ+',-s,T.pos);c.restore();}
+  if(o.count){const [m,p]=counts(a),sz=clamp(R*.24,FS,FS*1.9);
+    const put=(v,k)=>{const xx=x+k*nx*R*1.28,yy=y+k*ny*R*1.28;c.fillStyle=T.stage;c.strokeStyle=v===2?T.neg:rgba(T.muted,.6);c.lineWidth=2;
+      c.beginPath();c.arc(xx,yy,sz*.85,0,Math.PI*2);c.fill();c.stroke();text(c,String(v),xx,yy+1,{w:700,mono:true,size:sz,align:'center',base:'middle',col:v===2?T.neg:T.ink});};
+    put(p,1);put(m,-1);}
+  // Kern
+  const rn=Math.max(9,R*.17);c.fillStyle=T.pos;c.beginPath();c.arc(x,y,rn,0,Math.PI*2);c.fill();
+  text(c,'2+',x,y+1,{w:700,size:rn*.95,col:'#ffffff',align:'center',base:'middle'});
+  // Elektronen
+  const re=Math.max(7,R*.1);
+  for(const e of a.e){const ex=x+e[0]*R,ey=y+e[1]*R;
+    c.fillStyle=T.neg;c.beginPath();c.arc(ex,ey,re,0,Math.PI*2);c.fill();
+    c.strokeStyle='#ffffff';c.lineWidth=Math.max(2,re*.28);c.lineCap='round';c.beginPath();c.moveTo(ex-re*.5,ey);c.lineTo(ex+re*.5,ey);c.stroke();}
+}
+function arrow(c,x1,y1,x2,y2,col,lw,dashed){
+  const L=Math.hypot(x2-x1,y2-y1);if(L<2)return;const ux=(x2-x1)/L,uy=(y2-y1)/L,h=Math.min(L*.55,lw*3.6);
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw;c.lineCap='round';if(dashed)c.setLineDash([lw*1.6,lw*1.4]);
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-ux*h*.8,y2-uy*h*.8);c.stroke();c.setLineDash([]);
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-ux*h-uy*h*.6,y2-uy*h+ux*h*.6);c.lineTo(x2-ux*h+uy*h*.6,y2-uy*h-ux*h*.6);c.closePath();c.fill();c.restore();
+}
+function pill(c,s,x,y,align='left'){
+  c.font=`700 ${FS*.9}px ${FONT}`;const w=c.measureText(s).width+FS*1.2,h=FS*1.7;const x0=align==='right'?x-w:x;
+  c.fillStyle=T.ink;c.beginPath();c.roundRect(x0,y,w,h,h/2);c.fill();c.fillStyle=T.stage;c.textAlign='center';c.textBaseline='middle';c.fillText(s,x0+w/2,y+h/2+1);
+}
+function meter(c,x,y,w,val,title){
+  const h=FS*.9,mid=x+w/2;text(c,title,x,y,{w:700,size:FS*.95});
+  const ty=y+FS*.6;c.fillStyle=rgba(T.muted,.18);c.beginPath();c.roundRect(x,ty,w,h,h/2);c.fill();
+  const f=clamp(val,-1,1);c.fillStyle=f>=0?T.attr:T.muted;c.beginPath();c.roundRect(Math.min(mid,mid+f*w/2),ty,Math.abs(f*w/2),h,3);c.fill();
+  c.strokeStyle=T.ink;c.lineWidth=2;c.beginPath();c.moveTo(mid,ty-4);c.lineTo(mid,ty+h+4);c.stroke();
+  text(c,'Abstoßung',x,ty+h+FS*1.15,{size:FS*.8,col:T.muted});text(c,'Anziehung',x+w,ty+h+FS*1.15,{size:FS*.8,col:T.muted,align:'right'});
+}
+const landscape=()=>W/H>1.15;
+
+/* ---------- Modul 1: temporärer Dipol ---------- */
+const NS=12;
+const M1={id:1,tab:'Temporärer Dipol',
+  opts:{line:true,rot:true,count:false,delta:true,stats:false},
+  optDefs:[['line','Trennlinie'],['rot','Trennlinie dreht mit dem Dipol'],['count','Elektronen je Seite'],['delta','Teilladungen δ+ / δ−'],['stats','Statistik']],
+  clearStats(){this.sec=new Array(NS).fill(0);this.tDip=0;this.tAll=0;this.mx=0;this.my=0;},
+  reset(){this.a=heAtom();this.clearStats();},
+  lay(){const ls=landscape();
+    if(!this.opts.stats)return {x:W/2,y:H*.5,R:Math.min(W*.26,H*.32)};
+    if(ls)return {x:W*.3,y:H*.5,R:Math.min(W*.18,H*.3),box:{x:W*.56,y:H*.06,w:W*.4,h:H*.88}};
+    return {x:W/2,y:H*.27,R:Math.min(W*.26,H*.15),box:{x:W*.06,y:H*.52,w:W*.88,h:H*.46}};},
+  step(dt){const a=this.a;stepAtom(a,dt);updateLine(a,dt,this.opts.rot);const d=D(a);this.tAll+=dt;
+    if(d[0]||d[1]){this.tDip+=dt;let ang=Math.atan2(d[1],d[0]);if(ang<0)ang+=Math.PI*2;this.sec[Math.floor(ang/(Math.PI*2)*NS)%NS]+=dt;}
+    this.mx+=d[0]*dt;this.my+=d[1]*dt;},
+  draw(c){
+    const L=this.lay(),o=this.opts;drawHe(c,L.x,L.y,L.R,this.a,o);
+    text(c,'Helium-Atom',FS*1.2,FS*2,{w:700,size:FS*1.1});
+    if(L.box)this.stats(c,L.box);
+  },
+  stats(c,b){
+    const tot=this.tAll||1,fd=this.tDip/tot;
+    text(c,'Statistik',b.x,b.y+FS,{w:700,size:FS*1.05});
+    // Anteil Dipol / kein Dipol
+    const by=b.y+FS*2.2,bh=FS*1.1,bw=b.w;
+    c.fillStyle=rgba(T.muted,.35);c.beginPath();c.roundRect(b.x,by,bw,bh,bh/2);c.fill();
+    c.fillStyle=T.neg;c.beginPath();c.roundRect(b.x,by,Math.max(0,bw*fd),bh,bh/2);c.fill();
+    text(c,`Dipol ${Math.round(fd*100)} %`,b.x,by+bh+FS*1.2,{size:FS*.9,col:T.neg,w:700});
+    text(c,`kein Dipol ${Math.round((1-fd)*100)} %`,b.x+bw,by+bh+FS*1.2,{size:FS*.9,col:T.muted,w:700,align:'right'});
+    // Richtungsrose
+    const top=by+bh+FS*2.6;text(c,'In welche Richtung zeigte δ−?',b.x,top+FS*.4,{w:700,size:FS*.95});
+    const cx=b.x+b.w/2,cy=top+FS*1.4+(b.y+b.h-top-FS*1.4)/2,rr=Math.min(b.w*.42,(b.y+b.h-top-FS*1.4)*.44);
+    const mx=Math.max(...this.sec,1e-9);
+    c.strokeStyle=rgba(T.muted,.35);c.lineWidth=1;[.5,1].forEach(k=>{c.beginPath();c.arc(cx,cy,rr*k,0,Math.PI*2);c.stroke();});
+    for(let i=0;i<NS;i++){const a0=i/NS*Math.PI*2,a1=(i+1)/NS*Math.PI*2,r=rr*Math.sqrt(this.sec[i]/mx);
+      c.fillStyle=rgba(T.neg,.55);c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,r,a0+.03,a1-.03);c.closePath();c.fill();}
+    // Mittelwert aller Dipole
+    const ml=Math.hypot(this.mx,this.my)/tot;if(ml>.005){arrow(c,cx,cy,cx+this.mx/tot*rr,cy+this.my/tot*rr,T.ink,3);}
+    c.fillStyle=T.ink;c.beginPath();c.arc(cx,cy,4,0,Math.PI*2);c.fill();
+    text(c,'Pfeil: Mittelwert aller Dipole',cx,b.y+b.h,{size:FS*.8,col:T.muted,align:'center'});
+  }
+};
+
+/* ---------- Modul 2: induzierter Dipol ---------- */
+const M2={id:2,tab:'Induzierter Dipol',
+  opts:{line:true,rot:true,delta:true,forces:true,meter:false},
+  optDefs:[['line','Trennlinie'],['rot','Trennlinie dreht mit dem Dipol'],['delta','Teilladungen δ+ / δ−'],['forces','Kraftpfeile'],['meter','Anziehung im Mittel']],
+  d:2.4,coupling:true,
+  settings(){return [
+    {type:'switch',id:'m2-coupling',label:'Atom B reagiert auf A (Induktion)',get:()=>this.coupling,set:v=>{this.coupling=v;this.mean=0;}}];},
+  reset(){this.a=heAtom();this.b=heAtom();this.mean=0;this.v=0;},
+  lay(){const R=Math.min(W*.88/(this.d+2.6),H*.25);return {R,y:H*.42,ax:W/2-this.d*R/2,bx:W/2+this.d*R/2};},
+  step(dt){
+    stepAtom(this.a,dt);
+    let fx=0,fy=0;if(this.coupling){const [px,py]=dip(this.a),k=1.6/(this.d/2.3)**3;fx=k*2*px;fy=-k*py;}
+    stepAtom(this.b,dt,fx,fy);updateLine(this.a,dt,this.opts.rot);updateLine(this.b,dt,this.opts.rot);
+    this.v=inter(D(this.a),D(this.b));this.mean+=(this.v-this.mean)*(1-Math.exp(-dt/3));
+  },
+  draw(c){
+    const L=this.lay(),o=this.opts,R=L.R,y=L.y;
+    drawHe(c,L.ax,y,R,this.a,o);drawHe(c,L.bx,y,R,this.b,o);
+    if(o.forces&&Math.abs(this.v)>.2){const fy=y+R*1.4,len=R*clamp(Math.abs(this.v)*.4,.25,.8),lw=Math.max(3,R*.06);
+      if(this.v>0){arrow(c,L.ax-len/2,fy,L.ax+len/2,fy,T.attr,lw);arrow(c,L.bx+len/2,fy,L.bx-len/2,fy,T.attr,lw);text(c,'Anziehung',W/2,fy+FS*1.9,{w:700,col:T.attr,align:'center'});}
+      else{arrow(c,L.ax+len/2,fy,L.ax-len/2,fy,T.muted,lw,true);arrow(c,L.bx-len/2,fy,L.bx+len/2,fy,T.muted,lw,true);text(c,'Abstoßung',W/2,fy+FS*1.9,{w:700,col:T.muted,align:'center'});}}
+    if(o.meter)meter(c,W/2-Math.min(W*.4,420)/2,H-FS*4.2,Math.min(W*.4,420),this.mean/.35,'Anziehung im zeitlichen Mittel');
+  }
+};
+
+/* ---------- Modul 3: viele Atome ----------
+   Kleiner Bias: In zufälligen Abständen werden die Elektronen eines Atoms entlang der Kette verschoben
+   (spontaner Dipol), und die Induktion ist etwas verstärkt. Anziehung/Abstoßung bewegt die Atome:
+   Sie rücken zusammen oder auseinander und federn zu ihrem Platz zurück. */
+const M3={id:3,tab:'Viele Atome',
+  opts:{line:true,rot:true,delta:true,move:true,glow:true},
+  optDefs:[['line','Trennlinie'],['rot','Trennlinie dreht mit dem Dipol'],['delta','Teilladungen δ+ / δ−'],['move','Atome bewegen sich'],['glow','Anziehung farbig markieren']],
+  n:5,k:.55,sp:2.7,
+  reset(){this.ps=Array.from({length:this.n},()=>Object.assign(heAtom(),{ox:0,vx:0}));this.vs=new Array(this.n-1).fill(0);this.gl=new Array(this.n-1).fill(0);this.next=.4;},
+  lay(){const R=Math.min(W*.9/((this.n-1)*this.sp+2.6),H*.22);return {R,s:R*this.sp,x0:W/2-(this.n-1)*R*this.sp/2,y:H*.48};},
+  step(dt){
+    const ps=this.ps,k=this.k,Dp=ps.map(dip);
+    this.next-=dt;if(this.next<=0){this.next=.6+Math.random()*1.4;const a=ps[Math.floor(Math.random()*ps.length)],ang=(Math.random()<.5?0:Math.PI)+(Math.random()-.5)*.7;a.kx=Math.cos(ang);a.ky=Math.sin(ang);a.ks=5;}
+    ps.forEach((a,i)=>{let fx=0,fy=0;for(const j of [i-1,i+1]){if(j<0||j>=ps.length)continue;fx+=k*2*Dp[j][0];fy+=-k*Dp[j][1];}stepAtom(a,dt,fx,fy);updateLine(a,dt,this.opts.rot);});
+    const Ds=ps.map(D),F=new Array(ps.length).fill(0),gf=1-Math.exp(-dt/.15);
+    for(let i=0;i<ps.length-1;i++){const v=inter(Ds[i],Ds[i+1]);this.vs[i]=v;this.gl[i]+=(Math.max(0,v)-this.gl[i])*gf;F[i]+=1.6*v;F[i+1]-=1.6*v;}
+    ps.forEach((a,i)=>{if(!this.opts.move){a.ox+=(0-a.ox)*gf;a.vx=0;return;}a.vx+=(F[i]-6*a.ox-4*a.vx)*dt;a.ox+=a.vx*dt;a.ox=clamp(a.ox,-.35,.35);});
+  },
+  draw(c){
+    const L=this.lay(),o=this.opts,R=L.R;
+    const px=i=>L.x0+i*L.s+this.ps[i].ox*R;
+    if(o.glow)this.gl.forEach((g,i)=>{if(g<.05)return;const x1=px(i),x2=px(i+1),mx=(x1+x2)/2,w=(x2-x1)/2;
+      const gr=c.createRadialGradient(mx,L.y,0,mx,L.y,R*1.1);gr.addColorStop(0,rgba(T.attr,.55*clamp(g/1.4,0,1)));gr.addColorStop(1,rgba(T.attr,0));
+      c.save();c.translate(mx,L.y);c.scale(Math.max(.4,w/R),1);c.translate(-mx,-L.y);c.fillStyle=gr;c.beginPath();c.arc(mx,L.y,R*1.1,0,Math.PI*2);c.fill();c.restore();});
+    this.ps.forEach((a,i)=>drawHe(c,px(i),L.y,R,a,o));
+  },
+  click(x,y){const L=this.lay();this.ps.forEach((a,i)=>{const cx=L.x0+i*L.s+a.ox*L.R,dx=x-cx,dy=y-L.y,d=Math.hypot(dx,dy);if(d<L.R*1.2&&d>2){a.kx=dx/d;a.ky=dy/d;a.ks=7;}});},
+  pointer:true
+};
+
+/* ---------- App ---------- */
+const MODS=[M1,M2,M3];
+const S={cur:0,running:true,speed:.5};
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){S.speed=.3;$('#speed').value=.3;}
+const mod=()=>MODS[S.cur];
+MODS.forEach(m=>m.reset());
+const tabsEl=$('#tabs');
+MODS.forEach((m,i)=>{const b=document.createElement('button');b.className='tab';b.type='button';b.id='tab-'+m.id;b.setAttribute('role','tab');
+  b.innerHTML=`<span class="n">${m.id}</span><span>${m.tab}</span>`;b.addEventListener('click',()=>select(i));tabsEl.appendChild(b);});
+function select(i){
+  S.cur=i;[...tabsEl.children].forEach((b,j)=>b.setAttribute('aria-selected',j===i?'true':'false'));
+  cv.style.cursor=mod().pointer?'pointer':'default';buildPanel();
+  try{history.replaceState(null,'','#m'+mod().id);}catch(e){}
+}
+function sw(id,label,checked,onchange){const l=document.createElement('label');l.className='switch';l.htmlFor=id;
+  l.innerHTML=`<input type="checkbox" id="${id}"><span class="track"></span><span></span>`;l.lastChild.textContent=label;
+  const inp=l.querySelector('input');inp.checked=checked;inp.addEventListener('change',()=>onchange(inp.checked));return l;}
+function buildPanel(){
+  const m=mod(),oe=$('#opts');oe.innerHTML='';
+  m.optDefs.forEach(([k,lab])=>oe.appendChild(sw(`m${m.id}-${k}`,lab,m.opts[k],v=>{m.opts[k]=v;if((k==='rot'||k==='stats')&&m.clearStats)m.clearStats();})));
+  const se=$('#settings');se.innerHTML='';const defs=m.settings?m.settings():[];$('#setSec').hidden=!defs.length;
+  defs.forEach(d=>{
+    if(d.type==='switch')se.appendChild(sw(d.id,d.label,d.get(),d.set));
+    else if(d.type==='range'){const w=document.createElement('div');w.className='range';
+      w.innerHTML=`<label for="${d.id}"></label><input type="range" id="${d.id}" min="${d.min}" max="${d.max}" step="${d.step}"><div class="ends"><span></span><span></span></div>`;
+      w.querySelector('label').textContent=d.label;const inp=w.querySelector('input');inp.value=d.get();inp.addEventListener('input',()=>d.set(+inp.value));
+      const e=w.querySelectorAll('.ends span');e[0].textContent=d.ends[0];e[1].textContent=d.ends[1];se.appendChild(w);}
+    else if(d.type==='button'){const b=document.createElement('button');b.type='button';b.className='btn';b.id=d.id;b.textContent=d.label;b.addEventListener('click',d.action);se.appendChild(b);}
+  });
+}
+function setRunning(v){S.running=v;$('#playBtn').textContent=v?'Pause':'Weiter';}
+$('#playBtn').addEventListener('click',()=>setRunning(!S.running));
+$('#resetBtn').addEventListener('click',()=>mod().reset());
+$('#speed').addEventListener('input',e=>S.speed=+e.target.value);
+$('#infoBtn').addEventListener('click',()=>{const d=$('#info');try{d.showModal();}catch(e){d.setAttribute('open','');}});
+$('#infoClose').addEventListener('click',()=>{const d=$('#info');try{d.close();}catch(e){d.removeAttribute('open');}});
+$('#fsBtn').addEventListener('click',()=>{try{if(document.fullscreenElement)document.exitFullscreen();else{const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(()=>{});}}catch(e){}});
+document.addEventListener('keydown',e=>{
+  if($('#info').open)return;const t=e.target,tag=t.tagName;
+  if(e.code==='Space'&&tag!=='BUTTON'&&!(tag==='INPUT'&&t.type==='checkbox')){e.preventDefault();setRunning(!S.running);}
+  else if(/^[1-3]$/.test(e.key)&&tag!=='INPUT')select(+e.key-1);
+});
+cv.addEventListener('pointerdown',e=>{const r=cv.getBoundingClientRect();mod().click&&mod().click(e.clientX-r.left,e.clientY-r.top);});
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);FS=clamp(Math.min(W,H)/32,12,22);}
+new ResizeObserver(resize).observe($('#stageBox'));
+readTheme();
+new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readTheme);
+let last=performance.now();
+function frame(now){
+  const dt=clamp((now-last)/1000,0,.05);last=now;const m=mod();
+  try{
+    if(S.running&&W>0){const sim=dt*S.speed,n=Math.max(1,Math.ceil(sim/.004));for(let i=0;i<n;i++)m.step(sim/n);}
+    ctx.fillStyle=T.stage;ctx.fillRect(0,0,W,H);
+    if(W>0)m.draw(ctx);
+    if(!S.running)pill(ctx,'Pause · Momentaufnahme',W-FS,FS,'right');
+  }catch(err){console.error(err);}
+  requestAnimationFrame(frame);
+}
+const hm=(location.hash||'').match(/^#m([1-3])$/);
+select(hm?+hm[1]-1:0);
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

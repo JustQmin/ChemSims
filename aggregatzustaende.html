@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aggregatzustände – Teilchenmodell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1f; --muted: #5d5d63; --line: #d8d6ce;
+    --fest: #0072B2; --fl: #56B4E9; --gas: #CC79A7;
+    --heat: #D55E00; --cool: #0072B2; --acc: #E69F00;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: Lexend, system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink);
+         display: flex; flex-direction: column; font-size: 15px; }
+  header { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--panel);
+           border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  h1 { font-size: 20px; margin: 0; font-weight: 600; }
+  .state { margin-left: auto; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+  .lbl { color: var(--muted); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 6px; background: #f1f0eb; font-weight: 500; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+  .seg button { border: 0; background: transparent; padding: 7px 12px; font: inherit; cursor: pointer; color: var(--ink); }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--ink); color: #fff; }
+
+  main { flex: 1; display: grid; grid-template-columns: minmax(320px, 1.15fr) minmax(360px, 1fr); gap: 12px; padding: 12px; min-height: 0; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .panel > h2 { font-size: 15px; font-weight: 500; margin: 0; padding: 8px 12px; color: var(--muted);
+                border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 41px; }
+  .panel > h2 b { color: var(--ink); font-weight: 600; }
+  .panel > h2 .r { margin-left: auto; display: inline-flex; gap: 10px; align-items: center; }
+  .hint { font-size: 13px; }
+  .cv { flex: 1; position: relative; min-height: 200px; }
+  .cv canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #cvPart { cursor: pointer; }
+
+  .right { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .right .curve { flex: 1 1 auto; }
+  .legend { display: inline-flex; gap: 12px; font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+  .ctrl { padding: 10px 12px; display: flex; flex-direction: column; gap: 12px; }
+  .box { border-left: 4px solid var(--line); padding: 2px 0 2px 12px; display: flex; flex-direction: column; gap: 7px; }
+  .box .t { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .box .t .v { margin-left: auto; font-weight: 500; color: var(--muted); }
+  .b-heat { border-color: var(--heat); }
+  .b-run { border-color: var(--acc); }
+
+  button.btn { font: inherit; border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 7px 12px; cursor: pointer; color: var(--ink); }
+  button.btn:hover { background: #f3f2ee; }
+  button.tog { font: inherit; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 4px 10px 4px 28px; cursor: pointer;
+               position: relative; color: var(--ink); }
+  button.tog::before { content: ""; position: absolute; left: 9px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+                       border: 2px solid #8a8a90; border-radius: 3px; background: #fff; }
+  button.tog.on::before { background: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 2px #fff; }
+
+  #heat { width: 100%; -webkit-appearance: none; appearance: none; height: 14px; border-radius: 7px;
+          background: linear-gradient(90deg, var(--cool), #e9e8e3 50%, var(--heat)); outline: none; margin: 8px 0; }
+  #heat::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); cursor: pointer; }
+  #heat::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); cursor: pointer; }
+  .scale { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); margin-top: -4px; }
+  .note { font-size: 13px; color: var(--muted); }
+  .note:empty { display: none; }
+
+  @media (max-width: 1000px) {
+    main { grid-template-columns: 1fr; }
+    .cv { min-height: 460px; }
+    .right .curve .cv { min-height: 280px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Aggregatzustände im Teilchenmodell</h1>
+  <button class="btn" id="bReset">Neu starten</button>
+  <button class="btn" id="bScen">Eis bis Dampf</button>
+  <div class="state"><span class="lbl">Zustand:</span><span id="stateTxt" class="chip">fest</span></div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2><b>Teilchenebene</b> – Modell
+      <span class="r"><span class="hint" id="hint">Teilchen anklicken: verfolgen</span>
+      <button class="tog on" id="tZone">Zustände einfärben</button></span>
+    </h2>
+    <div class="cv"><canvas id="cvPart"></canvas></div>
+  </section>
+
+  <div class="right">
+    <section class="panel curve">
+      <h2><b>Temperatur–Zeit</b>
+        <span class="r legend">
+          <span><i class="sw" style="background:var(--fest)"></i>fest</span>
+          <span><i class="sw" style="background:var(--fl)"></i>flüssig</span>
+          <span><i class="sw" style="background:var(--gas)"></i>gasförmig</span>
+        </span>
+      </h2>
+      <div class="cv"><canvas id="cvCurve"></canvas></div>
+    </section>
+
+    <section class="panel">
+      <div class="ctrl">
+        <div class="box b-heat">
+          <div class="t">Heizplatte <span class="v" id="heatTxt">aus</span></div>
+          <input type="range" id="heat" min="-100" max="100" step="5" value="0" aria-label="Heizleistung">
+          <div class="scale"><span>kühlen</span><button class="btn" id="heatOff" style="padding:2px 10px">aus</button><span>heizen</span></div>
+          <div class="note" id="heatNote"></div>
+        </div>
+        <div class="box b-run">
+          <div class="t">Ablauf</div>
+          <div class="row">
+            <button class="btn" id="bPlay" style="min-width:90px">Start</button>
+            <div class="seg" id="segSpeed">
+              <button data-v="5">Zeitlupe</button>
+              <button data-v="20" class="on">normal</button>
+              <button data-v="60">Zeitraffer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+// Teilchen-Engine für Aggregatzustände (2D)
+// Bewegung: Molekulardynamik (Morse-Anziehung, Schwerkraft, Wände, geschlossenes Gefäß).
+// Ablauf der Zustandsänderungen: gesteuert über die zugeführte Energie (Enthalpie-Modell).
+//   fest -> erwärmen -> Schmelzen (Plateau) -> flüssig -> erwärmen -> Sieden (Plateau) -> gasförmig -> erwärmen
+// Jedes Teilchen hat einen Zustand (0 fest, 1 flüssig, 2 gasförmig), der die Wechselwirkung bestimmt:
+//   fest-fest: starke Anziehung (Kristall bleibt stabil), flüssig: schwächere Anziehung (beweglich),
+//   gasförmig: nur Abstoßung, keine Schwerkraft (füllt den Raum).
+// Während eines Plateaus wechseln nach und nach Teilchen an der Grenzfläche ihren Zustand.
+(function (root) {
+  let gSpare = 0, gHas = false;
+  function gauss() {
+    if (gHas) { gHas = false; return gSpare; }
+    let u = 0;
+    while (u === 0) u = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u)), a = 2 * Math.PI * Math.random();
+    gSpare = r * Math.sin(a); gHas = true;
+    return r * Math.cos(a);
+  }
+
+  class Sim {
+    constructor(o) {
+      o = o || {};
+      this.N = o.N || 600;
+      this.W = o.W || 72;
+      this.H = o.H || 72;
+      this.rc = o.rc || 2.2; this.rc2 = this.rc * this.rc;
+      this.ma = o.ma || 4.5; this.r0 = 1.12;
+      this.buildTable();
+      this.dt = o.dt || 0.008;
+      this.g = o.g !== undefined ? o.g : 0.08;
+      this.ewFloor = o.ewf !== undefined ? o.ewf : 0.6;
+      this.ewSide = o.ews !== undefined ? o.ews : 0.12;
+      // Stärke der Anziehung je Zustand
+      this.epsS = o.epsS || 1.6; this.epsL = o.epsL || 0.8;
+      this.tau = o.tau || 1.5;          // Zeitkonstante des Wärmeaustauschs mit der Heizplatte
+
+      // Enthalpie-Modell (pro Teilchen); Temperaturen in Modelleinheiten
+      this.T0 = 0.08; this.Tm = o.Tm || 0.36; this.Tb = o.Tb || 0.5; this.Tmax = o.Tmax || 1.2;
+      this.cS = 1.2; this.Lm = o.Lm || 0.45; this.cL = 2.0; this.Lv = o.Lv || 0.9; this.cG = 1.0;
+      this.H1 = this.cS * (this.Tm - this.T0);
+      this.H2 = this.H1 + this.Lm;
+      this.H3 = this.H2 + this.cL * (this.Tb - this.Tm);
+      this.H4 = this.H3 + this.Lv;
+      this.H5 = this.H4 + this.cG * (this.Tmax - this.Tb);      // Bezugsgröße für die Heizleistung
+      this.Hcap = this.H4 + this.cG * (8 - this.Tb);             // nur Sicherheitsgrenze (T = 8)
+      this.Hmin = -this.cS * (this.T0 - 0.02);
+      this.rate = o.rate || this.H5 / 600;   // Energiezufuhr pro Zeiteinheit bei voller Leistung
+      this.enth = 0;
+      this.power = 0;                        // -1 ... 1
+
+      const N = this.N;
+      this.x = new Float64Array(N); this.y = new Float64Array(N);
+      this.vx = new Float64Array(N); this.vy = new Float64Array(N);
+      this.fx = new Float64Array(N); this.fy = new Float64Array(N);
+      this.s = new Uint8Array(N);            // Zustand je Teilchen
+      this.nS = new Uint8Array(N); this.nL = new Uint8Array(N);   // feste/flüssige Nachbarn (r < 1.5)
+      this.next = new Int32Array(N);
+      this.nlA = new Int32Array(N * 16); this.nlB = new Int32Array(N * 16); this.nl = 0;
+      this.x0 = new Float64Array(N); this.y0 = new Float64Array(N); this.skin = 0.4; this.listDirty = true;
+      this.time = 0; this._cc = 0; this._hc = 0;
+      this.counts = [N, 0, 0];
+    }
+
+    buildTable() {
+      const M = 4000, r2min = 0.36, rc2 = this.rc2, a = this.ma, r0 = this.r0;
+      this.tinv = M / (rc2 - r2min);
+      this.tf = new Float64Array(M + 2);
+      const V = (r) => { const e = Math.exp(-a * (r - r0)); return e * e - 2 * e; };
+      const h = 1e-5;
+      for (let k = 0; k <= M; k++) {
+        const r = Math.sqrt(r2min + k / this.tinv);
+        this.tf[k] = -(V(r + h) - V(r - h)) / (2 * h) / r;
+      }
+    }
+
+    // ---------- Temperatur aus der Enthalpie ----------
+    tempOf(Hh) {
+      if (Hh <= this.H1) return this.T0 + Hh / this.cS;
+      if (Hh <= this.H2) return this.Tm;
+      if (Hh <= this.H3) return this.Tm + (Hh - this.H2) / this.cL;
+      if (Hh <= this.H4) return this.Tb;
+      return this.Tb + (Hh - this.H4) / this.cG;
+    }
+    target() { return this.tempOf(this.enth); }
+    // Sollanzahl fester und gasförmiger Teilchen
+    targets() {
+      const N = this.N, h = this.enth;
+      let nS = N, nG = 0;
+      if (h > this.H1) nS = Math.round(N * Math.max(0, 1 - (h - this.H1) / this.Lm));
+      if (h > this.H3) nG = Math.round(N * Math.min(1, (h - this.H3) / this.Lv));
+      return [nS, nG];
+    }
+    // Welcher Übergang läuft gerade? (für die Beschriftung)
+    stage() {
+      const h = this.enth;
+      if (h > this.H1 && h < this.H2) return 'sl';
+      if (h > this.H3 && h < this.H4) return 'lg';
+      return null;
+    }
+
+    // ---------- Startzustand ----------
+    initSolid() {
+      const N = this.N, a = 1.12, hh = a * Math.sqrt(3) / 2;
+      const cols = Math.min(Math.floor((this.W - 2) / a), Math.ceil(Math.sqrt(N * 1.3)));
+      const x0 = (this.W - (cols - 0.5) * a) / 2;
+      for (let i = 0; i < N; i++) {
+        const r = Math.floor(i / cols), c = i % cols;
+        this.x[i] = x0 + c * a + (r % 2) * a / 2;
+        this.y[i] = 0.62 + r * hh;
+        this.s[i] = 0;
+      }
+      this.enth = 0; this.time = 0; this.listDirty = true;
+      const T = this.target();
+      for (let i = 0; i < N; i++) { this.vx[i] = gauss() * Math.sqrt(T); this.vy[i] = gauss() * Math.sqrt(T); }
+      this.computeForces();
+      this.counts = [N, 0, 0];
+    }
+
+    // ---------- Wände ----------
+    static wallF(d) {
+      if (d >= 0.5612) return 0;
+      if (d < 0.25) d = 0.25;
+      const sr6 = Math.pow(0.5 / d, 6);
+      return 24 * (2 * sr6 * sr6 - sr6) / d;
+    }
+    static wallA(d, e) {
+      if (d > 3) return 0;
+      if (d < 0.56) d = 0.56;
+      return 2 * e * Math.exp(-2 * (d - 0.56));
+    }
+
+    buildList() {
+      const N = this.N, x = this.x, y = this.y;
+      const rl = this.rc + this.skin, rl2 = rl * rl;
+      const HH = this.H + 1;
+      const ncx = Math.max(1, Math.floor(this.W / rl)), ncy = Math.max(1, Math.floor(HH / rl));
+      const csx = this.W / ncx, csy = HH / ncy;
+      if (!this.head || this.head.length !== ncx * ncy) this.head = new Int32Array(ncx * ncy);
+      const head = this.head, next = this.next;
+      head.fill(-1);
+      for (let i = 0; i < N; i++) {
+        this.x0[i] = x[i]; this.y0[i] = y[i];
+        let cx = (x[i] / csx) | 0, cy = (y[i] / csy) | 0;
+        if (cx < 0) cx = 0; else if (cx >= ncx) cx = ncx - 1;
+        if (cy < 0) cy = 0; else if (cy >= ncy) cy = ncy - 1;
+        const c = cy * ncx + cx;
+        next[i] = head[c]; head[c] = i;
+      }
+      let n = 0, A = this.nlA, B = this.nlB;
+      const add = (i, j) => {
+        const dx = x[j] - x[i], dy = y[j] - y[i];
+        if (dx * dx + dy * dy >= rl2) return;
+        if (n >= A.length) {
+          const a2 = new Int32Array(A.length * 2), b2 = new Int32Array(A.length * 2);
+          a2.set(A); b2.set(B); this.nlA = A = a2; this.nlB = B = b2;
+        }
+        A[n] = i; B[n] = j; n++;
+      };
+      for (let cy = 0; cy < ncy; cy++) for (let cx = 0; cx < ncx; cx++) {
+        const c = cy * ncx + cx;
+        for (let i = head[c]; i >= 0; i = next[i]) {
+          for (let j = next[i]; j >= 0; j = next[j]) add(i, j);
+          if (cx + 1 < ncx) for (let j = head[c + 1]; j >= 0; j = next[j]) add(i, j);
+          if (cy + 1 < ncy) {
+            const c2 = c + ncx;
+            if (cx > 0) for (let j = head[c2 - 1]; j >= 0; j = next[j]) add(i, j);
+            for (let j = head[c2]; j >= 0; j = next[j]) add(i, j);
+            if (cx + 1 < ncx) for (let j = head[c2 + 1]; j >= 0; j = next[j]) add(i, j);
+          }
+        }
+      }
+      this.nl = n; this.listDirty = false;
+    }
+    needRebuild() {
+      if (this.listDirty) return true;
+      const N = this.N, x = this.x, y = this.y, x0 = this.x0, y0 = this.y0;
+      const lim = 0.25 * this.skin * this.skin;
+      for (let i = 0; i < N; i++) {
+        const dx = x[i] - x0[i], dy = y[i] - y0[i];
+        if (dx * dx + dy * dy > lim) return true;
+      }
+      return false;
+    }
+
+    computeForces() {
+      const N = this.N, x = this.x, y = this.y, fx = this.fx, fy = this.fy, s = this.s;
+      const rc2 = this.rc2, tf = this.tf, tinv = this.tinv, r02 = this.r0 * this.r0;
+      const nS = this.nS, nL = this.nL;
+      // Anziehungsstärke je Paar: fest-fest, fest-flüssig, flüssig-flüssig
+      // Flüssigkeit: Anziehung wächst mit der Temperatur mit, damit sie bis zum Sieden zusammenhält
+      // und beim Schmelzpunkt nicht von selbst kristallisiert (Modell-Kniff)
+      const eLL = Math.max(this.epsL, this.target() / 0.45), eSS = Math.max(this.epsS, eLL * 1.4), eSL = Math.sqrt(eSS * eLL);
+      fx.fill(0); fy.fill(0); nS.fill(0); nL.fill(0);
+      if (this.needRebuild()) this.buildList();
+      const A = this.nlA, B = this.nlB, nl = this.nl;
+      for (let k = 0; k < nl; k++) {
+        const i = A[k], j = B[k];
+        const dx = x[j] - x[i], dy = y[j] - y[i];
+        const r2 = dx * dx + dy * dy;
+        if (r2 >= rc2) continue;
+        const si = s[i], sj = s[j];
+        let eps;
+        if (si === 2 || sj === 2) {
+          if (r2 >= r02) continue;        // Gas: nur Abstoßung
+          eps = 1;
+        } else {
+          eps = si === 0 ? (sj === 0 ? eSS : eSL) : (sj === 0 ? eSL : eLL);
+          if (r2 < 2.25) {
+            if (si === 0) nS[j]++; else nL[j]++;
+            if (sj === 0) nS[i]++; else nL[i]++;
+          }
+        }
+        let u = (r2 - 0.36) * tinv; if (u < 0) u = 0;
+        const kk = u | 0, w = u - kk;
+        let f = tf[kk] + w * (tf[kk + 1] - tf[kk]);
+        if (r2 < r02) { if (eps < 1) eps = 1; }   // Abstoßung immer gleich stark (Teilchengröße bleibt gleich)
+        f *= eps;
+        const ffx = f * dx, ffy = f * dy;
+        fx[i] -= ffx; fy[i] -= ffy; fx[j] += ffx; fy[j] += ffy;
+      }
+      const W = this.W, g = this.g, ews = this.ewSide, ewf = this.ewFloor, Ht = this.H;
+      for (let i = 0; i < N; i++) {
+        const cond = s[i] !== 2;
+        // Feste/flüssige Teilchen ohne Nachbarn (hochgesprungen) werden stärker zurückgezogen
+        if (cond) fy[i] -= (nS[i] + nL[i] <= 1) ? 6 * g : g;
+        fx[i] += Sim.wallF(x[i]) - (cond ? Sim.wallA(x[i], ews) : 0);
+        fx[i] -= Sim.wallF(W - x[i]) - (cond ? Sim.wallA(W - x[i], ews) : 0);
+        fy[i] += Sim.wallF(y[i]) - (cond ? Sim.wallA(y[i], ewf) : 0);
+        fy[i] -= Sim.wallF(Ht - y[i]);
+      }
+    }
+
+    step() {
+      const N = this.N, dt = this.dt, hdt = 0.5 * dt, W = this.W, Ht = this.H;
+      const x = this.x, y = this.y, vx = this.vx, vy = this.vy, fx = this.fx, fy = this.fy;
+      for (let i = 0; i < N; i++) {
+        vx[i] += hdt * fx[i]; vy[i] += hdt * fy[i];
+        x[i] += dt * vx[i]; y[i] += dt * vy[i];
+        if (x[i] < 0.2) { x[i] = 0.2; vx[i] = Math.abs(vx[i]); }
+        if (x[i] > W - 0.2) { x[i] = W - 0.2; vx[i] = -Math.abs(vx[i]); }
+        if (y[i] < 0.2) { y[i] = 0.2; vy[i] = Math.abs(vy[i]); }
+        if (y[i] > Ht - 0.2) { y[i] = Ht - 0.2; vy[i] = -Math.abs(vy[i]); }
+      }
+      this.computeForces();
+      for (let i = 0; i < N; i++) { vx[i] += hdt * fx[i]; vy[i] += hdt * fy[i]; }
+      // Energiezufuhr
+      this.enth += this.power * this.rate * dt;
+      if (this.enth < this.Hmin) this.enth = this.Hmin;
+      if (this.enth > this.Hcap) this.enth = this.Hcap;
+      if (++this._hc >= 4) { this._hc = 0; this.thermostat(4 * dt); }
+      if (++this._cc >= 25) { this._cc = 0; this.transitions(); }
+      this.time += dt;
+    }
+
+    // Wärmeaustausch: alle Teilchen werden sanft auf die Solltemperatur gebracht (getrennt nach Zustand)
+    thermostat(dtt) {
+      const N = this.N, s = this.s, vx = this.vx, vy = this.vy, T = this.target();
+      const K = [0, 0, 0], n = [0, 0, 0];
+      for (let i = 0; i < N; i++) { const q = s[i]; K[q] += 0.5 * (vx[i] * vx[i] + vy[i] * vy[i]); n[q]++; }
+      const f = [1, 1, 1];
+      for (let q = 0; q < 3; q++) {
+        if (n[q] === 0 || K[q] <= 1e-12) continue;
+        const Tq = K[q] / n[q];
+        f[q] = Math.sqrt(Math.max(0.5, 1 + dtt / this.tau * (T / Tq - 1)));
+      }
+      // Feststoff soll nicht über den Boden rutschen: gemeinsame Seitwärtsbewegung des Kristalls entfernen
+      let mvx = 0;
+      if (n[0] > 0) { for (let i = 0; i < N; i++) if (s[i] === 0) mvx += vx[i]; mvx /= n[0]; }
+      for (let i = 0; i < N; i++) { const q = s[i]; if (q === 0) vx[i] -= mvx; vx[i] *= f[q]; vy[i] *= f[q]; }
+      this.Tkin = (K[0] + K[1] + K[2]) / N;
+    }
+
+    // Zustandswechsel an den Grenzflächen, bis die Sollanzahlen erreicht sind
+    transitions() {
+      const N = this.N, s = this.s, nS = this.nS, nL = this.nL, x = this.x, y = this.y;
+      const c = [0, 0, 0];
+      for (let i = 0; i < N; i++) c[s[i]]++;
+      const [tS, tG] = this.targets();
+      const maxFlip = 6;
+      // Schmelzen: feste Teilchen mit den wenigsten festen Nachbarn (Rand des Kristalls)
+      for (let k = 0; k < maxFlip && c[0] > tS; k++) {
+        let best = -1, bv = 1e9;
+        for (let i = 0; i < N; i++) if (s[i] === 0) {
+          const v = nS[i] + Math.random() * 0.9;
+          if (v < bv) { bv = v; best = i; }
+        }
+        if (best < 0) break;
+        s[best] = 1; c[0]--; c[1]++;
+      }
+      // Erstarren: flüssige Teilchen mit den meisten festen Nachbarn; ohne Kristall: Keim unten in der Mitte
+      for (let k = 0; k < maxFlip && c[0] < tS && c[1] > 0; k++) {
+        let best = -1, bv = -1e9;
+        for (let i = 0; i < N; i++) if (s[i] === 1) {
+          const v = c[0] > 0 ? nS[i] * 10 + nL[i] + Math.random() * 0.9 - y[i] * 0.01 : nL[i] - y[i] - Math.abs(x[i] - this.W / 2) * 0.2;
+          if (v > bv) { bv = v; best = i; }
+        }
+        if (best < 0) break;
+        s[best] = 0; c[1]--; c[0]++;
+      }
+      // Verdampfen: flüssige Teilchen an der Oberfläche (wenige Nachbarn, möglichst weit oben)
+      for (let k = 0; k < maxFlip && c[2] < tG && c[1] > 0; k++) {
+        let best = -1, bv = -1e9;
+        for (let i = 0; i < N; i++) if (s[i] === 1) {
+          const v = y[i] - 2 * (nL[i] + nS[i]) + Math.random() * 2;
+          if (v > bv) { bv = v; best = i; }
+        }
+        if (best < 0) break;
+        s[best] = 2; c[1]--; c[2]++;
+        this.vy[best] += 0.6 + Math.random() * 0.4;     // löst sich von der Oberfläche
+      }
+      // Kondensieren: Gasteilchen, die der Flüssigkeit am nächsten sind (möglichst weit unten)
+      for (let k = 0; k < maxFlip && c[2] > tG; k++) {
+        let best = -1, bv = 1e9;
+        for (let i = 0; i < N; i++) if (s[i] === 2) {
+          const v = y[i] + Math.random() * 2;
+          if (v < bv) { bv = v; best = i; }
+        }
+        if (best < 0) break;
+        s[best] = 1; c[2]--; c[1]++;
+      }
+      this.counts = c;
+    }
+
+    temperature() {
+      let K = 0;
+      for (let i = 0; i < this.N; i++) K += 0.5 * (this.vx[i] * this.vx[i] + this.vy[i] * this.vy[i]);
+      return K / this.N;
+    }
+  }
+
+  root.Sim = Sim;
+  
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function () {
+  'use strict';
+  const N = 600, W = 72, H = 72;
+  let yMax = 1.25;          // Temperaturachse: wird erst erweitert, wenn die Kurve oben anstößt
+  const C = {
+    fest: '#0072B2', fl: '#56B4E9', gas: '#CC79A7', heat: '#D55E00', cool: '#0072B2', acc: '#E69F00',
+    ink: '#1d1d1f', muted: '#6b6b70', wall: '#4a4a50', part: '#3f4a5c'
+  };
+
+  let sim, running = true, speed = 20, zone = true;
+  let sel = -1, trail = [];
+  let hist = [], lastSample = 0, tEnd = 1600, frame = 0;
+  const ws = new Float32Array(N), wl = new Float32Array(N);
+  const $ = (id) => document.getElementById(id);
+
+  function start() {
+    sim = new Sim({ N, W, H });
+    sim.initSolid();
+    sel = -1; trail = []; hist = []; lastSample = 0; tEnd = 1600; yMax = 1.25;
+    for (let i = 0; i < N; i++) { ws[i] = 1; wl[i] = 0; }
+    setHeat(0);
+    setRun(false);
+    window.__sim = sim;
+  }
+
+  // ---------- Bedienung ----------
+  function setHeat(v) { $('heat').value = v; updHeat(); }
+  function updHeat() {
+    const v = +$('heat').value;
+    $('heatTxt').textContent = v === 0 ? 'aus' : (v > 0 ? 'heizen ' + v + ' %' : 'kühlen ' + (-v) + ' %');
+    if (sim) sim.power = v / 100;
+  }
+  $('heat').addEventListener('input', updHeat);
+  $('heatOff').addEventListener('click', () => setHeat(0));
+  function setRun(r) { running = r; $('bPlay').textContent = r ? 'Pause' : 'Start'; }
+  function setSpeed(v) {
+    for (const q of $('segSpeed').querySelectorAll('button')) q.classList.toggle('on', +q.dataset.v === v);
+    speed = v;
+  }
+  $('bReset').addEventListener('click', start);
+  // Szenario: vom Eis bis zum Dampf in gut einer halben Minute
+  $('bScen').addEventListener('click', () => { start(); setHeat(75); setSpeed(60); setRun(true); });
+  $('bPlay').addEventListener('click', () => setRun(!running));
+  $('segSpeed').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (b) setSpeed(+b.dataset.v);
+  });
+  $('tZone').addEventListener('click', () => { zone = !zone; $('tZone').classList.toggle('on', zone); });
+  document.addEventListener('keyup', (e) => { if (e.code === 'Space') e.preventDefault(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); if (document.activeElement) document.activeElement.blur(); $('bPlay').click(); }
+  });
+
+  // ---------- Zeitschritt ----------
+  function advance(steps) {
+    for (let k = 0; k < steps; k++) sim.step();
+    if (sim.time - lastSample >= 2) {
+      const c = sim.counts;
+      hist.push({ t: sim.time, T: sim.target(), f: [c[0] / N, c[1] / N, c[2] / N], k: sim.stage(), p: Math.sign(sim.power) });
+      lastSample = sim.time;
+      if (hist.length > 4000) hist = hist.filter((_, i) => i % 2 === 0);
+    }
+    if (sel >= 0) { trail.push(sim.x[sel], sim.y[sel]); if (trail.length > 900) trail.splice(0, 2); }
+    const s = sim.s;
+    for (let i = 0; i < N; i++) {
+      ws[i] += 0.15 * ((s[i] === 0 ? 1 : 0) - ws[i]);
+      wl[i] += 0.15 * ((s[i] === 1 ? 1 : 0) - wl[i]);
+    }
+  }
+
+  // ---------- Hilfen ----------
+  function fit(cv) {
+    const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    const w = Math.max(10, Math.round(r.width * d)), h = Math.max(10, Math.round(r.height * d));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    return { w, h, d };
+  }
+  function view(cv) {
+    const { w, h, d } = fit(cv);
+    const wx = W + 3, wy = H + 4.5;
+    const s = Math.min(w / wx, h / wy);
+    const ox = (w - W * s) / 2, oy = h - 1.9 * s - (h - wy * s) / 2;
+    return { w, h, d, s, X: (x) => ox + x * s, Y: (y) => oy - y * s };
+  }
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function hex(c) { return [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)); }
+  function mix(a, b, t) { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',')})`; }
+
+  // ---------- Teilchenebene ----------
+  const cvP = $('cvPart'), ctxP = cvP.getContext('2d');
+  let vP = null;
+  cvP.addEventListener('click', (e) => {
+    if (!vP) return;
+    const r = cvP.getBoundingClientRect();
+    const px = (e.clientX - r.left) * vP.d, py = (e.clientY - r.top) * vP.d;
+    let best = -1, bd = 1.3 * 1.3;
+    for (let i = 0; i < N; i++) {
+      const dx = (vP.X(sim.x[i]) - px) / vP.s, dy = (vP.Y(sim.y[i]) - py) / vP.s;
+      const d2 = dx * dx + dy * dy; if (d2 < bd) { bd = d2; best = i; }
+    }
+    if (best === sel || best < 0) { sel = -1; trail = []; } else { sel = best; trail = []; }
+    updHint();
+  });
+  function updHint() { $('hint').textContent = sel >= 0 ? 'erneut anklicken: Verfolgen beenden' : 'Teilchen anklicken: verfolgen'; }
+
+  // Bereiche einfärben (fest / flüssig) hinter den Teilchen
+  const GR = 2, GW = W * GR, GH = H * GR;
+  const off = document.createElement('canvas'); off.width = GW; off.height = GH;
+  const offCtx = off.getContext('2d'), img = offCtx.createImageData(GW, GH);
+  const dS = new Float32Array(GW * GH), dL = new Float32Array(GW * GH);
+  const KS = 0.85, KR = Math.ceil(2.4 * GR), KW = 2 * KR + 1;
+  const kern = new Float32Array(KW * KW);
+  for (let a = -KR; a <= KR; a++) for (let b = -KR; b <= KR; b++)
+    kern[(a + KR) * KW + b + KR] = Math.exp(-((a / GR) ** 2 + (b / GR) ** 2) / (2 * KS * KS)) / (2 * Math.PI * KS * KS);
+  const RS = hex(C.fest), RL = hex(C.fl);
+  function drawZones(ctx, v) {
+    dS.fill(0); dL.fill(0);
+    for (let i = 0; i < N; i++) {
+      const a = ws[i], b = wl[i];
+      if (a + b < 0.05) continue;
+      const cx = Math.round(sim.x[i] * GR - 0.5), cy = Math.round((H - sim.y[i]) * GR - 0.5);
+      const y0 = Math.max(0, cy - KR), y1 = Math.min(GH - 1, cy + KR), x0 = Math.max(0, cx - KR), x1 = Math.min(GW - 1, cx + KR);
+      for (let yy = y0; yy <= y1; yy++) {
+        const kr = (yy - cy + KR) * KW + KR - cx, row = yy * GW;
+        for (let xx = x0; xx <= x1; xx++) { const k = kern[kr + xx], idx = row + xx; dS[idx] += k * a; dL[idx] += k * b; }
+      }
+    }
+    const d = img.data;
+    for (let idx = 0; idx < GW * GH; idx++) {
+      const s = dS[idx], l = dL[idx], D = s + l;
+      let al = (D - 0.3) / 0.2; al = al < 0 ? 0 : al > 1 ? 1 : al; al = al * al * (3 - 2 * al);
+      const f = D > 1e-6 ? s / D : 0, o = idx * 4;
+      d[o] = RL[0] + (RS[0] - RL[0]) * f; d[o + 1] = RL[1] + (RS[1] - RL[1]) * f; d[o + 2] = RL[2] + (RS[2] - RL[2]) * f;
+      d[o + 3] = 255 * al * (0.38 + 0.22 * f);
+    }
+    offCtx.putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(off, v.X(0), v.Y(H), W * v.s, H * v.s);
+  }
+
+  function drawVessel(ctx, v) {
+    const { s, X, Y } = v;
+    const p = sim.power;
+    let col = '#dcdad3';
+    if (p > 0) col = mix('#e6e4dd', C.heat, Math.min(1, 0.25 + p));
+    if (p < 0) col = mix('#e6e4dd', C.cool, Math.min(1, 0.25 - p));
+    ctx.fillStyle = col;
+    roundRect(ctx, X(-1.2), Y(-0.35), (W + 2.4) * s, 1.2 * s, 0.25 * s); ctx.fill();
+    ctx.strokeStyle = C.wall; ctx.lineWidth = Math.max(2, 0.22 * s); ctx.lineJoin = 'round';
+    ctx.strokeRect(X(-0.1), Y(H + 0.1), (W + 0.2) * s, (H + 0.2) * s);
+  }
+
+  let spr = null, sprS = 0;
+  function sprites(s) {
+    if (spr && sprS === s) return spr;
+    sprS = s;
+    const r = 0.47 * s, size = Math.ceil(2 * r + 4);
+    const ball = (col) => {
+      const c = document.createElement('canvas'); c.width = c.height = size;
+      const g = c.getContext('2d'), m = size / 2;
+      g.beginPath(); g.arc(m, m, r, 0, 6.2832); g.fillStyle = col; g.fill();
+      g.lineWidth = Math.max(1, 0.05 * s); g.strokeStyle = 'rgba(0,0,0,0.35)'; g.stroke();
+      g.beginPath(); g.arc(m - r * 0.32, m - r * 0.32, r * 0.28, 0, 6.2832); g.fillStyle = 'rgba(255,255,255,0.3)'; g.fill();
+      return c;
+    };
+    spr = { ball: ball(C.part), sel: ball(C.acc), size };
+    return spr;
+  }
+
+  function drawParticles() {
+    const v = vP = view(cvP);
+    const ctx = ctxP, { s, X, Y } = v;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, v.w, v.h);
+    if (zone) drawZones(ctx, v);
+    drawVessel(ctx, v);
+    if (sel >= 0 && trail.length > 4) {
+      ctx.strokeStyle = C.acc; ctx.lineWidth = Math.max(1.5, 0.09 * s); ctx.globalAlpha = 0.85;
+      ctx.beginPath(); ctx.moveTo(X(trail[0]), Y(trail[1]));
+      for (let k = 2; k < trail.length; k += 2) ctx.lineTo(X(trail[k]), Y(trail[k + 1]));
+      ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    const sp = sprites(s), o = sp.size / 2;
+    for (let i = 0; i < N; i++) ctx.drawImage(i === sel ? sp.sel : sp.ball, X(sim.x[i]) - o, Y(sim.y[i]) - o);
+  }
+
+  // ---------- Kurve ----------
+  const cvC = $('cvCurve'), ctxC = cvC.getContext('2d');
+  const KIND = { sl: ['Schmelzen', 'Erstarren', 'rgba(240,228,66,0.38)'], lg: ['Verdampfen', 'Kondensieren', 'rgba(0,158,115,0.17)'] };
+  function drawCurve() {
+    const { w, h, d } = fit(cvC), ctx = ctxC;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+    const L = 40 * d, R = 16 * d, T = 12 * d, SB = 14 * d, B = 28 * d;
+    const pw = w - L - R, ph = h - T - B - SB - 6 * d;
+    while (sim.time > 0.94 * tEnd) tEnd *= 1.5;
+    while (sim.target() > 0.97 * yMax) yMax *= 1.5;
+    const Xt = (t) => L + pw * t / tEnd, YT = (v) => T + ph * (1 - Math.max(0, Math.min(yMax, v)) / yMax);
+    ctx.strokeStyle = '#ecebe6'; ctx.lineWidth = d;
+    for (let k = 1; k < 5; k++) { const yy = T + ph * k / 5; ctx.beginPath(); ctx.moveTo(L, yy); ctx.lineTo(L + pw, yy); ctx.stroke(); }
+    // Bänder für die Übergänge
+    ctx.font = `${12 * d}px Lexend, system-ui, sans-serif`; ctx.textAlign = 'center';
+    let k0 = -1;
+    for (let k = 0; k <= hist.length; k++) {
+      const a = k < hist.length ? hist[k] : null;
+      const kk = a ? a.k : null;
+      const brk = k0 >= 0 && (!a || kk !== hist[k0].k || (a.p !== 0 && hist[k0].p !== 0 && a.p !== hist[k0].p));
+      if (brk) {
+        const kind = hist[k0].k, xa = Xt(k0 ? hist[k0 - 1].t : 0), xb = Xt(hist[k - 1].t);
+        let ps = 0; for (let q = k0; q < k; q++) ps += hist[q].p;
+        ctx.fillStyle = KIND[kind][2]; ctx.fillRect(xa, T, xb - xa, ph);
+        const lbl = ps >= 0 ? KIND[kind][0] : KIND[kind][1];
+        ctx.fillStyle = C.muted;
+        if (ctx.measureText(lbl).width + 6 * d < xb - xa) ctx.fillText(lbl, (xa + xb) / 2, T + 14 * d);
+        else if (xb - xa > 14 * d) {   // schmales Band: Beschriftung senkrecht
+          ctx.save(); ctx.translate((xa + xb) / 2 + 4 * d, T + 6 * d); ctx.rotate(Math.PI / 2);
+          ctx.textAlign = 'left'; ctx.fillText(lbl, 0, 0); ctx.restore();
+        }
+        k0 = -1;
+      }
+      if (a && kk && k0 < 0) k0 = k;
+    }
+    // Achsen
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5 * d;
+    ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, T + ph); ctx.lineTo(L + pw, T + ph); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.font = `${13 * d}px Lexend, system-ui, sans-serif`;
+    ctx.textAlign = 'right'; ctx.fillText('Zeit', L + pw, h - 6 * d);
+    ctx.save(); ctx.translate(16 * d, T + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('Temperatur', 0, 0); ctx.restore();
+    // Zustandsstreifen
+    const sy = T + ph + 6 * d, cols = [C.fest, C.fl, C.gas];
+    for (let k = 0; k < hist.length; k++) {
+      const a = hist[k], x0 = Xt(k ? hist[k - 1].t : 0), x1 = Xt(a.t) + 0.6;
+      let yy = sy;
+      for (let q = 0; q < 3; q++) { const hh = SB * a.f[q]; ctx.fillStyle = cols[q]; ctx.fillRect(x0, yy, x1 - x0, hh); yy += hh; }
+    }
+    ctx.strokeStyle = '#c9c7bf'; ctx.lineWidth = d; ctx.strokeRect(L, sy, pw, SB);
+    // Kurve
+    if (hist.length > 1) {
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 2.8 * d; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let k = 0; k < hist.length; k++) { const a = hist[k]; k ? ctx.lineTo(Xt(a.t), YT(a.T)) : ctx.moveTo(Xt(a.t), YT(a.T)); }
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(Xt(sim.time), YT(sim.target()), 5 * d, 0, 6.2832); ctx.fillStyle = C.acc; ctx.fill();
+  }
+
+  // ---------- Status ----------
+  const names = ['fest', 'flüssig', 'gasförmig'], cols = [C.fest, C.fl, C.gas];
+  function updStatus() {
+    const c = sim.counts, parts = [];
+    for (let q = 0; q < 3; q++) if (c[q] > 0.02 * N) parts.push(q);
+    $('stateTxt').innerHTML = parts.map(q => `<i class="sw" style="background:${cols[q]}"></i>${names[q]}`).join(' + ');
+    const st = sim.stage();
+    let note = '';
+    if (st && sim.power !== 0) note = (st === 'sl' ? (sim.power > 0 ? 'Schmelzen' : 'Erstarren') : (sim.power > 0 ? 'Verdampfen' : 'Kondensieren')) +
+      ': Die Temperatur bleibt gleich.';
+    else if (sim.power < 0 && sim.enth <= sim.Hmin + 1e-9) note = 'Tiefsttemperatur erreicht.';
+    $('heatNote').textContent = note;
+  }
+
+  function loop() {
+    if (running) advance(speed);
+    drawParticles();
+    drawCurve();
+    if (frame++ % 6 === 0) updStatus();
+    requestAnimationFrame(loop);
+  }
+
+  start();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

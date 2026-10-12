@@ -214,6 +214,14 @@
       return this.Tb + (Hh - this.H4) / this.cG;
     }
     target() { return this.tempOf(this.enth); }
+    // Bewegungstemperatur der Teilchen (Modell-Kniff): innerhalb jedes Zustands deutlich gespreizt,
+    // damit man sieht, wie die Bewegung mit der Temperatur zunimmt (fest: kaum Wackeln -> starkes Wackeln).
+    mdTemp() {
+      const T = this.target(), Ts0 = 0.006, Tsm = 0.36, Tlb = 0.85;
+      if (T <= this.Tm) return Math.max(0.004, Ts0 + (T - this.T0) / (this.Tm - this.T0) * (Tsm - Ts0));
+      if (T <= this.Tb) return Tsm + (T - this.Tm) / (this.Tb - this.Tm) * (Tlb - Tsm);
+      return Tlb + (T - this.Tb) * 1.6;
+    }
     // Sollanzahl fester und gasförmiger Teilchen
     targets() {
       const N = this.N, h = this.enth;
@@ -242,7 +250,7 @@
         this.s[i] = 0;
       }
       this.enth = 0; this.time = 0; this.listDirty = true;
-      const T = this.target();
+      const T = this.mdTemp();
       for (let i = 0; i < N; i++) { this.vx[i] = gauss() * Math.sqrt(T); this.vy[i] = gauss() * Math.sqrt(T); }
       this.computeForces();
       this.counts = [N, 0, 0];
@@ -321,7 +329,7 @@
       // Anziehungsstärke je Paar: fest-fest, fest-flüssig, flüssig-flüssig
       // Flüssigkeit: Anziehung wächst mit der Temperatur mit, damit sie bis zum Sieden zusammenhält
       // und beim Schmelzpunkt nicht von selbst kristallisiert (Modell-Kniff)
-      const eLL = Math.max(this.epsL, this.target() / 0.45), eSS = Math.max(this.epsS, eLL * 1.4), eSL = Math.sqrt(eSS * eLL);
+      const eLL = Math.max(this.epsL, this.mdTemp() / 0.45), eSS = Math.max(this.epsS, eLL * 1.4), eSL = Math.sqrt(eSS * eLL);
       fx.fill(0); fy.fill(0); nS.fill(0); nL.fill(0);
       if (this.needRebuild()) this.buildList();
       const A = this.nlA, B = this.nlB, nl = this.nl;
@@ -386,7 +394,7 @@
 
     // Wärmeaustausch: alle Teilchen werden sanft auf die Solltemperatur gebracht (getrennt nach Zustand)
     thermostat(dtt) {
-      const N = this.N, s = this.s, vx = this.vx, vy = this.vy, T = this.target();
+      const N = this.N, s = this.s, vx = this.vx, vy = this.vy, T = this.mdTemp();
       const K = [0, 0, 0], n = [0, 0, 0];
       for (let i = 0; i < N; i++) { const q = s[i]; K[q] += 0.5 * (vx[i] * vx[i] + vy[i] * vy[i]); n[q]++; }
       const f = [1, 1, 1];
@@ -479,13 +487,16 @@
   let sel = -1, trail = [];
   let hist = [], lastSample = 0, tEnd = 1600, frame = 0;
   const ws = new Float32Array(N), wl = new Float32Array(N);
+  // Darstellung: Schwingung um die mittlere Lage wird im festen (und leicht im flüssigen) Zustand verstärkt,
+  // und zwar umso mehr, je wärmer der Stoff ist -> kalt: kaum Wackeln, kurz vor dem Übergang: deutliches Wackeln
+  const ax = new Float64Array(N), ay = new Float64Array(N), px = new Float64Array(N), py = new Float64Array(N);
   const $ = (id) => document.getElementById(id);
 
   function start() {
     sim = new Sim({ N, W, H });
     sim.initSolid();
     sel = -1; trail = []; hist = []; lastSample = 0; tEnd = 1600; yMax = 1.25;
-    for (let i = 0; i < N; i++) { ws[i] = 1; wl[i] = 0; }
+    for (let i = 0; i < N; i++) { ws[i] = 1; wl[i] = 0; ax[i] = sim.x[i]; ay[i] = sim.y[i]; }
     setHeat(0);
     setRun(false);
     window.__sim = sim;
@@ -521,6 +532,8 @@
   // ---------- Zeitschritt ----------
   function advance(steps) {
     for (let k = 0; k < steps; k++) sim.step();
+    const al = 1 - Math.exp(-(steps * sim.dt) / 0.5);
+    for (let i = 0; i < N; i++) { ax[i] += al * (sim.x[i] - ax[i]); ay[i] += al * (sim.y[i] - ay[i]); }
     if (sim.time - lastSample >= 2) {
       const c = sim.counts;
       hist.push({ t: sim.time, T: sim.target(), f: [c[0] / N, c[1] / N, c[2] / N], k: sim.stage(), p: Math.sign(sim.power) });
@@ -651,7 +664,20 @@
       ctx.stroke(); ctx.globalAlpha = 1;
     }
     const sp = sprites(s), o = sp.size / 2;
-    for (let i = 0; i < N; i++) ctx.drawImage(i === sel ? sp.sel : sp.ball, X(sim.x[i]) - o, Y(sim.y[i]) - o);
+    displayPos();
+    for (let i = 0; i < N; i++) ctx.drawImage(i === sel ? sp.sel : sp.ball, X(px[i]) - o, Y(py[i]) - o);
+  }
+
+  function displayPos() {
+    const T = sim.target();
+    const pS = Math.max(0, Math.min(1, (T - sim.T0) / (sim.Tm - sim.T0)));
+    const pL = T <= sim.Tm ? 0 : Math.max(0, Math.min(1, (T - sim.Tm) / (sim.Tb - sim.Tm)));
+    const aS = 1 + 1.2 * pS, aL = T <= sim.Tm ? 1 : 1.25 + 0.35 * pL;
+    for (let i = 0; i < N; i++) {
+      const A = 1 + (aS - 1) * ws[i] + (aL - 1) * wl[i];
+      px[i] = ax[i] + A * (sim.x[i] - ax[i]);
+      py[i] = ay[i] + A * (sim.y[i] - ay[i]);
+    }
   }
 
   // ---------- Kurve ----------

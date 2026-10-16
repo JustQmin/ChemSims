@@ -35,7 +35,7 @@
   .panel > h2 { font-size: 15px; font-weight: 500; margin: 0; padding: 8px 12px; color: var(--muted);
                 border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 41px; }
   .panel > h2 b { color: var(--ink); font-weight: 600; }
-  .panel > h2 .r { margin-left: auto; display: inline-flex; gap: 10px; align-items: center; }
+  .panel > h2 .r { margin-left: auto; display: inline-flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .hint { font-size: 13px; }
   .cv { flex: 1; position: relative; min-height: 200px; }
   .cv canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -69,6 +69,29 @@
   .note { font-size: 13px; color: var(--muted); }
   .note:empty { display: none; }
 
+  .gone { display: none !important; }
+  main.solo { grid-template-columns: 1fr; }
+  .right .curve.only { flex: 1 1 auto; }
+  button.btn.small { font-size: 13px; padding: 4px 10px; }
+  #pPart:fullscreen { border-radius: 0; border: 0; }
+  .fsbar { display: none; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); }
+  #pPart:fullscreen .fsbar { display: flex; }
+  .fsbar .fl { font-weight: 600; }
+  .fsbar .v { color: var(--muted); min-width: 92px; }
+  .fsheat { display: inline-flex; align-items: center; gap: 8px; flex: 1 1 320px; font-size: 13px; }
+  #heatFs { flex: 1; -webkit-appearance: none; appearance: none; height: 14px; border-radius: 7px;
+            background: linear-gradient(90deg, var(--cool), #e9e8e3 50%, var(--heat)); outline: none; }
+  #heatFs::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); cursor: pointer; }
+  #heatFs::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); cursor: pointer; }
+  button.vis { font: inherit; font-size: 12px; border: 1px solid var(--line); background: #fff; border-radius: 6px;
+               padding: 2px 8px; cursor: pointer; color: var(--muted); }
+  button.vis:hover { background: #f3f2ee; }
+  button.vis.off { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .cv.off canvas { visibility: hidden; }
+  .cv.off::after { content: "ausgeblendet"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+                   color: #a5a39b; font-size: 18px; }
+  .hid { visibility: hidden; }
+
   @media (max-width: 1000px) {
     main { grid-template-columns: 1fr; }
     .cv { min-height: 460px; }
@@ -81,20 +104,42 @@
   <h1>Aggregatzustände im Teilchenmodell</h1>
   <button class="btn" id="bReset">Neu starten</button>
   <button class="btn" id="bScen">Eis bis Dampf</button>
-  <div class="state"><span class="lbl">Zustand:</span><span id="stateTxt" class="chip">fest</span></div>
+  <div class="row views"><span class="lbl">Anzeigen:</span>
+    <button class="tog on" data-view="pPart">Teilchen</button>
+    <button class="tog on" data-view="pCurve">Diagramm</button>
+    <button class="tog on" data-view="pCtrl">Bedienung</button>
+    <button class="tog on" data-view="state">Zustand</button>
+  </div>
+  <div class="state" id="state"><span class="lbl">Zustand:</span><span id="stateTxt" class="chip">fest</span>
+  </div>
 </header>
 
 <main>
-  <section class="panel">
+  <section class="panel" id="pPart">
     <h2><b>Teilchenebene</b> – Modell
       <span class="r"><span class="hint" id="hint">Teilchen anklicken: verfolgen</span>
-      <button class="tog on" id="tZone">Zustände einfärben</button></span>
+      <button class="tog on" id="tZone">Zustände einfärben</button>
+      <button class="btn small" id="bFull">Vollbild</button></span>
     </h2>
-    <div class="cv"><canvas id="cvPart"></canvas></div>
+    <div class="cv" id="cvPartBox"><canvas id="cvPart"></canvas></div>
+    <div class="fsbar">
+      <span class="fl">Heizplatte</span>
+      <span class="fsheat"><span class="lbl">kühlen</span>
+        <input type="range" id="heatFs" min="-100" max="100" step="5" value="0" aria-label="Heizleistung">
+        <span class="lbl">heizen</span></span>
+      <span class="v" id="heatTxtFs">aus</span>
+      <button class="btn" id="heatOffFs" style="padding:4px 10px">aus</button>
+      <button class="btn" id="bPlayFs" style="min-width:90px">Start</button>
+      <div class="seg" id="segSpeedFs">
+        <button data-v="5">Zeitlupe</button>
+        <button data-v="20" class="on">normal</button>
+        <button data-v="60">Zeitraffer</button>
+      </div>
+    </div>
   </section>
 
-  <div class="right">
-    <section class="panel curve">
+  <div class="right" id="pRight">
+    <section class="panel curve" id="pCurve">
       <h2><b>Temperatur–Zeit</b>
         <span class="r legend">
           <span><i class="sw" style="background:var(--fest)"></i>fest</span>
@@ -102,16 +147,18 @@
           <span><i class="sw" style="background:var(--gas)"></i>gasförmig</span>
         </span>
       </h2>
-      <div class="cv"><canvas id="cvCurve"></canvas></div>
+      <div class="cv" id="cvCurveBox"><canvas id="cvCurve"></canvas></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="pCtrl">
       <div class="ctrl">
         <div class="box b-heat">
           <div class="t">Heizplatte <span class="v" id="heatTxt">aus</span></div>
-          <input type="range" id="heat" min="-100" max="100" step="5" value="0" aria-label="Heizleistung">
-          <div class="scale"><span>kühlen</span><button class="btn" id="heatOff" style="padding:2px 10px">aus</button><span>heizen</span></div>
-          <div class="note" id="heatNote"></div>
+          <div id="heatBody">
+            <input type="range" id="heat" min="-100" max="100" step="5" value="0" aria-label="Heizleistung">
+            <div class="scale"><span>kühlen</span><button class="btn" id="heatOff" style="padding:2px 10px">aus</button><span>heizen</span></div>
+            <div class="note" id="heatNote"></div>
+          </div>
         </div>
         <div class="box b-run">
           <div class="t">Ablauf</div>
@@ -165,6 +212,7 @@
       // Stärke der Anziehung je Zustand
       this.epsS = o.epsS || 1.6; this.epsL = o.epsL || 0.8;
       this.tau = o.tau || 1.5;          // Zeitkonstante des Wärmeaustauschs mit der Heizplatte
+      this.gasBoost = o.gasBoost || 3;  // Gasteilchen bewegen sich schneller als Flüssigkeitsteilchen (Modell-Kniff)
 
       // Enthalpie-Modell (pro Teilchen); Temperaturen in Modelleinheiten
       this.T0 = 0.08; this.Tm = o.Tm || 0.36; this.Tb = o.Tb || 0.5; this.Tmax = o.Tmax || 1.2;
@@ -220,7 +268,7 @@
       const T = this.target(), Ts0 = 0.006, Tsm = 0.36, Tlb = 0.85;
       if (T <= this.Tm) return Math.max(0.004, Ts0 + (T - this.T0) / (this.Tm - this.T0) * (Tsm - Ts0));
       if (T <= this.Tb) return Tsm + (T - this.Tm) / (this.Tb - this.Tm) * (Tlb - Tsm);
-      return Tlb + (T - this.Tb) * 1.6;
+      return Tlb + (T - this.Tb) * 2.0;
     }
     // Sollanzahl fester und gasförmiger Teilchen
     targets() {
@@ -400,8 +448,8 @@
       const f = [1, 1, 1];
       for (let q = 0; q < 3; q++) {
         if (n[q] === 0 || K[q] <= 1e-12) continue;
-        const Tq = K[q] / n[q];
-        f[q] = Math.sqrt(Math.max(0.5, 1 + dtt / this.tau * (T / Tq - 1)));
+        const Tq = K[q] / n[q], Tt = q === 2 ? T * this.gasBoost : T;   // Gasteilchen bewegen sich schneller (Modell-Kniff)
+        f[q] = Math.sqrt(Math.max(0.5, 1 + dtt / this.tau * (Tt / Tq - 1)));
       }
       // Feststoff soll nicht über den Boden rutschen: gemeinsame Seitwärtsbewegung des Kristalls entfernen
       let mvx = 0;
@@ -503,19 +551,27 @@
   }
 
   // ---------- Bedienung ----------
-  function setHeat(v) { $('heat').value = v; updHeat(); }
-  function updHeat() {
-    const v = +$('heat').value;
-    $('heatTxt').textContent = v === 0 ? 'aus' : (v > 0 ? 'heizen ' + v + ' %' : 'kühlen ' + (-v) + ' %');
+  // Heizplatte, Start/Pause und Tempo gibt es zweimal (Bedienung und Vollbild-Leiste); beide bleiben gleich
+  function setHeat(v) {
+    $('heat').value = v; $('heatFs').value = v;
+    const t = v === 0 ? 'aus' : (v > 0 ? 'heizen ' + v + ' %' : 'kühlen ' + (-v) + ' %');
+    $('heatTxt').textContent = t; $('heatTxtFs').textContent = t;
     if (sim) sim.power = v / 100;
   }
+  function updHeat() { setHeat(+$('heat').value); }
   $('heat').addEventListener('input', updHeat);
+  $('heatFs').addEventListener('input', () => setHeat(+$('heatFs').value));
   $('heatOff').addEventListener('click', () => setHeat(0));
-  function setRun(r) { running = r; $('bPlay').textContent = r ? 'Pause' : 'Start'; }
+  $('heatOffFs').addEventListener('click', () => setHeat(0));
+  function setRun(r) { running = r; $('bPlay').textContent = $('bPlayFs').textContent = r ? 'Pause' : 'Start'; }
   function setSpeed(v) {
-    for (const q of $('segSpeed').querySelectorAll('button')) q.classList.toggle('on', +q.dataset.v === v);
+    for (const q of document.querySelectorAll('#segSpeed button, #segSpeedFs button')) q.classList.toggle('on', +q.dataset.v === v);
     speed = v;
   }
+  $('bPlayFs').addEventListener('click', () => setRun(!running));
+  $('segSpeedFs').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (b) setSpeed(+b.dataset.v);
+  });
   $('bReset').addEventListener('click', start);
   // Szenario: vom Eis bis zum Dampf in gut einer halben Minute
   $('bScen').addEventListener('click', () => { start(); setHeat(75); setSpeed(60); setRun(true); });
@@ -754,10 +810,34 @@
     $('heatNote').textContent = note;
   }
 
+  // Kacheln ein-/ausblenden; die übrigen Kacheln nutzen den frei werdenden Platz
+  function applyViews() {
+    const on = {};
+    for (const b of document.querySelectorAll('button[data-view]')) on[b.dataset.view] = b.classList.contains('on');
+    $('pPart').classList.toggle('gone', !on.pPart);
+    $('pCurve').classList.toggle('gone', !on.pCurve);
+    $('pCtrl').classList.toggle('gone', !on.pCtrl);
+    $('state').classList.toggle('hid', !on.state);
+    const right = on.pCurve || on.pCtrl;
+    $('pRight').classList.toggle('gone', !right);
+    document.querySelector('main').classList.toggle('solo', !on.pPart || !right);
+  }
+  for (const b of document.querySelectorAll('button[data-view]')) {
+    b.addEventListener('click', () => { b.classList.toggle('on'); applyViews(); });
+  }
+  // Vollbild nur für die Teilchenebene (Esc beendet)
+  $('bFull').addEventListener('click', () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if ($('pPart').requestFullscreen) $('pPart').requestFullscreen();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    $('bFull').textContent = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+  });
+
   function loop() {
     if (running) advance(speed);
-    drawParticles();
-    drawCurve();
+    if (!$('pPart').classList.contains('gone')) drawParticles();
+    if (!$('pCurve').classList.contains('gone')) drawCurve();
     if (frame++ % 6 === 0) updStatus();
     requestAnimationFrame(loop);
   }

@@ -1,0 +1,990 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salze in Wasser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: Arbeitsfläche links (Teilchenebene + Bedienung), rechts eine Spalte mit Kästen (Gleichung, Phasen, Makroebene, Legende). Kästen mit farbigem linken Rand, keine Icons. */
+:root{
+  --bg:#f3f6f8; --panel:#ffffff; --fg:#1b2530; --muted:#56636f; --line:#d3dce3;
+  --canvas:#e8f1f6; --warm:#d55e00; --cold:#0072b2; --macro-water:#d4e8f3; --glass:#8a99a6;
+  --na:#9e4f86; --cl:#007a5e; --o:#c85500; --h:#ffffff; --h-stroke:#7a8691;
+  --ion-stroke:rgba(0,0,0,.28); --ion-text:#ffffff;
+  --accent:#0068a8; --accent-soft:#e1eef7; --on-accent:#ffffff;
+  --track:#c98400; --bond:#5d6b77; --crystal:#fbfcfd; --crystal-edge:#8a97a2;
+  --font-display:"Lexend", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Lexend", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12181d; --panel:#1a2229; --fg:#e4ebf0; --muted:#9daab5; --line:#2e3b45;
+    --canvas:#0f1f2a; --warm:#ff7a33; --cold:#4aa8ff; --macro-water:#173447; --glass:#7f8e9a;
+    --na:#c77aaf; --cl:#1fa37f; --o:#e8742e; --h:#e8edf1; --h-stroke:#8995a0;
+    --ion-stroke:rgba(0,0,0,.45); --ion-text:#ffffff;
+    --accent:#5fb0e6; --accent-soft:#1c3444; --on-accent:#0b1a24;
+    --track:#f2b43a; --bond:#aab6c0; --crystal:#dfe6ec; --crystal-edge:#7f8c97;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12181d; --panel:#1a2229; --fg:#e4ebf0; --muted:#9daab5; --line:#2e3b45;
+  --canvas:#0f1f2a; --warm:#ff7a33; --cold:#4aa8ff; --macro-water:#173447; --glass:#7f8e9a;
+  --na:#c77aaf; --cl:#1fa37f; --o:#e8742e; --h:#e8edf1; --h-stroke:#8995a0;
+  --ion-stroke:rgba(0,0,0,.45); --ion-text:#ffffff;
+  --accent:#5fb0e6; --accent-soft:#1c3444; --on-accent:#0b1a24;
+  --track:#f2b43a; --bond:#aab6c0; --crystal:#dfe6ec; --crystal-edge:#7f8c97;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:17px;line-height:1.5}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:20px 40px}
+header{display:grid;gap:4px;margin-bottom:18px}
+.eyebrow{margin:0;font-family:var(--font-display);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.2;text-wrap:balance}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:20px;align-items:start}
+@media (max-width:960px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage-col{display:grid;gap:12px;min-width:0}
+.stage{position:relative;width:100%;aspect-ratio:16/10;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--canvas)}
+.stage canvas{display:block;width:100%;height:100%;cursor:pointer}
+.zoom{position:absolute;right:10px;bottom:10px;display:flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.zoom button{font:inherit;font-family:var(--font-display);font-size:1rem;line-height:1;min-width:40px;padding:8px 10px;border:0;background:var(--panel);color:var(--fg);cursor:pointer}
+.zoom button+button{border-left:1.5px solid var(--line)}
+.zoom button:hover{background:var(--accent-soft)}
+.zoom #zoomVal{min-width:68px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.zoom #fsBtn{font-size:.9rem;padding:8px 12px}
+.fs-host:fullscreen,.fs-host.is-max{background:var(--bg);overflow:auto;padding:16px;align-content:start}
+.fs-host.is-max{position:fixed;inset:0;z-index:50;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.fs-host:fullscreen .stage,.fs-host.is-max .stage{width:min(calc(100vw - 48px),calc((100vh - 200px) * 1.6));height:calc(min(calc(100vw - 48px),calc((100vh - 200px) * 1.6)) / 1.6);aspect-ratio:auto;justify-self:center}
+.stage canvas{touch-action:none}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-family:var(--font-display);font-weight:500;font-size:1rem;padding:9px 18px;border-radius:6px;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--track);outline-offset:2px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;margin:0;padding:0}
+.seg legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{padding:9px 14px;cursor:pointer;font-family:var(--font-display);font-size:.95rem;background:var(--panel)}
+.seg label+input+label,.seg input+label~label{border-left:1.5px solid var(--line)}
+.seg input:checked+label{background:var(--accent-soft);color:var(--fg);font-weight:600;box-shadow:inset 0 -3px 0 var(--accent)}
+.seg input:focus-visible+label{outline:3px solid var(--track);outline-offset:-3px}
+.speed{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:.95rem}
+.speed input{width:120px;accent-color:var(--accent)}
+.speed output{min-width:3ch;font-variant-numeric:tabular-nums}
+.temp output{min-width:5ch}
+.options{display:flex;flex-wrap:wrap;gap:6px 20px}
+.options label{display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+.options input{width:18px;height:18px;accent-color:var(--accent)}
+.hint{margin:0;color:var(--muted);font-size:.92rem}
+.msg{margin:0;min-height:1.5em;font-weight:700}
+.side{display:grid;gap:14px;min-width:0}
+.box{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:6px;padding:14px 16px;display:grid;gap:10px}
+.box h2{margin:0;font-family:var(--font-display);font-size:1rem;font-weight:600}
+.box.eq{border-left-color:var(--bond)}
+.box.legend{border-left-color:var(--na)}
+.field{display:grid;gap:4px}
+.field span{font-size:.88rem;color:var(--muted)}
+select{font:inherit;font-size:1rem;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg);width:100%}
+.equation{font-family:var(--font-display);font-size:1.3rem;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.equation sub{font-size:.6em}
+.ix{display:inline-flex;flex-direction:column;vertical-align:middle;font-size:.6em;line-height:1.05;margin-left:1px}
+.ix span:first-child{transform:translateY(-2px)}
+.equation > span{padding:1px 5px;border-radius:4px;transition:background .3s}
+.equation .hl{background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)}
+.arrow{display:inline-grid;text-align:center;line-height:1}
+.arrow small{font-size:.65rem;color:var(--muted)}
+ol.phases{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+ol.phases li{border-left:4px solid var(--line);padding:6px 10px;border-radius:0 4px 4px 0;color:var(--muted)}
+ol.phases li b{font-family:var(--font-display);font-weight:500;color:var(--fg)}
+ol.phases li p{margin:4px 0 0;display:none;color:var(--fg);font-size:.95rem}
+ol.phases li.done{opacity:.8}
+ol.phases li.done b{color:var(--muted)}
+ol.phases li.now{border-left-color:var(--accent);background:var(--accent-soft)}
+ol.phases li.now b{font-weight:600}
+ol.phases li.now p{display:block}
+.num{display:inline-block;min-width:1.4em;font-variant-numeric:tabular-nums;color:var(--muted)}
+.tracked{margin:0;font-size:.95rem;color:var(--muted)}
+.tracked strong{color:var(--fg)}
+.small{margin:0;font-size:.9rem;color:var(--muted)}
+ul.legend{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.legend li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;font-size:.95rem}
+ul.legend svg{width:44px;height:30px;overflow:visible}
+.keys{font-size:.85rem;color:var(--muted)}
+.keys b,.small b.kh{font-family:var(--font-display);font-weight:600;color:var(--fg);margin-right:4px}
+@media (prefers-reduced-motion: reduce){.equation > span{transition:none}}
+
+body{margin:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Chemie · Teilchenmodell</p>
+    <h1>Lösungsvorgang von Salzen</h1>
+  </header>
+
+  <div class="main">
+    <section class="stage-col" aria-label="Simulation">
+      <div class="stage">
+        <div class="zoom" role="group" aria-label="Zoom"><button type="button" data-zoom="out" aria-label="Herauszoomen">−</button><button type="button" data-zoom="reset" id="zoomVal" aria-label="Zoom zurücksetzen" title="Zoom zurücksetzen">100 %</button><button type="button" data-zoom="in" aria-label="Hineinzoomen">+</button><button type="button" id="fsBtn" aria-pressed="false" title="Vollbild (Taste F)">Vollbild</button></div>
+        <canvas id="sim" role="img" aria-label="Teilchenmodell: Salzkristall in Wasser. Wassermoleküle lagern sich an, lösen Ionen heraus und bilden Hydrathüllen."></canvas>
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" id="btnPlay" type="button">Start</button>
+        <button class="btn primary" id="btnNext" type="button" hidden>Weiter</button>
+        <button class="btn" id="btnReset" type="button">Neu starten</button>
+        <fieldset class="seg">
+          <legend>Ablauf</legend>
+          <input type="radio" name="mode" id="modeCont" value="cont" checked><label for="modeCont">Fortlaufend</label>
+          <input type="radio" name="mode" id="modeStep" value="step"><label for="modeStep">Schritt für Schritt</label>
+        </fieldset>
+        <label class="speed" for="speed">Tempo <input type="range" id="speed" min="0.25" max="2" step="0.25" value="1"><output id="speedOut" for="speed">1×</output></label>
+        <label class="speed temp" for="temp">Temperatur <input type="range" id="temp" min="5" max="80" step="5" value="20"><output id="tempOut" for="temp">20 °C</output></label>
+      </div>
+
+      <div class="options">
+        <label><input type="checkbox" id="optForces" checked> Anziehungskräfte zeigen</label>
+        <label><input type="checkbox" id="optDelta" checked> Teilladungen δ⁺/δ⁻ zeigen</label>
+        <label><input type="checkbox" id="optFree" checked> Freie Wassermoleküle zeigen</label>
+        <label><input type="checkbox" id="optStruct"> Wasser als Strukturformel</label>
+        <label><input type="checkbox" id="optTrack" checked> Verfolgtes Ion markieren</label>
+        <label><input type="checkbox" id="optExact"> Anion: eine O–H-Bindung zeigt zum Ion (genauer)</label>
+      </div>
+
+      <p class="hint">Ion am Kristallrand anklicken: Es wird als Nächstes gelöst. Gelöstes Ion anklicken: Es wird verfolgt.<br>Höhere Temperatur: Die Teilchen bewegen sich schneller, das Salz löst sich schneller. Der Effekt ist übertrieben dargestellt.<br>Damit es übersichtlich bleibt, verlassen ältere gelöste Ionen nach und nach den Bildausschnitt.</p>
+      <p class="msg" id="msg" aria-live="polite"></p>
+      <p class="keys"><b class="kh">Tastatur und Maus</b> Leertaste: Start/Pause · Pfeil nach rechts: Weiter (im Modus „Schritt für Schritt“) · F: Vollbild · Mausrad oder zwei Finger: zoomen · Ziehen: Ausschnitt verschieben · + / − / 0: Zoom</p>
+    </section>
+
+    <aside class="side">
+      <div class="box eq">
+        <h2>Salz</h2>
+        <label class="field"><span>Salz auswählen</span><select id="salt"></select></label>
+        <div class="equation" id="eqBox">
+          <span id="eqS"></span>
+          <span class="arrow"><small>Wasser</small>⟶</span>
+          <span id="eqAq"></span>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Ablauf am verfolgten Ion</h2>
+        <ol class="phases" id="phases">
+          <li data-i="0"><b><span class="num">0</span>Ionengitter</b>
+            <p id="ph0"></p></li>
+          <li data-i="1"><b><span class="num">1</span>Anlagerung</b>
+            <p id="ph1"></p></li>
+          <li data-i="2"><b><span class="num">2</span>Herauslösen</b>
+            <p id="ph2"></p></li>
+          <li data-i="3"><b><span class="num">3</span>Hydratation</b>
+            <p id="ph3"></p></li>
+          <li data-i="4"><b><span class="num">4</span>Verteilung</b>
+            <p id="ph4"></p></li>
+        </ol>
+        <p class="tracked" id="trackedInfo">Noch kein Ion ausgewählt.</p>
+      </div>
+
+      <div class="box legend">
+        <h2>Legende</h2>
+        <ul class="legend">
+          <li id="lgCat"></li>
+          <li id="lgAn"></li>
+          <li><svg viewBox="0 0 44 30" aria-hidden="true"><circle cx="28" cy="9.5" r="3.6" style="fill:var(--h);stroke:var(--h-stroke)"/><circle cx="28" cy="20.5" r="3.6" style="fill:var(--h);stroke:var(--h-stroke)"/><circle cx="20" cy="15" r="6.5" style="fill:var(--o);stroke:var(--ion-stroke)"/><text x="6" y="19" text-anchor="middle" style="fill:var(--fg);font:700 10px var(--font-body)">δ−</text><text x="41" y="19" text-anchor="middle" style="fill:var(--fg);font:700 10px var(--font-body)">δ+</text></svg><span><strong>H₂O</strong> Wassermolekül (Dipol): O-Seite δ⁻, H-Seite δ⁺</span></li>
+          <li><svg viewBox="0 0 44 30" aria-hidden="true"><line x1="21" y1="13" x2="29" y2="7" style="stroke:var(--fg);stroke-width:1.5"/><line x1="21" y1="17" x2="29" y2="23" style="stroke:var(--fg);stroke-width:1.5"/><line x1="9" y1="7" x2="12" y2="12" style="stroke:var(--fg);stroke-width:1.5"/><line x1="9" y1="23" x2="12" y2="18" style="stroke:var(--fg);stroke-width:1.5"/><text x="17" y="19" text-anchor="middle" style="fill:var(--o);font:700 12px var(--font-body)">O</text><text x="34" y="9" text-anchor="middle" style="fill:var(--fg);font:700 10px var(--font-body)">H</text><text x="34" y="27" text-anchor="middle" style="fill:var(--fg);font:700 10px var(--font-body)">H</text></svg><span>H₂O als Strukturformel: Striche am O-Atom sind freie Elektronenpaare</span></li>
+          <li><svg viewBox="0 0 44 30" aria-hidden="true"><line x1="4" y1="15" x2="40" y2="15" style="stroke:var(--accent);stroke-width:2;stroke-dasharray:4 3"/></svg><span>Anziehung Ion ↔ Wassermolekül</span></li>
+          <li><svg viewBox="0 0 44 30" aria-hidden="true"><line x1="4" y1="15" x2="40" y2="15" style="stroke:var(--bond);stroke-width:2.5"/></svg><span>Anziehung im Ionengitter</span></li>
+          <li><svg viewBox="0 0 44 30" aria-hidden="true"><circle cx="22" cy="15" r="11" style="fill:none;stroke:var(--track);stroke-width:2.5"/></svg><span>Verfolgtes Ion mit Bahn</span></li>
+        </ul>
+        <p class="small">Räumlicher Ausschnitt, stark vergrößert. Hintere Ionen sind kleiner und blasser gezeichnet. Die Wassermoleküle bewegen sich zur Übersicht nur in der vorderen Ebene. Größen und Teilchenzahlen sind schematisch, die Ionengrößen stimmen grob im Verhältnis.</p>
+        <p class="small" id="structNote"></p>
+        <p class="small" id="saltNote"></p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const cv = $('sim'), ctx = cv.getContext('2d');
+
+  // Weltkoordinaten
+  const W = 768, H = 480, N = 6;
+  let A = 26, DET = 46, SLOW = 1;
+  // Zoom und Ausschnitt: Mausrad oder zwei Finger zoomen, Ziehen verschiebt, Tasten + − 0
+  function makeView(canvas, W, H, onChange){
+    const ZMAX = 6, v = { z: 1, ox: 0, oy: 0, dragged: false };
+    const lbl = document.getElementById('zoomVal');
+    function clamp(){
+      v.z = Math.min(ZMAX, Math.max(1, v.z));
+      v.ox = Math.min(W - W / v.z, Math.max(0, v.ox));
+      v.oy = Math.min(H - H / v.z, Math.max(0, v.oy));
+    }
+    function changed(){
+      clamp();
+      if (lbl) lbl.textContent = Math.round(v.z * 100) + ' %';
+      canvas.style.cursor = v.z > 1.001 ? (pts.size ? 'grabbing' : 'grab') : '';
+      if (onChange) onChange();
+    }
+    v.toWorld = (cx, cy) => {
+      const r = canvas.getBoundingClientRect();
+      return { x: v.ox + (cx - r.left) / r.width * W / v.z, y: v.oy + (cy - r.top) / r.height * H / v.z };
+    };
+    v.zoomAt = (f, wx, wy) => {
+      const nz = Math.min(ZMAX, Math.max(1, v.z * f));
+      v.ox = wx - (wx - v.ox) * v.z / nz; v.oy = wy - (wy - v.oy) * v.z / nz; v.z = nz; changed();
+    };
+    v.zoomCenter = f => v.zoomAt(f, v.ox + W / v.z / 2, v.oy + H / v.z / 2);
+    v.reset = () => { v.z = 1; v.ox = 0; v.oy = 0; changed(); };
+    v.apply = (c, k) => { const s = k * v.z; c.setTransform(s, 0, 0, s, -v.ox * s, -v.oy * s); };
+
+    const pts = new Map(); let pan = null, pinch = null;
+    const center = () => { let x = 0, y = 0; for (const p of pts.values()){ x += p.x; y += p.y; } return { x: x / pts.size, y: y / pts.size }; };
+    const spread = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y) || 1; };
+    function startPan(){ const c = center(); pan = { x: c.x, y: c.y, ox: v.ox, oy: v.oy }; }
+    canvas.addEventListener('pointerdown', e => {
+      if (e.button !== undefined && e.button > 0) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 1){ v.dragged = false; startPan(); }
+      else if (pts.size === 2){ const c = center(); pinch = { d: spread(), z: v.z, w: v.toWorld(c.x, c.y) }; v.dragged = true; }
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const r = canvas.getBoundingClientRect();
+      if (pts.size >= 2 && pinch){
+        const c = center();
+        v.z = Math.min(ZMAX, Math.max(1, pinch.z * spread() / pinch.d));
+        v.ox = pinch.w.x - (c.x - r.left) / r.width * W / v.z; v.oy = pinch.w.y - (c.y - r.top) / r.height * H / v.z;
+        changed();
+      } else if (pan){
+        const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+        if (!v.dragged && Math.hypot(dx, dy) > 5 && v.z > 1.001) v.dragged = true;
+        if (v.dragged){ v.ox = pan.ox - dx / r.width * W / v.z; v.oy = pan.oy - dy / r.height * H / v.z; changed(); }
+      }
+    });
+    const up = e => {
+      if (!pts.delete(e.pointerId)) return;
+      if (pts.size < 2) pinch = null;
+      if (pts.size === 1) startPan(); else if (!pts.size) pan = null;
+      changed();
+    };
+    canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+    // Ein Ziehen soll keinen Klick auslösen
+    canvas.addEventListener('click', e => { if (v.dragged){ e.stopImmediatePropagation(); v.dragged = false; } }, true);
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const w = v.toWorld(e.clientX, e.clientY);
+      v.zoomAt(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.06 : 0.0018)), w.x, w.y);
+    }, { passive: false });
+    document.querySelectorAll('[data-zoom]').forEach(b => b.addEventListener('click', () => {
+      const a = b.dataset.zoom; if (a === 'in') v.zoomCenter(1.5); else if (a === 'out') v.zoomCenter(1 / 1.5); else v.reset();
+    }));
+    document.addEventListener('keydown', e => {
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (tag === 'INPUT' && document.activeElement.type === 'text') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === '+' || e.key === '='){ e.preventDefault(); v.zoomCenter(1.5); }
+      else if (e.key === '-'){ e.preventDefault(); v.zoomCenter(1 / 1.5); }
+      else if (e.key === '0'){ e.preventDefault(); v.reset(); }
+    });
+    return v;
+  }
+  const view = makeView(cv, W, H);
+
+  // Vollbild: Simulationsfeld mit Bedienung bildschirmfüllend (Taste F)
+  (function(){
+    const host = cv.closest('section'), btn = document.getElementById('fsBtn');
+    if (!host || !btn) return;
+    host.classList.add('fs-host');
+    const isOn = () => document.fullscreenElement === host || host.classList.contains('is-max');
+    const sync = () => { btn.textContent = isOn() ? 'Normalansicht' : 'Vollbild'; btn.setAttribute('aria-pressed', String(isOn())); };
+    const toggle = () => {
+      if (isOn()){
+        if (document.fullscreenElement === host && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        host.classList.remove('is-max'); sync(); return;
+      }
+      const fallback = () => { host.classList.add('is-max'); sync(); };
+      try { if (host.requestFullscreen) host.requestFullscreen().then(sync, fallback); else fallback(); } catch (err){ fallback(); }
+    };
+    btn.addEventListener('click', toggle);
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('keydown', e => {
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (e.key === 'Escape' && host.classList.contains('is-max')){ host.classList.remove('is-max'); sync(); }
+      else if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)){ e.preventDefault(); toggle(); }
+    });
+  })();
+  const R = { cat: 9.5, an: 16 }, RO = 7.5, RH = 4.3, DOH = 10.5, TH = 52.25 * Math.PI / 180;
+  const CX = W / 2, CY = H / 2;
+
+  // Salze: je Gittertyp ein gut lösliches Beispiel. Mehratomige Ionen sind vereinfacht als Kugel dargestellt.
+  const NA = { sym: 'Na', q: 1, r: 9.5, name: 'Natrium-Ion' }, MG = { sym: 'Mg', q: 2, r: 7.5, name: 'Magnesium-Ion' };
+  const CL = { sym: 'Cl', q: -1, r: 16, name: 'Chlorid-Ion' }, SO4 = { sym: 'SO4', q: -2, r: 20, poly: true, name: 'Sulfat-Ion' };
+  const SALTS = [
+    { group: 'AB (1+ / 1−)', name: 'Natriumchlorid', f: 'NaCl', lat: 'ab', nc: 1, na: 1, cat: NA, an: CL, note: 'Im echten Kristall beträgt der Abstand Na⁺–Cl⁻ 282 pm.' },
+    { group: 'AB (1+ / 1−)', name: 'Kaliumchlorid', f: 'KCl', lat: 'ab', nc: 1, na: 1, cat: { sym: 'K', q: 1, r: 12.5, name: 'Kalium-Ion' }, an: CL, note: 'Das K⁺-Ion ist größer als das Na⁺-Ion. Seine Hydrathülle ist weniger fest gebunden.' },
+    { group: 'AB₂ (2+ / 1−)', name: 'Calciumchlorid', f: 'CaCl2', lat: 'ab2', nc: 1, na: 2, cat: { sym: 'Ca', q: 2, r: 9.5, name: 'Calcium-Ion' }, an: CL, note: 'Auf ein Ca²⁺ kommen zwei Cl⁻. Beim Lösen wird die Lösung deutlich warm.' },
+    { group: 'AB₂ (2+ / 1−)', name: 'Magnesiumchlorid', f: 'MgCl2', lat: 'ab2', nc: 1, na: 2, cat: MG, an: CL, note: 'Das kleine, zweifach geladene Mg²⁺ hält seine Hydrathülle sehr fest.' },
+    { group: 'AB₃ (3+ / 1−)', name: 'Aluminiumchlorid', f: 'AlCl3', lat: 'ab3', nc: 1, na: 3, cat: { sym: 'Al', q: 3, r: 7, name: 'Aluminium-Ion' }, an: CL, note: 'Das Al³⁺-Ion hält seine Hydrathülle besonders fest. Die Lösung reagiert leicht sauer, das ist hier nicht dargestellt.' },
+    { group: 'A₂B (1+ / 2−)', name: 'Natriumsulfat', f: 'Na2SO4', lat: 'a2b', nc: 2, na: 1, cat: NA, an: SO4, note: 'Das Sulfat-Ion ist mehratomig (ein S- und vier O-Atome). Hier ist es vereinfacht als Kugel dargestellt.' },
+    { group: 'AB (2+ / 2−)', name: 'Magnesiumsulfat', f: 'MgSO4', lat: 'ab', nc: 1, na: 1, cat: MG, an: SO4, note: 'Beide Ionen sind zweifach geladen. Das Sulfat-Ion ist vereinfacht als Kugel dargestellt.' },
+    { group: 'A₃B (1+ / 3−)', name: 'Natriumphosphat', f: 'Na3PO4', lat: 'a3b', nc: 3, na: 1, cat: NA, an: { sym: 'PO4', q: -3, r: 21, poly: true, name: 'Phosphat-Ion' }, note: 'Das Phosphat-Ion ist mehratomig (ein P- und vier O-Atome) und hier als Kugel dargestellt. Die Lösung reagiert stark alkalisch, das ist hier nicht dargestellt.' }
+  ];
+  let SALT = SALTS[0];
+  const SUBD = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉' };
+  const uniF = t => t.replace(/[0-9]/g, d => SUBD[d]);
+  const supQ = q => (Math.abs(q) > 1 ? ['', '', '²', '³'][Math.abs(q)] : '') + (q > 0 ? '⁺' : '⁻');
+  const chargeTxt = q => (Math.abs(q) > 1 ? Math.abs(q) : '') + (q > 0 ? '+' : '−');
+  const ionLabel = ion => uniF(ion.sym) + supQ(ion.q);
+  const htmlF = t => t.replace(/([A-Za-z])(\d+)/g, '$1<sub>$2</sub>');
+  // Räumliches Gitter: Jedes Ion hat nur entgegengesetzt geladene nächste Nachbarn.
+  // ab: Natriumchlorid-Typ · ab2/a2b: Fluorit-Typ bzw. Anti-Fluorit · ab3/a3b: Gitter mit Kation auf den Würfelecken und Anionen auf den Kanten (bzw. umgekehrt)
+  function latticeSites(lat){
+    const out = [];
+    if (lat === 'ab'){
+      for (let x = 0; x < 4; x++) for (let y = 0; y < 4; y++) for (let z = 0; z < 3; z++) out.push({ g: [x, y, z], t: (x + y + z) % 2 === 0 ? 'cat' : 'an' });
+      return { sites: out, unit: 1, coord: { cat: 6, an: 6 } };
+    }
+    if (lat === 'ab2' || lat === 'a2b'){
+      const fcc = lat === 'ab2' ? 'cat' : 'an', sc = fcc === 'cat' ? 'an' : 'cat';
+      for (let x = 0; x <= 7; x++) for (let y = 0; y <= 7; y++) for (let z = 0; z <= 3; z++){
+        if (x % 2 === 0 && y % 2 === 0 && z % 2 === 0 && (x + y + z) % 4 === 0) out.push({ g: [x, y, z], t: fcc });
+        else if (x % 2 === 1 && y % 2 === 1 && z % 2 === 1) out.push({ g: [x, y, z], t: sc });
+      }
+      return { sites: out, unit: Math.sqrt(3), coord: { [fcc]: 8, [sc]: 4 } };
+    }
+    const corner = lat === 'ab3' ? 'cat' : 'an', edge = corner === 'cat' ? 'an' : 'cat';
+    for (let x = 0; x <= 4; x += 2) for (let y = 0; y <= 4; y += 2){
+      out.push({ g: [x, y, 0], t: corner });
+      out.push({ g: [x + 1, y, 0], t: edge }); out.push({ g: [x, y + 1, 0], t: edge }); out.push({ g: [x, y, 1], t: edge });
+    }
+    return { sites: out, unit: 1, coord: { [corner]: 6, [edge]: 2 } };
+  }
+  function applySalt(s){
+    SALT = s; R.cat = s.cat.r; R.an = s.an.r;
+    const rc = s.cat.r, ra = s.an.r, rm = Math.max(rc, ra);
+    // Abstand der nächsten Nachbarn: Kontakt Kation–Anion, gleich geladene Ionen dürfen sich nicht überlappen
+    if (s.lat === 'ab') A = Math.max(rc + ra + 1, (2 * rm + 1) / Math.SQRT2);
+    else if (s.lat === 'ab2') A = Math.max(rc + ra + 1, (2 * ra + 1) * Math.sqrt(3) / 2);
+    else if (s.lat === 'a2b') A = Math.max(rc + ra + 1, (2 * rc + 1) * Math.sqrt(3) / 2);
+    else if (s.lat === 'ab3') A = Math.max(rc + ra + 1, (2 * ra + 1) / Math.SQRT2);
+    else A = Math.max(rc + ra + 1, (2 * rc + 1) / Math.SQRT2);
+    DET = A * 1.75;
+    SLOW = 1 + 0.35 * (s.cat.q * -s.an.q - 1);
+    buildSaltUI();
+  }
+  const TOTAL = N * N;
+
+  const opts = { forces: true, delta: true, free: true, track: true, exact: false, struct: false };
+  let speed = 1, temp = 20;
+  const tf = () => 1 + (temp - 20) / 50;
+  let paused = true;
+  let ions = [], waters = [], sim = null, lat = { n: 0, cx: CX, cy: CY, ext: 0 };
+  let C = {};
+
+  function readColors(){
+    const s = getComputedStyle(document.documentElement), g = n => s.getPropertyValue(n).trim();
+    C = { canvas: g('--canvas'), cat: g('--na'), an: g('--cl'), o: g('--o'), h: g('--h'), hs: g('--h-stroke'),
+      fg: g('--fg'), muted: g('--muted'), accent: g('--accent'), track: g('--track'), bond: g('--bond'),
+      ionStroke: g('--ion-stroke'), ionText: g('--ion-text'), crystal: g('--crystal'), crystalEdge: g('--crystal-edge'),
+      glass: g('--glass'), warm: g('--warm'), cold: g('--cold') };
+  }
+
+  // Hydrathülle: Kationen mit höherer Ladung ziehen die Wassermoleküle enger heran
+  const ring = q => q.type === 'cat' ? R.cat + 17.5 - (SALT.cat.q - 1) * 1.5 : R.an + (opts.exact ? 26 : 24);
+  const cr = q => ring(q) + (q.type === 'cat' ? 13 : 11);
+  const nSlots = q => q.type === 'an' && SALT.an.poly ? 8 : 6;
+  const wAng = (q, a) => q.type === 'cat' ? a : (opts.exact ? a + Math.PI + TH : a + Math.PI);
+  const nCount = q => q.nb.reduce((n, o) => n + (inLattice(o) ? 1 : 0), 0);
+  const inLattice = q => q.state === 'lattice' || q.state === 'attaching';
+  const posName = q => q.startN + ' von ' + q.coord + ' Nachbar-Ionen' + (q.coord === 6 && SALT.lat === 'ab' ? ({ 3: ' (Ecke)', 4: ' (Kante)', 5: ' (Fläche)' }[q.startN] || '') : '');
+  const ionName = q => ionLabel(SALT[q.type]);
+
+  function newWater(initial, fg){
+    let x = 0, y = 0;
+    for (let tries = 0; tries < (fg ? 1 : 40); tries++){
+      x = 12 + Math.random() * (W - 24); y = 12 + Math.random() * (H - 24);
+      let ok = true;
+      for (const q of ions){
+        const m = inLattice(q) ? R[q.type] + RO + 6 : cr(q) + RO + 2;
+        if (Math.hypot(x - q.x, y - q.y) < m){ ok = false; break; }
+      }
+      if (ok) break;
+    }
+    return { x, y, ang: Math.random() * Math.PI * 2, vx: 0, vy: 0, av: 0, state: 'free', ion: null, slot: null, alpha: initial ? 1 : 0, fg: !!fg };
+  }
+
+  function spawnEdge(t){
+    const d = [t.x, W - t.x, t.y, H - t.y], m = Math.min(...d);
+    let x = t.x, y = t.y;
+    if (m === d[0]) x = 10; else if (m === d[1]) x = W - 10; else if (m === d[2]) y = 10; else y = H - 10;
+    const w = newWater(false); w.x = x; w.y = y; return w;
+  }
+
+  function reset(){
+    ions = []; waters = [];
+    const L = latticeSites(SALT.lat), u = A / L.unit;
+    // Schrägbild: hintere Ebenen nach rechts oben versetzt, kleiner und blasser
+    const pts = L.sites.map(st => { const [gx, gy, gz] = st.g, Z = gz * u; return { st, px: gx * u + Z * 0.5, py: gy * u - Z * 0.4, dz: Z / A }; });
+    const mx = (Math.min(...pts.map(p => p.px)) + Math.max(...pts.map(p => p.px))) / 2, my = (Math.min(...pts.map(p => p.py)) + Math.max(...pts.map(p => p.py))) / 2;
+    for (const p of pts){
+      const hx = CX + p.px - mx, hy = CY + p.py - my, sc = 1 - 0.07 * p.dz;
+      ions.push({ type: p.st.t, g: p.st.g, dz: p.dz, sc, sc0: sc, coord: L.coord[p.st.t], nb: [], hx, hy, x: hx, y: hy, state: 'lattice', t: 0,
+        slots: null, out: { x: 0, y: -1 }, vx: 0, vy: 0, rot: 0, rotV: 0, trail: [], trailT: 0, ph: Math.random() * 6.28, startN: 0, nextHeld: false });
+    }
+    // nächste Nachbarn (entgegengesetzt geladen) über den räumlichen Abstand
+    const d3 = (a, b) => Math.hypot(a.g[0] - b.g[0], a.g[1] - b.g[1], a.g[2] - b.g[2]);
+    for (const a of ions) for (const b of ions) if (a !== b && a.type !== b.type && d3(a, b) <= L.unit * 1.01) a.nb.push(b);
+    ions.sort((a, b) => b.dz - a.dz || a.hy - b.hy);
+    for (let k = 0; k < 105; k++) waters.push(newWater(true));
+    for (let k = 0; k < 18; k++) waters.push(newWater(true, true));
+    const step = sim ? sim.step : false;
+    sim = { time: 0, nextStart: 0.8, tracked: null, hold: null, pending: null, done: false, step };
+    if (step) setHold(null, 'newIon');
+    setMsg('');
+  }
+
+  function blockedAt(ion, a, Rr){
+    const px = ion.hx + Rr * Math.cos(a), py = ion.hy + Rr * Math.sin(a);
+    for (const q of ions){
+      if (q === ion || !inLattice(q) || q.dz > ion.dz + 0.05) continue;
+      if (Math.hypot(px - q.hx, py - q.hy) < R[q.type] * q.sc + RO + 1.5) return true;
+    }
+    return false;
+  }
+
+  function slotPos(q, s){
+    const a = s.ang + q.rot, Rr = ring(q);
+    return { x: q.x + Rr * Math.cos(a), y: q.y + Rr * Math.sin(a), ang: wAng(q, a) };
+  }
+
+  function recruit(q, s){
+    const t = slotPos(q, s);
+    let best = null, bd = 1e9;
+    for (const w of waters){
+      if (w.state !== 'free' || w.fg || w.alpha < 0.5) continue;
+      const d = Math.hypot(w.x - t.x, w.y - t.y);
+      const dot = (w.x - q.x) * q.out.x + (w.y - q.y) * q.out.y;
+      const sc = d + (dot < 0 ? 260 : 0);
+      if (sc < bd){ bd = sc; best = w; }
+    }
+    if (!best || bd > 420){ best = spawnEdge(t); waters.push(best); }
+    best.state = 'recruited'; best.ion = q; best.slot = s; s.water = best;
+  }
+
+  function startDissolve(q){
+    q.startN = nCount(q);
+    let ox = 0, oy = 0;
+    for (const o of q.nb) if (inLattice(o)){ ox += q.hx - o.hx; oy += q.hy - o.hy; }
+    const cx0 = q.hx - lat.cx, cy0 = q.hy - lat.cy, cl0 = Math.hypot(cx0, cy0) || 1;
+    ox = ox / (A || 1) + cx0 / cl0 * 1.5; oy = oy / (A || 1) + cy0 / cl0 * 1.5;
+    if (Math.hypot(ox, oy) < 0.01){ ox = 0; oy = -1; }
+    const L = Math.hypot(ox, oy); q.out = { x: ox / L, y: oy / L };
+    const base = Math.atan2(q.out.y, q.out.x), Rr = ring(q), ns = nSlots(q), st = 2 * Math.PI / ns;
+    let best = 0, bestCnt = -1;
+    for (let off = -25; off <= 25; off += 5){
+      const o = off * Math.PI / 180; let cnt = 0;
+      for (let k = 0; k < ns; k++) if (!blockedAt(q, base + o + k * st, Rr)) cnt++;
+      if (cnt > bestCnt || (cnt === bestCnt && Math.abs(off) < Math.abs(best))){ bestCnt = cnt; best = off; }
+    }
+    q.slots = [];
+    for (let k = 0; k < ns; k++){
+      const a = base + best * Math.PI / 180 + k * st;
+      q.slots.push({ ang: a, water: null, blocked: blockedAt(q, a, Rr) });
+    }
+    if (bestCnt === 0) q.slots[0].blocked = false;
+    q.rot = 0; q.rotV = 0; q.state = 'attaching'; q.t = 0; q.trail = []; q.nextHeld = false;
+    for (const s of q.slots) if (!s.blocked) recruit(q, s);
+  }
+
+  function startNext(){
+    let c = null;
+    if (sim.pending && sim.pending.state === 'lattice' && nCount(sim.pending) < sim.pending.coord) c = sim.pending;
+    sim.pending = null;
+    if (!c){
+      const cand = ions.filter(q => q.state === 'lattice');
+      if (!cand.length) return null;
+      const busy = ions.filter(q => q.state === 'attaching');
+      let pool = cand.filter(q => !busy.some(b => b.nb.includes(q)));
+      if (!pool.length) pool = cand;
+      // bevorzugt: wenige Nachbarn (Ecken, Kanten), dann vordere Ebenen
+      const score = q => nCount(q) / q.coord + 0.08 * q.dz;
+      const minS = Math.min(...pool.map(score));
+      pool = pool.filter(q => score(q) <= minS + 0.01);
+      c = pool[Math.floor(Math.random() * pool.length)];
+    }
+    startDissolve(c);
+    if (sim.step || !sim.tracked || (sim.tracked.state === 'hydrated' && sim.tracked.t > 4)) sim.tracked = c;
+    return c;
+  }
+
+  function setHold(ion, next){ sim.hold = { ion, next }; }
+
+  function release(){
+    const h = sim.hold; if (!h) return;
+    sim.hold = null;
+    if (h.next === 'newIon'){ if (!startNext()) sim.hold = null; }
+    else transition(h.ion, h.next);
+  }
+
+  function phaseDone(q, next){
+    if (sim.step && q === sim.tracked){ if (!sim.hold) setHold(q, next); }
+    else transition(q, next);
+  }
+
+  function transition(q, next){
+    if (next === 'detaching'){ q.state = 'detaching'; q.t = 0; }
+    else if (next === 'hydrating'){ q.state = 'hydrating'; q.t = 0; for (const s of q.slots) if (!s.water) recruit(q, s); }
+    else if (next === 'hydrated'){ q.state = 'hydrated'; q.t = 0; q.vx = q.out.x * 20; q.vy = q.out.y * 20; q.rotV = (Math.random() - 0.5) * 0.6; q.nextHeld = false; }
+  }
+
+  const arrived = q => q.slots.every(s => !s.water || s.water.state === 'bound');
+  const activeCount = () => ions.filter(q => q.state === 'attaching' || q.state === 'detaching' || q.state === 'hydrating').length;
+
+  function update(dt){
+    sim.time += dt;
+    const f = tf(), dtp = dt * f;
+
+    // Gitter-Statistik
+    let n = 0, sx = 0, sy = 0;
+    for (const q of ions) if (inLattice(q)){ n++; sx += q.hx; sy += q.hy; }
+    lat.n = n; if (n){ lat.cx = sx / n; lat.cy = sy / n; }
+    lat.ext = 0; for (const q of ions) if (inLattice(q)) lat.ext = Math.max(lat.ext, Math.hypot(q.hx - lat.cx, q.hy - lat.cy));
+
+    if (!sim.step){
+      sim.nextStart -= dtp;
+      if (sim.nextStart <= 0){ if (activeCount() < Math.round(2 + f)) startNext(); sim.nextStart = 1.4; }
+    } else if (!sim.hold && !sim.tracked && lat.n){ setHold(null, 'newIon'); }
+
+    for (const q of ions){
+      if (q.state === 'lattice'){
+        q.x = q.hx + 0.9 * f * Math.sin(sim.time * 7 * Math.sqrt(f) + q.ph); q.y = q.hy + 0.9 * f * Math.cos(sim.time * 6.1 * Math.sqrt(f) + q.ph * 1.7);
+        continue;
+      }
+      q.t += dtp;
+      const held = sim.hold && sim.hold.ion === q;
+      if (q.state === 'attaching'){
+        q.x = q.hx + 1.6 * Math.sin(sim.time * 9 + q.ph); q.y = q.hy + 1.6 * Math.cos(sim.time * 8.3 + q.ph * 1.7);
+        if (!held && q.t > 1.8 * SLOW && (arrived(q) || q.t > 6 * SLOW)) phaseDone(q, 'detaching');
+      } else if (q.state === 'detaching'){
+        const p = Math.min(1, q.t / (1.9 * SLOW)), e = p * p * (3 - 2 * p);
+        q.sc = q.sc0 + (1 - q.sc0) * e;
+        q.x = q.hx + q.out.x * DET * e + 0.8 * Math.sin(sim.time * 7 + q.ph);
+        q.y = q.hy + q.out.y * DET * e + 0.8 * Math.cos(sim.time * 6 + q.ph);
+        if (!held && p >= 1) phaseDone(q, 'hydrating');
+      } else if (q.state === 'hydrating'){
+        if (!held){ q.x += q.out.x * 6 * dtp; q.y += q.out.y * 6 * dtp; }
+        if (!held && q.t > 1.4 && (arrived(q) || q.t > 6)) phaseDone(q, 'hydrated');
+      } else if (q.state === 'hydrated'){
+        q.vx += (Math.random() - 0.5) * 900 * f * dt; q.vy += (Math.random() - 0.5) * 900 * f * dt;
+        if (lat.n){
+          const dx = q.x - lat.cx, dy = q.y - lat.cy, d = Math.hypot(dx, dy) || 1;
+          if (d < lat.ext + cr(q) + 60){ q.vx += dx / d * 140 * dt; q.vy += dy / d * 140 * dt; }
+        }
+        const damp = Math.pow(0.35, dt); q.vx *= damp; q.vy *= damp;
+        q.x += q.vx * dt; q.y += q.vy * dt;
+        q.rotV += (Math.random() - 0.5) * 3 * dt; q.rotV *= Math.pow(0.5, dt);
+        q.rotV = Math.max(-0.6, Math.min(0.6, q.rotV)); q.rot += q.rotV * dt;
+        const m = cr(q);
+        if (q.x < m){ q.x = m; q.vx = Math.abs(q.vx); } if (q.x > W - m){ q.x = W - m; q.vx = -Math.abs(q.vx); }
+        if (q.y < m){ q.y = m; q.vy = Math.abs(q.vy); } if (q.y > H - m){ q.y = H - m; q.vy = -Math.abs(q.vy); }
+        if (sim.step && sim.tracked === q && !q.nextHeld && q.t > 3.5 && !sim.hold){ q.nextHeld = true; if (lat.n) setHold(null, 'newIon'); }
+      } else if (q.state === 'leaving'){
+        // verlässt den Ausschnitt mit seiner Hydrathülle
+        const sp = 120 * f * Math.min(1, q.t / 1.2), kk = Math.min(1, dt * 3);
+        q.vx += (q.exit.x * sp - q.vx) * kk; q.vy += (q.exit.y * sp - q.vy) * kk;
+        q.x += q.vx * dt; q.y += q.vy * dt; q.rot += q.rotV * dt;
+      }
+      if (q === sim.tracked){
+        q.trailT += dt;
+        if (q.trailT > 0.12){ q.trailT = 0; q.trail.push([q.x, q.y]); if (q.trail.length > 90) q.trail.shift(); }
+      }
+    }
+
+    // Abstoßung gelöster Ionen untereinander und vom Gitter: Verschiebungen sammeln und in der Geschwindigkeit begrenzen,
+    // damit ein frisch gelöstes Ion nie springt, sondern gleichmäßig vom Kristall wegdriftet
+    const hyd = ions.filter(q => q.state === 'hydrated');
+    const moving = ions.filter(q => q.state === 'detaching' || q.state === 'hydrating' || q.state === 'hydrated');
+    for (const q of hyd){ q.px = 0; q.py = 0; }
+    for (const a of hyd){
+      for (const b of moving){
+        if (a === b) continue;
+        const dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy) || 0.01, m = cr(a) + cr(b) - 4;
+        if (d < m){
+          const push = (m - d) * (b.state === 'hydrated' ? 0.5 : 1);
+          a.px += dx / d * push; a.py += dy / d * push;
+          if (b.state === 'hydrated'){ b.px -= dx / d * push; b.py -= dy / d * push; }
+        }
+      }
+      // Gitter: nur die stärkste Überlappung zählt, sonst addieren sich viele Ionen im Schrägbild
+      let best = 0, bx = 0, by = 0;
+      for (const q of ions){
+        if (!inLattice(q)) continue;
+        const dx = a.x - q.hx, dy = a.y - q.hy, d = Math.hypot(dx, dy) || 0.01, m = cr(a) + R[q.type] * q.sc + 3;
+        if (d < m && m - d > best){ best = m - d; bx = dx / d; by = dy / d; }
+      }
+      if (best > 0){ a.px += bx * best; a.py += by * best; }
+    }
+    const vmax = 70 * dt;
+    for (const q of hyd){
+      const L = Math.hypot(q.px, q.py); if (L < 1e-6) continue;
+      const stp = Math.min(L * Math.min(1, dt * 4), vmax);
+      q.x += q.px / L * stp; q.y += q.py / L * stp;
+    }
+
+    // Wassermoleküle
+    let freeCount = 0, fgCount = 0;
+    const dampW = Math.pow(0.35, dt), dampA = Math.pow(0.3, dt), kPos = 1 - Math.exp(-dtp * 2.8);
+    for (const w of waters){
+      w.alpha = Math.min(1, w.alpha + dt * 1.2);
+      if (w.state === 'free'){
+        if (w.fg) fgCount++; else freeCount++;
+        w.vx += (Math.random() - 0.5) * 1400 * f * dt; w.vy += (Math.random() - 0.5) * 1400 * f * dt;
+        w.vx *= dampW; w.vy *= dampW; w.x += w.vx * dt; w.y += w.vy * dt;
+        w.av += (Math.random() - 0.5) * 12 * f * dt; w.av *= dampA; w.ang += w.av * dt;
+        if (w.x < 8){ w.x = 8; w.vx = Math.abs(w.vx); } if (w.x > W - 8){ w.x = W - 8; w.vx = -Math.abs(w.vx); }
+        if (w.y < 8){ w.y = 8; w.vy = Math.abs(w.vy); } if (w.y > H - 8){ w.y = H - 8; w.vy = -Math.abs(w.vy); }
+        if (!w.fg) for (const q of ions){
+          const m = inLattice(q) ? R[q.type] + RO + 3 : cr(q) + RO - 2;
+          const dx = w.x - q.x, dy = w.y - q.y;
+          if (Math.abs(dx) > m || Math.abs(dy) > m) continue;
+          const d = Math.hypot(dx, dy) || 0.01;
+          if (d < m){ w.x += dx / d * (m - d); w.y += dy / d * (m - d); }
+        }
+      } else {
+        const t = slotPos(w.ion, w.slot);
+        if (w.state === 'recruited'){
+          const dx = t.x - w.x, dy = t.y - w.y, d = Math.hypot(dx, dy);
+          const stepLen = Math.min(d, Math.max(d * kPos, 55 * dtp));
+          if (d > 0){ w.x += dx / d * stepLen; w.y += dy / d * stepLen; }
+          let da = t.ang - w.ang; da = Math.atan2(Math.sin(da), Math.cos(da));
+          const turn = Math.min(Math.abs(da), Math.max(Math.abs(da) * Math.min(1, dtp * 4), 2 * dtp));
+          w.ang += Math.sign(da) * turn;
+          if (d - stepLen < 1.2 && Math.abs(da) - turn < 0.08) w.state = 'bound';
+        }
+        if (w.state === 'bound'){ w.x = t.x; w.y = t.y; w.ang = t.ang; }
+      }
+    }
+    if (freeCount < 66) waters.push(newWater(false));
+    if (fgCount < 18) waters.push(newWater(false, true));
+
+    // Übersicht behalten: Sind zu viele Ionen gelöst, verlässt das älteste gelöste Ion den Ausschnitt
+    const MAXH = 14, hydNow = ions.filter(q => q.state === 'hydrated');
+    if (hydNow.length > MAXH && ions.filter(q => q.state === 'leaving').length < 2){
+      const cand = hydNow.filter(q => q !== sim.tracked && q.t > 6).sort((a, b) => b.t - a.t)[0];
+      if (cand){
+        const d = [cand.x, W - cand.x, cand.y, H - cand.y], m = Math.min(...d);
+        cand.exit = m === d[0] ? { x: -1, y: 0 } : m === d[1] ? { x: 1, y: 0 } : m === d[2] ? { x: 0, y: -1 } : { x: 0, y: 1 };
+        cand.state = 'leaving'; cand.t = 0;
+      }
+    }
+    const gone = ions.filter(q => q.state === 'leaving' && (q.x < -cr(q) - 30 || q.x > W + cr(q) + 30 || q.y < -cr(q) - 30 || q.y > H + cr(q) + 30));
+    if (gone.length){
+      const set = new Set(gone);
+      ions = ions.filter(q => !set.has(q)); waters = waters.filter(w => !(w.ion && set.has(w.ion)));
+      if (set.has(sim.tracked)) sim.tracked = null;
+    }
+
+    if (!lat.n && ions.every(q => q.state === 'hydrated' || q.state === 'leaving')){
+      if (!sim.done){ sim.done = true; setMsg('Der Kristall ist vollständig gelöst.'); }
+      if (sim.hold && sim.hold.next === 'newIon') sim.hold = null;
+    }
+  }
+
+  // Zeichnen
+  function halo(text, x, y, font){
+    ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 4; ctx.strokeStyle = C.canvas; ctx.strokeText(text, x, y);
+    ctx.fillStyle = C.fg; ctx.fillText(text, x, y);
+  }
+
+  function drawIon(q){
+    const r = R[q.type] * (q.sc || 1), t = chargeTxt(SALT[q.type].q);
+    ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = C[q.type]; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = C.ionStroke; ctx.stroke();
+    ctx.fillStyle = C.ionText; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const fs = Math.max(9, Math.min(19, r * (t.length > 1 ? 1.05 : 1.45)));
+    ctx.font = '700 ' + fs.toFixed(1) + 'px "Atkinson Hyperlegible", sans-serif';
+    ctx.fillText(t, q.x, q.y + 1);
+    // Tiefenwirkung: hintere Ionen im Gitter blasser
+    const fog = inLattice(q) ? Math.min(0.5, 0.2 * q.dz) : q.state === 'detaching' ? Math.min(0.5, 0.2 * q.dz) * (1 - (q.sc - q.sc0) / Math.max(0.001, 1 - q.sc0)) : 0;
+    if (fog > 0.01){ ctx.globalAlpha = fog; ctx.beginPath(); ctx.arc(q.x, q.y, r + 0.6, 0, Math.PI * 2); ctx.fillStyle = C.canvas; ctx.fill(); ctx.globalAlpha = 1; }
+  }
+
+  function hPos(w){
+    return [[w.x + DOH * Math.cos(w.ang + TH), w.y + DOH * Math.sin(w.ang + TH)],
+            [w.x + DOH * Math.cos(w.ang - TH), w.y + DOH * Math.sin(w.ang - TH)]];
+  }
+
+  // Strukturformelansicht: H–O–H mit zwei freien Elektronenpaaren (Striche) am O-Atom
+  const DS = 15;
+  function hPosDraw(w){
+    const d = opts.struct ? DS : DOH;
+    return [[w.x + d * Math.cos(w.ang + TH), w.y + d * Math.sin(w.ang + TH)],
+            [w.x + d * Math.cos(w.ang - TH), w.y + d * Math.sin(w.ang - TH)]];
+  }
+  function drawWaterStruct(w){
+    const hs = hPosDraw(w);
+    ctx.strokeStyle = C.fg; ctx.lineWidth = 1.6; ctx.lineCap = 'round'; ctx.beginPath();
+    for (const [hx, hy] of hs){ const ux = (hx - w.x) / DS, uy = (hy - w.y) / DS; ctx.moveTo(w.x + ux * 6, w.y + uy * 6); ctx.lineTo(hx - ux * 4.5, hy - uy * 4.5); }
+    for (const s of [-1, 1]){
+      const a = w.ang + Math.PI + s * 0.95, cx = w.x + Math.cos(a) * 8.5, cy = w.y + Math.sin(a) * 8.5, tx = -Math.sin(a) * 3.6, ty = Math.cos(a) * 3.6;
+      ctx.moveTo(cx - tx, cy - ty); ctx.lineTo(cx + tx, cy + ty);
+    }
+    ctx.stroke(); ctx.lineCap = 'butt';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 12px "Atkinson Hyperlegible", sans-serif'; ctx.fillStyle = C.o; ctx.fillText('O', w.x, w.y + 0.5);
+    ctx.font = '700 10px "Atkinson Hyperlegible", sans-serif'; ctx.fillStyle = C.fg;
+    for (const [hx, hy] of hs) ctx.fillText('H', hx, hy + 0.5);
+  }
+  function drawWater(w, alpha, delta, sc){
+    ctx.globalAlpha = alpha;
+    if (sc){ ctx.save(); ctx.translate(w.x, w.y); ctx.scale(sc, sc); ctx.translate(-w.x, -w.y); }
+    if (opts.struct) drawWaterStruct(w);
+    else for (const [hx, hy] of hPos(w)){
+      ctx.beginPath(); ctx.arc(hx, hy, RH, 0, Math.PI * 2);
+      ctx.fillStyle = C.h; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = C.hs; ctx.stroke();
+    }
+    if (!opts.struct){
+      ctx.beginPath(); ctx.arc(w.x, w.y, RO, 0, Math.PI * 2);
+      ctx.fillStyle = C.o; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = C.ionStroke; ctx.stroke();
+    }
+    if (delta){
+      const ax = Math.cos(w.ang), ay = Math.sin(w.ang), f = '700 11px "Atkinson Hyperlegible", sans-serif';
+      halo('δ−', w.x - ax * (RO + 8), w.y - ay * (RO + 8), f);
+      const dp = DOH * Math.cos(TH) + RH + 8;
+      halo('δ+', w.x + ax * dp, w.y + ay * dp, f);
+    }
+    if (sc) ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  function line(x1, y1, x2, y2, r1, r2){
+    const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy);
+    if (d <= r1 + r2 + 1) return;
+    const ux = dx / d, uy = dy / d;
+    ctx.beginPath(); ctx.moveTo(x1 + ux * r1, y1 + uy * r1); ctx.lineTo(x2 - ux * r2, y2 - uy * r2); ctx.stroke();
+  }
+
+  function draw(){
+    const k = cv.width / W;
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.fillStyle = C.canvas; ctx.fillRect(0, 0, W, H);
+    if (temp !== 20){
+      ctx.globalAlpha = temp > 20 ? (temp - 20) / 60 * 0.16 : (20 - temp) / 15 * 0.16;
+      ctx.fillStyle = temp > 20 ? C.warm : C.cold; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
+    }
+    view.apply(ctx, k);
+
+    if (opts.free) for (const w of waters) if (w.state === 'free' && !w.fg) drawWater(w, 0.38 * w.alpha, false);
+
+    // Gitterbindungen der Ionen, die gerade gelöst werden
+    if (opts.forces){
+      ctx.strokeStyle = C.bond; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+      for (const q of ions){
+        if (q.state !== 'attaching' && q.state !== 'detaching') continue;
+        const a = q.state === 'attaching' ? 0.85 : 0.85 * Math.pow(Math.max(0, 1 - q.t / (1.9 * SLOW)), 1.5);
+        if (a < 0.03) continue;
+        ctx.globalAlpha = a;
+        for (const nb of q.nb) if (inLattice(nb)) line(q.x, q.y, nb.x, nb.y, R[q.type] * q.sc, R[nb.type] * nb.sc);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    for (const q of ions) if (q.state === 'lattice') drawIon(q);
+
+    const deltaFor = q => opts.delta && ((q.state !== 'hydrated' && q.state !== 'leaving') || q === sim.tracked);
+    for (const q of ions){
+      if (q.state === 'lattice') continue;
+      const dl = deltaFor(q);
+      if (opts.struct) drawIon(q);
+      for (const s of q.slots) if (s.water) drawWater(s.water, s.water.state === 'bound' ? 1 : Math.max(0.5, s.water.alpha), dl && s.water.state === 'bound');
+      if (!opts.struct) drawIon(q);
+    }
+
+    // Ion-Dipol-Anziehung
+    if (opts.forces){
+      ctx.strokeStyle = C.accent; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+      for (const q of ions){
+        if (q.state === 'lattice') continue;
+        if ((q.state === 'hydrated' || q.state === 'leaving') && q !== sim.tracked) continue;
+        ctx.lineWidth = 1.6 + 0.7 * (Math.abs(SALT[q.type].q) - 1);
+        for (const s of q.slots){
+          const w = s.water; if (!w || w.state !== 'bound') continue;
+          if (q.type === 'cat') line(q.x, q.y, w.x, w.y, R.cat, RO);
+          else {
+            const hs = hPosDraw(w); const h = Math.hypot(hs[0][0] - q.x, hs[0][1] - q.y) < Math.hypot(hs[1][0] - q.x, hs[1][1] - q.y) ? hs[0] : hs[1];
+            line(q.x, q.y, h[0], h[1], R.an, opts.struct ? 5 : RH);
+          }
+        }
+      }
+      ctx.setLineDash([]);
+    }
+
+    // Wassermoleküle vor der Schnittebene
+    if (opts.free) for (const w of waters) if (w.fg) drawWater(w, 0.42 * w.alpha, false, 1.3);
+
+    // verfolgtes Ion
+    const tr = sim.tracked;
+    if (opts.track && tr){
+      if (tr.trail.length > 1){
+        ctx.globalAlpha = 0.6; ctx.strokeStyle = C.track; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(tr.trail[0][0], tr.trail[0][1]);
+        for (const p of tr.trail) ctx.lineTo(p[0], p[1]);
+        ctx.lineTo(tr.x, tr.y); ctx.stroke(); ctx.globalAlpha = 1;
+      }
+      ctx.beginPath(); ctx.arc(tr.x, tr.y, R[tr.type] * (tr.sc || 1) + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = C.track; ctx.lineWidth = 3; ctx.stroke();
+      const off = tr.state === 'lattice' || tr.state === 'attaching' ? R[tr.type] + 16 : cr(tr) + 12;
+      halo(ionName(tr), tr.x, Math.max(14, tr.y - off), '700 16px "Atkinson Hyperlegible", sans-serif');
+    }
+
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.font = '500 14px "Lexend", sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = C.muted; ctx.fillText('Teilchenebene · Ionengitter räumlich · stark vergrößert', 14, 12);
+    ctx.textAlign = 'right'; ctx.fillText((paused ? 'pausiert · ' : '') + temp + ' °C', W - 14, 12);
+    if (sim.done) halo('Kristall vollständig gelöst', W / 2, H / 2, '600 26px "Lexend", sans-serif');
+  }
+
+  // Bedienoberfläche
+  function legendIon(ion, cls){
+    const r = Math.min(13, Math.max(5.5, ion.r * 0.72)), t = chargeTxt(ion.q), fs = t.length > 1 ? Math.max(8, r * 1.05) : Math.max(10, r * 1.3);
+    const size = ion.q > 0 ? (ion.r < 9 ? 'klein, ' : ion.r > 11 ? 'eher groß, ' : '') : (ion.poly ? 'groß, mehratomig, ' : 'groß, ');
+    return `<svg viewBox="0 0 44 30" aria-hidden="true"><circle cx="22" cy="15" r="${r}" style="fill:var(${cls});stroke:var(--ion-stroke)"/><text x="22" y="${15 + fs * 0.36}" text-anchor="middle" style="fill:var(--ion-text);font:700 ${fs}px var(--font-body)">${t}</text></svg><span><strong>${ionLabel(ion)}</strong> ${ion.name}: ${size}${ion.q > 0 ? 'positiv' : 'negativ'}</span>`;
+  }
+  function buildSaltUI(){
+    const s = SALT, cN = ionLabel(s.cat), aN = ionLabel(s.an), co = n => n > 1 ? n + ' ' : '';
+    const ix = q => `<span class="ix"><span>${chargeTxt(q)}</span><span>(aq)</span></span>`;
+    $('eqS').innerHTML = htmlF(s.f) + '<sub>(s)</sub>';
+    $('eqAq').innerHTML = co(s.nc) + htmlF(s.cat.sym) + ix(s.cat.q) + ' + ' + co(s.na) + htmlF(s.an.sym) + ix(s.an.q);
+    $('eqBox').setAttribute('aria-label', `${uniF(s.f)} (fest) löst sich in Wasser zu ${co(s.nc)}${cN} (aq) und ${co(s.na)}${aN} (aq)`);
+    const ratio = s.nc === s.na ? '' : ` Auf ${s.nc > 1 ? s.nc + ' ' + cN : 'ein ' + cN} ${s.nc > 1 || s.na > 1 ? 'kommen' : 'kommt'} ${s.na > 1 ? s.na + ' ' + aN : 'ein ' + aN}.`;
+    const hi = Math.max(s.cat.q, -s.an.q) > 1;
+    $('ph0').textContent = `${cN} und ${aN} sind regelmäßig angeordnet.${ratio} Jedes Ion ist nur von entgegengesetzt geladenen Ionen umgeben und wird durch deren Anziehung festgehalten. Die Ionen schwingen nur um ihren festen Platz.`;
+    $('ph1').textContent = `Wassermoleküle lagern sich an Ionen der Oberfläche an, zuerst an Ecken und Kanten. Dort hat ein Ion weniger Nachbarn im Gitter. Die δ⁻-Seite (O) zeigt zum ${cN}, die δ⁺-Seite (H) zum ${aN}.`;
+    $('ph2').textContent = 'Die Anziehung durch die Wassermoleküle überwiegt die Anziehung der Nachbar-Ionen. Das Ion wird aus dem Gitter herausgelöst.' + (hi ? ' Höher geladene Ionen werden im Gitter stärker festgehalten. Das Herauslösen dauert deshalb länger.' : '');
+    $('ph3').innerHTML = `Das Ion wird ringsum von Wassermolekülen umgeben: Es entsteht eine Hydrathülle. Schreibweise: ${htmlF(s.cat.sym)}<sup>${chargeTxt(s.cat.q)}</sup><sub>(aq)</sub> bzw. ${htmlF(s.an.sym)}<sup>${chargeTxt(s.an.q)}</sup><sub>(aq)</sub>.` + (s.cat.q > 1 ? ` Um das kleine, höher geladene ${cN} liegen die Wassermoleküle besonders eng und fest.` : '');
+    $('ph4').textContent = `Die hydratisierten Ionen bewegen sich ungeordnet und verteilen sich in der Lösung. ${cN} und ${aN} liegen einzeln vor. Es gibt keine ${uniF(s.f)}-Moleküle.`;
+    $('lgCat').innerHTML = legendIon(s.cat, '--na');
+    $('lgAn').innerHTML = legendIon(s.an, '--cl');
+    $('saltNote').textContent = s.note;
+    const cN2 = ionLabel(s.cat), aN2 = ionLabel(s.an);
+    $('structNote').textContent = s.lat === 'ab' ? (s.f === 'NaCl' || s.f === 'KCl' ? 'Gitter vom Natriumchlorid-Typ: Jedes Ion hat sechs entgegengesetzt geladene Nachbarn.' : 'Schematisch als Gitter vom Natriumchlorid-Typ dargestellt: Jedes Ion hat sechs entgegengesetzt geladene Nachbarn. Die echte Kristallstruktur weicht davon ab.')
+      : s.lat === 'ab2' ? `Schematisches Gitter vom Fluorit-Typ: Jedes ${cN2} hat acht, jedes ${aN2} vier entgegengesetzt geladene Nachbarn. Die echte Kristallstruktur weicht davon ab.`
+      : s.lat === 'a2b' ? `Schematisches Gitter vom Anti-Fluorit-Typ: Jedes ${aN2} hat acht, jedes ${cN2} vier entgegengesetzt geladene Nachbarn. Die echte Kristallstruktur weicht davon ab.`
+      : s.lat === 'ab3' ? `Schematisches Gitter: Jedes ${cN2} hat sechs, jedes ${aN2} zwei entgegengesetzt geladene Nachbarn. Die echte Kristallstruktur weicht davon ab.`
+      : `Schematisches Gitter: Jedes ${aN2} hat sechs, jedes ${cN2} zwei entgegengesetzt geladene Nachbarn. Die echte Kristallstruktur weicht davon ab.`;
+  }
+  const groups = [...new Set(SALTS.map(x => x.group))];
+  $('salt').innerHTML = groups.map(g => `<optgroup label="${g}">` + SALTS.map((x, i) => x.group === g ? `<option value="${i}">${x.name} (${uniF(x.f)})</option>` : '').join('') + '</optgroup>').join('');
+  $('salt').addEventListener('change', e => { applySalt(SALTS[+e.target.value]); reset(); });
+
+  const ui = {};
+  function setMsg(t){ const m = $('msg'); if (m.textContent !== t) m.textContent = t; }
+  function syncUI(){
+    const tr = sim.tracked;
+    const map = { lattice: 0, attaching: 1, detaching: 2, hydrating: 3, hydrated: 4, leaving: 4 };
+    const pi = tr ? map[tr.state] : 0;
+    if (ui.pi !== pi){
+      ui.pi = pi;
+      document.querySelectorAll('#phases li').forEach(li => {
+        const i = +li.dataset.i; li.classList.toggle('now', i === pi); li.classList.toggle('done', i < pi);
+      });
+      $('eqS').classList.toggle('hl', pi <= 1);
+      $('eqAq').classList.toggle('hl', pi >= 3);
+    }
+    const info = tr ? `Verfolgt: <strong>${ionName(tr)}</strong> · Startposition: ${posName(tr)}` : 'Noch kein Ion ausgewählt.';
+    if (ui.info !== info){ ui.info = info; $('trackedInfo').innerHTML = info; }
+
+    $('btnPlay').textContent = paused ? 'Start' : 'Pause';
+    const nb = $('btnNext');
+    nb.hidden = !sim.step;
+    const labels = { detaching: 'Weiter: Herauslösen', hydrating: 'Weiter: Hydrathülle', hydrated: 'Weiter: Verteilung', newIon: sim.tracked ? 'Nächstes Ion lösen' : 'Erstes Ion lösen' };
+    const nl = sim.hold ? labels[sim.hold.next] : 'Weiter';
+    if (nb.textContent !== nl) nb.textContent = nl;
+    nb.disabled = !sim.hold;
+  }
+
+  $('btnPlay').addEventListener('click', () => { paused = !paused; });
+  $('btnNext').addEventListener('click', () => { if (sim.hold){ release(); paused = false; } });
+  $('btnReset').addEventListener('click', () => { reset(); });
+  document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener('change', () => {
+    const step = $('modeStep').checked;
+    sim.step = step;
+    if (!step){ if (sim.hold) release(); }
+    else if (!sim.hold && (!sim.tracked || sim.tracked.state === 'hydrated') && lat.n){
+      if (sim.tracked) sim.tracked.nextHeld = true;
+      setHold(null, 'newIon');
+    }
+  }));
+  $('temp').addEventListener('input', e => { temp = +e.target.value; $('tempOut').textContent = temp + ' °C'; });
+  $('speed').addEventListener('input', e => { speed = +e.target.value; $('speedOut').textContent = String(speed).replace('.', ',') + '×'; });
+  const bind = (id, key) => $(id).addEventListener('change', e => { opts[key] = e.target.checked; });
+  bind('optForces', 'forces'); bind('optDelta', 'delta'); bind('optFree', 'free'); bind('optTrack', 'track'); bind('optExact', 'exact'); bind('optStruct', 'struct');
+
+  cv.addEventListener('click', e => {
+    const r = cv.getBoundingClientRect();
+    const { x, y } = view.toWorld(e.clientX, e.clientY);
+    let hit = null;
+    for (const q of ions){
+      const m = q.state === 'lattice' ? R[q.type] * q.sc + 2 : cr(q);
+      if (Math.hypot(x - q.x, y - q.y) < m){ if (!hit || (q.state === 'lattice' && hit.state === 'lattice' && q.dz <= hit.dz) || hit.state === 'lattice' && q.state !== 'lattice') hit = q; }
+    }
+    if (!hit) return;
+    if (hit.state !== 'lattice'){
+      sim.tracked = hit; hit.trail = []; hit.nextHeld = true;
+      setMsg(`${ionName(hit)} wird jetzt verfolgt.`); return;
+    }
+    if (nCount(hit) >= hit.coord){
+      setMsg(`Dieses ${ionName(hit)} ist auf allen Seiten von Gegen-Ionen umgeben. Die Wassermoleküle kommen noch nicht heran.`); return;
+    }
+    if (!sim.step){
+      startDissolve(hit); sim.tracked = hit;
+      setMsg(`${ionName(hit)} (${posName(hit)}) wird jetzt gelöst.`);
+    } else {
+      sim.pending = hit;
+      if (sim.hold && sim.hold.next === 'newIon'){ release(); paused = false; setMsg(`${ionName(hit)} (${posName(sim.tracked)}) wird jetzt gelöst.`); }
+      else setMsg(`${ionName(hit)} wird als Nächstes gelöst.`);
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    const tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (e.code === 'Space' && !['BUTTON', 'INPUT', 'LABEL'].includes(tag)){ e.preventDefault(); paused = !paused; }
+    if (e.code === 'ArrowRight' && tag !== 'INPUT' && sim.step && sim.hold){ e.preventDefault(); release(); paused = false; }
+  });
+
+  function resize(){
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(cv.clientWidth * dpr); cv.height = Math.round(cv.clientWidth * dpr * H / W);
+  }
+  new ResizeObserver(resize).observe(cv);
+  readColors();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (document.fonts) document.fonts.ready.then(readColors);
+
+  applySalt(SALT); reset(); resize();
+  let last = performance.now();
+  function frame(now){
+    const real = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!paused) update(real * speed);
+    draw(); syncUI();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gleichgewichtslabor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: links Teilchenbox, Bedienung und zwei Diagramme; rechts Kästen für Reaktion/K, Startwerte und Auswertung mit Eingriffen. Kästen mit farbigem linken Rand, keine Icons. */
+:root{
+  --bg:#f3f6f8; --panel:#ffffff; --fg:#1b2530; --muted:#56636f; --line:#d3dce3; --grid:#dde4ea;
+  --canvas:#eef3f6; --scrim:rgba(12,22,30,.55);
+  --sA:#0072b2; --sA-t:#ffffff; --sB:#e69f00; --sB-t:#1b2530; --sC:#009e73; --sC-t:#ffffff; --sD:#cc79a7; --sD-t:#1b2530;
+  --accent:#0068a8; --accent-soft:#e1eef7; --on-accent:#ffffff; --track:#c98400;
+  --font-display:"Lexend", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Lexend", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12181d; --panel:#1a2229; --fg:#e4ebf0; --muted:#9daab5; --line:#2e3b45; --grid:#26333c;
+    --canvas:#0f1b24;
+    --sA:#56b4e9; --sA-t:#0b1a24; --sB:#e69f00; --sB-t:#1b2530; --sC:#2fbf97; --sC-t:#0b1a24; --sD:#d68bbd; --sD-t:#1b2530;
+    --accent:#5fb0e6; --accent-soft:#1c3444; --on-accent:#0b1a24; --track:#f2b43a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12181d; --panel:#1a2229; --fg:#e4ebf0; --muted:#9daab5; --line:#2e3b45; --grid:#26333c;
+  --canvas:#0f1b24;
+  --sA:#56b4e9; --sA-t:#0b1a24; --sB:#e69f00; --sB-t:#1b2530; --sC:#2fbf97; --sC-t:#0b1a24; --sD:#d68bbd; --sD-t:#1b2530;
+  --accent:#5fb0e6; --accent-soft:#1c3444; --on-accent:#0b1a24; --track:#f2b43a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:17px;line-height:1.5}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:20px 40px}
+header{display:grid;gap:4px;margin-bottom:18px}
+.eyebrow{margin:0;font-family:var(--font-display);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.2}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+@media (max-width:1020px){.main{grid-template-columns:minmax(0,1fr)}}
+.col{display:grid;gap:12px;min-width:0}
+.stage{position:relative;width:100%;aspect-ratio:16/10;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--canvas)}
+.stage canvas{display:block;width:100%;height:100%;cursor:crosshair}
+.zoom{position:absolute;right:10px;bottom:10px;display:flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.zoom button{font:inherit;font-family:var(--font-display);font-size:1rem;line-height:1;min-width:40px;padding:8px 10px;border:0;background:var(--panel);color:var(--fg);cursor:pointer}
+.zoom button+button{border-left:1.5px solid var(--line)}
+.zoom button:hover{background:var(--accent-soft)}
+.zoom #zoomVal{min-width:68px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.zoom #fsBtn{font-size:.9rem;padding:8px 12px}
+.fs-host:fullscreen,.fs-host.is-max{background:var(--bg);overflow:auto;padding:16px;align-content:start}
+.fs-host.is-max{position:fixed;inset:0;z-index:50;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.fs-host:fullscreen .stage,.fs-host.is-max .stage{width:min(calc(100vw - 48px),calc((100vh - 200px) * 1.6));height:calc(min(calc(100vw - 48px),calc((100vh - 200px) * 1.6)) / 1.6);aspect-ratio:auto;justify-self:center}
+.stage canvas{touch-action:none}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-family:var(--font-display);font-weight:500;font-size:1rem;padding:9px 16px;border-radius:6px;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.sm{padding:3px 9px;font-size:.9rem}
+:focus-visible{outline:3px solid var(--track);outline-offset:2px}
+.slider{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:.95rem}
+.slider input{width:130px;accent-color:var(--accent)}
+.slider output{min-width:3ch;font-variant-numeric:tabular-nums}
+.options{display:flex;flex-wrap:wrap;gap:6px 20px}
+.options label{display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+.options input{width:18px;height:18px;accent-color:var(--accent)}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.charts{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:6px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.box h2{margin:0;font-family:var(--font-display);font-size:1rem;font-weight:600}
+.box.b2{border-left-color:var(--sB)}
+.box.b3{border-left-color:var(--sC)}
+.box.b4{border-left-color:var(--sD)}
+.chart canvas{width:100%;aspect-ratio:400/220;display:block}
+.chart-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chartbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.chartbar .seg label{flex:none;padding:6px 12px}
+.cb-lbl{font-family:var(--font-display);font-size:.95rem}
+.cb-focus{display:inline-flex;gap:8px;align-items:center}
+.krow input[type=text]{width:7ch;font:inherit;font-size:1.15rem;font-weight:600;text-align:right;padding:4px 8px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-variant-numeric:tabular-nums}
+.krow input[type=text][aria-invalid=true]{border-color:var(--track)}
+.overlay{position:fixed;inset:0;z-index:60;background:var(--scrim);display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.ov-inner{background:var(--panel);border:1px solid var(--line);border-radius:8px;width:min(1500px,100%);max-height:100%;overflow:auto;padding:16px 20px;display:grid;gap:10px}
+.ov-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ov-head h2{margin:0;font-family:var(--font-display);font-size:1.3rem;font-weight:600}
+#ovCanvas{width:100%;aspect-ratio:760/400;display:block}
+.ov-inner .key{font-size:1rem}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key svg{width:26px;height:8px}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;margin:0;padding:0}
+.seg legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{flex:1;text-align:center;padding:8px 10px;cursor:pointer;font-family:var(--font-display);font-size:.95rem;background:var(--panel)}
+.seg label+input+label{border-left:1.5px solid var(--line)}
+.seg input:checked+label{background:var(--accent-soft);font-weight:600;box-shadow:inset 0 -3px 0 var(--accent)}
+.seg input:focus-visible+label{outline:3px solid var(--track);outline-offset:-3px}
+.clickpick{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:.95rem}
+.clickpick .seg label{padding:6px 12px;flex:none}
+.equation{font-family:var(--font-display);font-size:1.5rem;text-align:center;letter-spacing:.02em}
+.mwg{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-display);font-size:1.05rem}
+.frac{display:inline-grid;text-align:center}
+.frac span:first-child{border-bottom:1.5px solid var(--fg);padding:0 4px}
+.krow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-family:var(--font-display)}
+.krow input{width:100%;accent-color:var(--accent)}
+.krow output{font-size:1.2rem;font-weight:600;min-width:4.5ch;text-align:right;font-variant-numeric:tabular-nums}
+.startgrid{display:grid;gap:8px}
+.startrow{display:grid;grid-template-columns:30px minmax(0,1fr) 3.5ch;gap:10px;align-items:center}
+.startrow input{width:100%;accent-color:var(--accent)}
+.startrow output{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+[hidden]{display:none!important}
+.chk{display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.tabs button{font:inherit;font-family:var(--font-display);font-size:1rem;padding:10px;border:0;background:var(--panel);color:var(--fg);cursor:pointer}
+.tabs button+button{border-left:1.5px solid var(--line)}
+.tabs button[aria-selected=true]{background:var(--accent-soft);font-weight:600;box-shadow:inset 0 -3px 0 var(--accent)}
+.tabs button:focus-visible{outline:3px solid var(--track);outline-offset:-3px}
+table.sum td{font-weight:500}
+table.sum td:nth-child(2),table.sum td:nth-child(3){font-weight:700}
+table.sum td:last-child{text-align:left;font-weight:400;white-space:normal}
+table.sum th:last-child{text-align:left}
+table.sum tr.act td:first-child{box-shadow:inset 3px 0 0 var(--accent);padding-left:8px}
+.chip{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font-weight:700;font-size:.9rem}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+table.vals{border-collapse:collapse;width:100%;font-size:.95rem}
+table.vals th{font-weight:400;color:var(--muted);text-align:right;padding:2px 4px;font-size:.85rem}
+table.vals th:first-child{text-align:left}
+table.vals td{text-align:right;padding:4px;font-variant-numeric:tabular-nums;font-weight:700}
+table.vals td:first-child{text-align:left}
+table.vals td.act{white-space:nowrap}
+.qk{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:2px 12px;font-family:var(--font-display);font-size:1.05rem}
+.qk b{font-variant-numeric:tabular-nums}
+.status{margin:0;padding:8px 10px;border-radius:4px;border-left:4px solid var(--muted);background:var(--bg);font-size:.95rem}
+.status.fwd{border-left-color:var(--track)}
+.status.bwd{border-left-color:var(--accent)}
+.small{margin:0;font-size:.88rem;color:var(--muted)}
+.keys b,.small b.kh{font-family:var(--font-display);font-weight:600;color:var(--fg);margin-right:4px}
+
+body{margin:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Chemie · Chemisches Gleichgewicht</p>
+    <h1>Gleichgewichtslabor</h1>
+  </header>
+
+  <div class="main">
+    <section class="col" aria-label="Simulation">
+      <div class="stage"><div class="zoom" role="group" aria-label="Zoom"><button type="button" data-zoom="out" aria-label="Herauszoomen">−</button><button type="button" data-zoom="reset" id="zoomVal" aria-label="Zoom zurücksetzen" title="Zoom zurücksetzen">100 %</button><button type="button" data-zoom="in" aria-label="Hineinzoomen">+</button><button type="button" id="fsBtn" aria-pressed="false" title="Vollbild (Taste F)">Vollbild</button></div><canvas id="sim" role="img" aria-label="Teilchenbox: Teilchen bewegen sich, stoßen zusammen und reagieren mit einer bestimmten Wahrscheinlichkeit."></canvas></div>
+      <div class="controls">
+        <button class="btn primary" id="btnPlay" type="button">Start</button>
+        <button class="btn" id="btnReset" type="button">Neustart</button>
+        <label class="slider" for="speed">Tempo <input type="range" id="speed" min="0.25" max="3" step="0.25" value="0.5"><output id="speedOut" for="speed">0,5×</output></label>
+        <span class="clickpick">Klick in die Box fügt 5 Teilchen hinzu: <fieldset class="seg" id="clickSeg"><legend>Stoff für Klick</legend></fieldset></span>
+      </div>
+      <div class="options">
+        <label><input type="checkbox" id="optPulse" checked> Reaktionen aufblitzen lassen</label>
+        <label><input type="checkbox" id="optCmp"> Vergleichsmodus mit zweiter Box</label>
+        <label><input type="checkbox" id="optEns" checked> Diagramme glätten (Mittel aus 5 gleichen Boxen)</label>
+      </div>
+      <div class="chartbar" id="chartBar" hidden>
+        <span class="cb-lbl">Diagramme</span>
+        <fieldset class="seg"><legend>Darstellung der Diagramme im Vergleichsmodus</legend>
+          <input type="radio" name="chMode" id="chSep" value="sep" checked><label for="chSep">Getrennt je Box</label>
+          <input type="radio" name="chMode" id="chOver" value="over"><label for="chOver">Überlagert</label>
+        </fieldset>
+        <label class="chk" id="sameAxRow"><input type="checkbox" id="optSameAx" checked> Gleiche Achsen</label>
+        <span class="cb-focus" id="focusRow" hidden><span class="cb-lbl">Stoff</span><fieldset class="seg" id="focusSeg"><legend>Stoff im überlagerten Diagramm</legend></fieldset></span>
+      </div>
+      <div class="charts" id="charts"></div>
+      <p class="small"><b class="kh">Tastatur und Maus</b> Leertaste: Start/Pause · 1 / 2: Box 1 / Box 2 wählen · F: Vollbild · Mausrad oder zwei Finger: zoomen · Ziehen: Ausschnitt verschieben · + / − / 0: Zoom</p>
+      <p class="small" id="cmpNote" hidden>Vergleichsmodus: Box 1 ist links, Box 2 rechts. Jede Box hat eigene Einstellungen, die du rechts über die Reiter „Box 1“ und „Box 2“ wählst. Die Diagramme zeigen jede Box getrennt oder beide überlagert. Beim Überlagern lässt sich ein einzelner Stoff auswählen: Box 1 ist dann durchgezogen, Box 2 gestrichelt.</p>
+      <p class="small">Alle Teilchen sind gleich groß und gleich schwer. Stoßen passende Teilchen zusammen, reagieren sie mit der Wahrscheinlichkeit p<sub>hin</sub> bzw. p<sub>rück</sub>. Es gilt K = p<sub>hin</sub> / p<sub>rück</sub>. Gestrichelte waagerechte Linien im Diagramm: berechnete Gleichgewichtswerte nach dem Massenwirkungsgesetz. Zum Glätten laufen im Hintergrund vier weitere, unsichtbare Boxen mit denselben Einstellungen und Eingriffen mit. Diagramme, Q und Hinweistext zeigen dann den Mittelwert, die Tabelle zeigt immer die sichtbare Box.</p>
+    </section>
+
+    <aside class="col">
+      <div class="box">
+        <h2>Reaktion</h2>
+        <fieldset class="seg" id="tplSeg"><legend>Reaktionstyp</legend></fieldset>
+        <div class="equation" id="eq"></div>
+        <div class="mwg" id="mwg"></div>
+        <p class="small" id="bi2Note" hidden>Stöße zweier C-Teilchen sind nur halb so häufig wie Stöße von A mit B. Das ist in p<sub>rück</sub> berücksichtigt, damit K stimmt.</p>
+      </div>
+
+      <div class="box b4" id="sumBox" hidden>
+        <h2>Übersicht</h2>
+        <table class="vals sum">
+          <thead><tr><th>Box</th><th>K</th><th>Q</th><th>Zustand</th></tr></thead>
+          <tbody id="sumRows"></tbody>
+        </table>
+      </div>
+
+      <div class="tabs" id="tabs" role="tablist" aria-label="Box auswählen" hidden>
+        <button type="button" role="tab" id="tab0" aria-selected="true" aria-controls="panel">Box 1 (links)</button>
+        <button type="button" role="tab" id="tab1" aria-selected="false" aria-controls="panel">Box 2 (rechts)</button>
+      </div>
+
+      <div class="col" id="panel" role="tabpanel">
+        <div class="box">
+          <h2 id="setTitle">Einstellungen</h2>
+          <div class="krow">
+            <label for="kText">K</label>
+            <input type="range" id="kSlider" min="0" max="12" step="1" value="8" aria-label="K grob einstellen">
+            <input type="text" id="kText" inputmode="decimal" value="4" aria-describedby="kHelp">
+          </div>
+          <p class="small" id="kHelp">Regler für typische Werte, Textfeld für beliebige Werte zwischen 0,001 und 1000 (mit Eingabetaste bestätigen). Jede Änderung wird im Diagramm markiert.</p>
+          <label class="chk"><input type="checkbox" id="optCat"> Katalysator</label>
+          <p class="small" id="pInfo"></p>
+        </div>
+
+        <div class="box b2">
+          <h2 id="startTitle">Startwerte (Teilchenzahl)</h2>
+          <div id="startRows" class="startgrid"></div>
+          <div class="btnrow">
+            <button class="btn sm" id="btnOnlyRe" type="button">Nur Edukte</button>
+            <button class="btn sm" id="btnOnlyPr" type="button">Nur Produkte</button>
+            <button class="btn sm" id="btnMirror" type="button" hidden>Wie Box 1, von der anderen Seite</button>
+          </div>
+          <div class="btnrow" id="copyRow" hidden><button class="btn sm" id="btnCopy1" type="button">Alle Einstellungen von Box 1 übernehmen</button></div>
+          <p class="small" id="startHint">Eine Änderung der Startwerte startet die Simulation neu. K und Katalysator wirken sofort.</p>
+        </div>
+
+        <div class="box b3">
+          <h2 id="evalTitle">Auswertung und Eingriffe</h2>
+          <table class="vals">
+            <thead><tr><th>Stoff</th><th>jetzt (sicht&shy;bare Box)</th><th>im Gleich­gewicht</th><th>zugeben / entnehmen</th></tr></thead>
+            <tbody id="valRows"></tbody>
+          </table>
+          <label class="chk" id="bothRow" hidden><input type="checkbox" id="optBoth"> Zugeben, Entnehmen und Markieren in beiden Boxen gleichzeitig</label>
+          <div class="qk">
+            <span>Reaktionsquotient Q</span><b id="qOut">–</b>
+            <span>Gleichgewichtskonstante K</span><b id="kOut2">4</b>
+          </div>
+          <p class="status" id="status"></p>
+          <div class="btnrow">
+            <button class="btn sm" id="btnMark" type="button">20 Teilchen markieren</button>
+            <button class="btn sm" id="btnUnmark" type="button">Markierung entfernen</button>
+          </div>
+          <p class="small" id="markInfo"></p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="overlay" id="ov" hidden role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+  <div class="ov-inner">
+    <div class="ov-head"><h2 id="ovTitle"></h2><button class="btn" id="ovClose" type="button">Schließen</button></div>
+    <canvas id="ovCanvas"></canvas>
+    <div class="key" id="ovKey"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const cv = $('sim'), ctx = cv.getContext('2d');
+
+  // Stoffe und Reaktionsvorlagen. Später können hier echte Stoffe mit Formel und eigener Darstellung ergänzt werden.
+  const SPECIES = {
+    A: { label: 'A', color: '--sA', text: '--sA-t', dash: [] },
+    B: { label: 'B', color: '--sB', text: '--sB-t', dash: [6, 3] },
+    C: { label: 'C', color: '--sC', text: '--sC-t', dash: [2, 3] },
+    D: { label: 'D', color: '--sD', text: '--sD-t', dash: [8, 3, 2, 3] }
+  };
+  const SK = ['A', 'B', 'C', 'D'], SI = { A: 0, B: 1, C: 2, D: 3 };
+  const TEMPLATES = [
+    { id: 'uni', title: 'A ⇌ B', re: ['A'], pr: ['B'], start: { A: 240, B: 0 }, example: 'Beispiel: Umlagerung eines Isomers in ein anderes' },
+    { id: 'bi', title: 'A + B ⇌ C + D', re: ['A', 'B'], pr: ['C', 'D'], start: { A: 180, B: 180, C: 0, D: 0 }, example: 'Beispiel: Veresterung, Säure + Alkohol ⇌ Ester + Wasser (K ≈ 4)' },
+    { id: 'bi2', title: 'A + B ⇌ 2 C', re: ['A', 'B'], pr: ['C', 'C'], start: { A: 180, B: 180, C: 0 }, example: 'Beispiel: H₂ + I₂ ⇌ 2 HI (K ≈ 50 bei etwa 450 °C)' }
+  ];
+  const KVALS = [0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 10, 20, 50, 100];
+
+  const W = 960, H = 600, R = 7, D2 = 4 * R * R, MAXN = 400, STEP = 20, CLICKN = 5, NBOX = 5, MARKN = 20, GAP = 8;
+  // Zoom und Ausschnitt: Mausrad oder zwei Finger zoomen, Ziehen verschiebt, Tasten + − 0
+  function makeView(canvas, W, H, onChange){
+    const ZMAX = 6, v = { z: 1, ox: 0, oy: 0, dragged: false };
+    const lbl = document.getElementById('zoomVal');
+    function clamp(){
+      v.z = Math.min(ZMAX, Math.max(1, v.z));
+      v.ox = Math.min(W - W / v.z, Math.max(0, v.ox));
+      v.oy = Math.min(H - H / v.z, Math.max(0, v.oy));
+    }
+    function changed(){
+      clamp();
+      if (lbl) lbl.textContent = Math.round(v.z * 100) + ' %';
+      canvas.style.cursor = v.z > 1.001 ? (pts.size ? 'grabbing' : 'grab') : '';
+      if (onChange) onChange();
+    }
+    v.toWorld = (cx, cy) => {
+      const r = canvas.getBoundingClientRect();
+      return { x: v.ox + (cx - r.left) / r.width * W / v.z, y: v.oy + (cy - r.top) / r.height * H / v.z };
+    };
+    v.zoomAt = (f, wx, wy) => {
+      const nz = Math.min(ZMAX, Math.max(1, v.z * f));
+      v.ox = wx - (wx - v.ox) * v.z / nz; v.oy = wy - (wy - v.oy) * v.z / nz; v.z = nz; changed();
+    };
+    v.zoomCenter = f => v.zoomAt(f, v.ox + W / v.z / 2, v.oy + H / v.z / 2);
+    v.reset = () => { v.z = 1; v.ox = 0; v.oy = 0; changed(); };
+    v.apply = (c, k) => { const s = k * v.z; c.setTransform(s, 0, 0, s, -v.ox * s, -v.oy * s); };
+
+    const pts = new Map(); let pan = null, pinch = null;
+    const center = () => { let x = 0, y = 0; for (const p of pts.values()){ x += p.x; y += p.y; } return { x: x / pts.size, y: y / pts.size }; };
+    const spread = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y) || 1; };
+    function startPan(){ const c = center(); pan = { x: c.x, y: c.y, ox: v.ox, oy: v.oy }; }
+    canvas.addEventListener('pointerdown', e => {
+      if (e.button !== undefined && e.button > 0) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 1){ v.dragged = false; startPan(); }
+      else if (pts.size === 2){ const c = center(); pinch = { d: spread(), z: v.z, w: v.toWorld(c.x, c.y) }; v.dragged = true; }
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const r = canvas.getBoundingClientRect();
+      if (pts.size >= 2 && pinch){
+        const c = center();
+        v.z = Math.min(ZMAX, Math.max(1, pinch.z * spread() / pinch.d));
+        v.ox = pinch.w.x - (c.x - r.left) / r.width * W / v.z; v.oy = pinch.w.y - (c.y - r.top) / r.height * H / v.z;
+        changed();
+      } else if (pan){
+        const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+        if (!v.dragged && Math.hypot(dx, dy) > 5 && v.z > 1.001) v.dragged = true;
+        if (v.dragged){ v.ox = pan.ox - dx / r.width * W / v.z; v.oy = pan.oy - dy / r.height * H / v.z; changed(); }
+      }
+    });
+    const up = e => {
+      if (!pts.delete(e.pointerId)) return;
+      if (pts.size < 2) pinch = null;
+      if (pts.size === 1) startPan(); else if (!pts.size) pan = null;
+      changed();
+    };
+    canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+    // Ein Ziehen soll keinen Klick auslösen
+    canvas.addEventListener('click', e => { if (v.dragged){ e.stopImmediatePropagation(); v.dragged = false; } }, true);
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const w = v.toWorld(e.clientX, e.clientY);
+      v.zoomAt(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.06 : 0.0018)), w.x, w.y);
+    }, { passive: false });
+    document.querySelectorAll('[data-zoom]').forEach(b => b.addEventListener('click', () => {
+      const a = b.dataset.zoom; if (a === 'in') v.zoomCenter(1.5); else if (a === 'out') v.zoomCenter(1 / 1.5); else v.reset();
+    }));
+    document.addEventListener('keydown', e => {
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (tag === 'INPUT' && document.activeElement.type === 'text') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === '+' || e.key === '='){ e.preventDefault(); v.zoomCenter(1.5); }
+      else if (e.key === '-'){ e.preventDefault(); v.zoomCenter(1 / 1.5); }
+      else if (e.key === '0'){ e.preventDefault(); v.reset(); }
+    });
+    return v;
+  }
+  let spriteZ = 1;
+  const view = makeView(cv, W, H, () => { if (Math.abs(view.z - spriteZ) > 0.01) buildSprites(); });
+
+  // Vollbild: Simulationsfeld mit Bedienung bildschirmfüllend (Taste F)
+  (function(){
+    const host = cv.closest('section'), btn = document.getElementById('fsBtn');
+    if (!host || !btn) return;
+    host.classList.add('fs-host');
+    const isOn = () => document.fullscreenElement === host || host.classList.contains('is-max');
+    const sync = () => { btn.textContent = isOn() ? 'Normalansicht' : 'Vollbild'; btn.setAttribute('aria-pressed', String(isOn())); };
+    const toggle = () => {
+      if (isOn()){
+        if (document.fullscreenElement === host && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        host.classList.remove('is-max'); sync(); return;
+      }
+      const fallback = () => { host.classList.add('is-max'); sync(); };
+      try { if (host.requestFullscreen) host.requestFullscreen().then(sync, fallback); else fallback(); } catch (err){ fallback(); }
+    };
+    btn.addEventListener('click', toggle);
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('keydown', e => {
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (e.key === 'Escape' && host.classList.contains('is-max')){ host.classList.remove('is-max'); sync(); }
+      else if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)){ e.preventDefault(); toggle(); }
+    });
+  })();
+  const PMAX = 0.25, CAT = 3, RUNI = 1.2, SIGMA = 80, POP = 0.35;
+
+  let tpl = TEMPLATES[1], speed = 0.5, clickS = 'A', ovOpen = null, active = 0;
+  let paused = true;
+  const opts = { pulse: true, ens: true, cmp: false, both: false };
+  // Einstellungen je Box: Startwerte, K, Katalysator. Die Simulation liest nur hieraus.
+  const cfg = [{ start: { ...tpl.start }, k: 4, cat: false }, { start: {}, k: 4, cat: false }];
+  let ens = [], sim, C = {}, sprites = {}, chartsDirty = true;
+
+  const K = (side = 0) => cfg[side].k;
+  const coef = arr => arr.reduce((m, s) => (m[s] = (m[s] || 0) + 1, m), {});
+  const speciesOf = () => [...new Set([...tpl.re, ...tpl.pr])];
+  // Symmetriefaktor: Stöße gleichartiger Teilchen sind nur halb so häufig wie Stöße verschiedener
+  function probs(side = 0){
+    const sf = tpl.re.length === 2 && tpl.re[0] === tpl.re[1] ? 0.5 : 1;
+    const sb = tpl.pr.length === 2 && tpl.pr[0] === tpl.pr[1] ? 0.5 : 1;
+    const cat = cfg[side].cat;
+    const k = K(side) * sb / sf, f = cat ? CAT : 1;
+    return k >= 1 ? { pf: PMAX * f, pr: PMAX * f / k } : { pf: PMAX * f * k, pr: PMAX * f };
+  }
+  let P = probs(), RX = null;
+  function setRX(){ RX = tpl.re.length === 2 ? { r1: SI[tpl.re[0]], r2: SI[tpl.re[1]], p1: SI[tpl.pr[0]], p2: SI[tpl.pr[1]] } : null; }
+  setRX();
+
+  function readColors(){
+    const s = getComputedStyle(document.documentElement), g = n => s.getPropertyValue(n).trim();
+    C = { panel: g('--panel'), canvas: g('--canvas'), fg: g('--fg'), muted: g('--muted'), grid: g('--grid'), line: g('--line'), accent: g('--accent'), track: g('--track'), bg: g('--bg') };
+    for (const key in SPECIES){ C[key] = g(SPECIES[key].color); C[key + 't'] = g(SPECIES[key].text); }
+    buildSprites(); chartsDirty = true;
+  }
+
+  const de = (x, d) => x.toFixed(d).replace('.', ',');
+  const fmtK = v => (v >= 100 ? v.toFixed(0) : v >= 1 ? String(+v.toPrecision(3)) : String(+v.toPrecision(2))).replace('.', ',');
+  function fmtQ(q){
+    if (!isFinite(q)) return '→ ∞';
+    if (q === 0) return '0';
+    return q >= 100 ? de(q, 0) : q >= 10 ? de(q, 1) : q >= 0.1 ? de(q, 2) : de(q, 3);
+  }
+  function gauss(){ return Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random()); }
+
+  // Eine Box: Teilchen in typisierten Arrays, Zähler laufend mitgeführt
+  const CELL = 16;
+  class Box {
+    constructor(w, h){
+      this.w = w; this.h = h; this.gc = Math.ceil(w / CELL); this.gr = Math.ceil(h / CELL);
+      this.n = 0; this.cap = 0; this.cnt = new Int32Array(4); this.evF = 0; this.evR = 0;
+      this.heads = new Int32Array(this.gc * this.gr); this.alloc(1024);
+    }
+    alloc(cap){
+      const grow = (old, T) => { const a = new T(cap); if (old) a.set(old.subarray(0, this.n)); return a; };
+      this.x = grow(this.x, Float32Array); this.y = grow(this.y, Float32Array);
+      this.vx = grow(this.vx, Float32Array); this.vy = grow(this.vy, Float32Array);
+      this.s = grow(this.s, Uint8Array); this.pop = grow(this.pop, Float32Array); this.pk = grow(this.pk, Uint8Array); this.mk = grow(this.mk, Uint8Array);
+      this.next = new Int32Array(cap); this.cap = cap;
+    }
+    add(si, x, y, pk){
+      if (this.n >= this.cap) this.alloc(this.cap * 2);
+      const i = this.n++;
+      this.x[i] = x; this.y[i] = y; this.vx[i] = gauss() * SIGMA; this.vy[i] = gauss() * SIGMA;
+      this.s[i] = si; this.pop[i] = pk ? 1 : 0; this.pk[i] = pk || 0; this.mk[i] = 0; this.cnt[si]++;
+    }
+    addRandom(si){
+      let x = 0, y = 0;
+      for (let t = 0; t < 8; t++){
+        x = R + 1 + Math.random() * (this.w - 2 * R - 2); y = R + 1 + Math.random() * (this.h - 2 * R - 2);
+        let ok = true;
+        for (let i = 0; i < this.n; i++){ const dx = this.x[i] - x, dy = this.y[i] - y; if (dx * dx + dy * dy < D2){ ok = false; break; } }
+        if (ok) break;
+      }
+      this.add(si, x, y, 0);
+    }
+    removeAt(i){
+      const l = --this.n; this.cnt[this.s[i]]--;
+      if (i !== l){ this.x[i] = this.x[l]; this.y[i] = this.y[l]; this.vx[i] = this.vx[l]; this.vy[i] = this.vy[l]; this.s[i] = this.s[l]; this.pop[i] = this.pop[l]; this.pk[i] = this.pk[l]; this.mk[i] = this.mk[l]; }
+    }
+    removeSpecies(si, k){
+      const idx = []; for (let i = 0; i < this.n; i++) if (this.s[i] === si) idx.push(i);
+      for (let i = idx.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+      idx.slice(0, k).sort((a, b) => b - a).forEach(i => this.removeAt(i));
+    }
+  }
+
+  function flash(b, a, c, kind){ b.pop[a] = b.pop[c] = 1; b.pk[a] = b.pk[c] = kind; }
+  function collide(b, i, j){
+    const x = b.x, y = b.y, dx = x[j] - x[i], dy = y[j] - y[i], d2 = dx * dx + dy * dy;
+    if (d2 >= D2) return;
+    const d = Math.sqrt(d2) || 0.001, nx = dx / d, ny = dy / d, ov = (2 * R - d) / 2;
+    x[i] -= nx * ov; y[i] -= ny * ov; x[j] += nx * ov; y[j] += ny * ov;
+    const vx = b.vx, vy = b.vy, rv = (vx[j] - vx[i]) * nx + (vy[j] - vy[i]) * ny;
+    if (rv >= 0) return;
+    vx[i] += rv * nx; vy[i] += rv * ny; vx[j] -= rv * nx; vy[j] -= rv * ny;
+    if (!RX) return;
+    const s = b.s, si = s[i], sj = s[j], X = RX;
+    if ((si === X.r1 && sj === X.r2) || (si === X.r2 && sj === X.r1)){
+      if (Math.random() < P.pf){
+        const a = X.r1 === X.r2 ? (Math.random() < 0.5 ? i : j) : (si === X.r1 ? i : j), c = a === i ? j : i;
+        s[a] = X.p1; s[c] = X.p2; b.cnt[X.r1]--; b.cnt[X.r2]--; b.cnt[X.p1]++; b.cnt[X.p2]++; b.evF++; flash(b, a, c, 1);
+      }
+    } else if ((si === X.p1 && sj === X.p2) || (si === X.p2 && sj === X.p1)){
+      if (Math.random() < P.pr){
+        // bei zwei gleichen Teilchen zufällig zuordnen (sonst stimmt das Gleichgewicht nicht exakt)
+        const a = X.p1 === X.p2 ? (Math.random() < 0.5 ? i : j) : (si === X.p1 ? i : j), c = a === i ? j : i;
+        s[a] = X.r1; s[c] = X.r2; b.cnt[X.p1]--; b.cnt[X.p2]--; b.cnt[X.r1]++; b.cnt[X.r2]++; b.evR++; flash(b, a, c, 2);
+      }
+    }
+  }
+
+  function step(b, dt){
+    const n = b.n, x = b.x, y = b.y, vx = b.vx, vy = b.vy, pop = b.pop, heads = b.heads, next = b.next;
+    const GC = b.gc, GR = b.gr, w = b.w, h = b.h, pd = dt / POP;
+    for (let i = 0; i < n; i++){
+      let px = x[i] + vx[i] * dt, py = y[i] + vy[i] * dt;
+      if (px < R){ px = R; if (vx[i] < 0) vx[i] = -vx[i]; } else if (px > w - R){ px = w - R; if (vx[i] > 0) vx[i] = -vx[i]; }
+      if (py < R){ py = R; if (vy[i] < 0) vy[i] = -vy[i]; } else if (py > h - R){ py = h - R; if (vy[i] > 0) vy[i] = -vy[i]; }
+      x[i] = px; y[i] = py;
+      if (pop[i] > 0) pop[i] = pop[i] > pd ? pop[i] - pd : 0;
+    }
+    heads.fill(-1);
+    for (let i = 0; i < n; i++){
+      let cx = (x[i] / CELL) | 0, cy = (y[i] / CELL) | 0;
+      if (cx >= GC) cx = GC - 1; if (cy >= GR) cy = GR - 1;
+      const ci = cy * GC + cx; next[i] = heads[ci]; heads[ci] = i;
+    }
+    for (let cy = 0; cy < GR; cy++) for (let cx = 0; cx < GC; cx++){
+      const ci = cy * GC + cx;
+      for (let i = heads[ci]; i !== -1; i = next[i]){
+        for (let j = next[i]; j !== -1; j = next[j]) collide(b, i, j);
+        if (cx + 1 < GC) for (let j = heads[ci + 1]; j !== -1; j = next[j]) collide(b, i, j);
+        if (cy + 1 < GR){
+          if (cx > 0) for (let j = heads[ci + GC - 1]; j !== -1; j = next[j]) collide(b, i, j);
+          for (let j = heads[ci + GC]; j !== -1; j = next[j]) collide(b, i, j);
+          if (cx + 1 < GC) for (let j = heads[ci + GC + 1]; j !== -1; j = next[j]) collide(b, i, j);
+        }
+      }
+    }
+    if (!RX){
+      const qf = 1 - Math.exp(-RUNI * P.pf * dt), qr = 1 - Math.exp(-RUNI * P.pr * dt), s = b.s;
+      for (let i = 0; i < n; i++){
+        if (s[i] === 0){ if (Math.random() < qf){ s[i] = 1; b.cnt[0]--; b.cnt[1]++; b.evF++; pop[i] = 1; b.pk[i] = 1; } }
+        else if (s[i] === 1){ if (Math.random() < qr){ s[i] = 0; b.cnt[1]--; b.cnt[0]++; b.evR++; pop[i] = 1; b.pk[i] = 2; } }
+      }
+    }
+    if (n){
+      let ke = 0; for (let i = 0; i < n; i++) ke += vx[i] * vx[i] + vy[i] * vy[i];
+      const f = Math.pow(2 * SIGMA * SIGMA * n / Math.max(1, ke), Math.min(0.5, dt));
+      if (Math.abs(f - 1) > 1e-6) for (let i = 0; i < n; i++){ vx[i] *= f; vy[i] *= f; }
+    }
+  }
+
+  const cntObj = arr => ({ A: arr[0], B: arr[1], C: arr[2], D: arr[3] });
+  function meanCounts(side){ const m = [0, 0, 0, 0]; for (const b of side) for (let k = 0; k < 4; k++) m[k] += b.cnt[k]; return cntObj(m.map(v => v / side.length)); }
+
+  // Startwerte "von der anderen Seite": maximal nach rechts (bzw. links) verschoben, gleiche Erhaltungsgrößen
+  function mirror(st){
+    const cr = coef(tpl.re), cp = coef(tpl.pr), out = { ...st };
+    let m = Math.min(...Object.keys(cr).map(s => (st[s] || 0) / cr[s]));
+    if (m > 0){ for (const s in cr) out[s] = (out[s] || 0) - m * cr[s]; for (const s in cp) out[s] = (out[s] || 0) + m * cp[s]; }
+    else {
+      m = Math.min(...Object.keys(cp).map(s => (st[s] || 0) / cp[s]));
+      for (const s in cp) out[s] = (out[s] || 0) - m * cp[s]; for (const s in cr) out[s] = (out[s] || 0) + m * cr[s];
+    }
+    for (const s in out) out[s] = Math.round(out[s]);
+    return out;
+  }
+  const boxW = () => opts.cmp ? (W - GAP) / 2 : W;
+  const boxX = side => side === 0 ? 0 : (W + GAP) / 2;
+
+  function makeSide(st){
+    const side = [];
+    for (let k = 0; k < NBOX; k++){
+      const b = new Box(boxW(), H);
+      for (const s of speciesOf()) for (let i = 0; i < (st[s] || 0); i++) b.addRandom(SI[s]);
+      side.push(b);
+    }
+    return side;
+  }
+  const sideData = side => ({ rE: { f: 0, r: 0 }, r0: { f: 0, r: 0 }, smE: meanCounts(side), sm0: cntObj(side[0].cnt) });
+  function reset(){
+    const starts = (opts.cmp ? [0, 1] : [0]).map(i => ({ ...cfg[i].start }));
+    ens = starts.map(makeSide);
+    sim = { marks: [], time: 0, hist: [], histT: 0, starts, sd: ens.map(sideData) };
+    for (const k in chartState) chartState[k].ymax = 0; chartsDirty = true;
+  }
+  // nur eine Box neu starten, die andere läuft weiter
+  function resetBox(i){
+    if (!sim || !ens[i]) return reset();
+    sim.starts[i] = { ...cfg[i].start }; ens[i] = makeSide(sim.starts[i]); sim.sd[i] = sideData(ens[i]);
+    sim.marks.push({ t: sim.time, label: 'Box ' + (i + 1) + ': Neustart', side: i }); chartsDirty = true;
+  }
+
+  // Gleichgewicht nach dem MWG (hängt nur von den Erhaltungsgrößen ab)
+  function equilibrium(n, side = 0){
+    const k = K(side);
+    if (tpl.id === 'uni'){ const tot = n.A + n.B, a = tot / (1 + k); return { A: a, B: tot - a, C: 0, D: 0 }; }
+    const a = n.A, b = n.B, c = n.C, d = n.D;
+    let qa, qb, qc, lo, hi = Math.min(a, b);
+    if (tpl.id === 'bi'){ qa = 1 - k; qb = c + d + k * (a + b); qc = c * d - k * a * b; lo = -Math.min(c, d); }
+    else { qa = 4 - k; qb = 4 * c + k * (a + b); qc = c * c - k * a * b; lo = -c / 2; }
+    let x;
+    if (Math.abs(qa) < 1e-9) x = qb > 0 ? -qc / qb : 0;
+    else {
+      const disc = Math.max(0, qb * qb - 4 * qa * qc), r1 = (-qb + Math.sqrt(disc)) / (2 * qa), r2 = (-qb - Math.sqrt(disc)) / (2 * qa);
+      x = (r1 >= lo - 1e-9 && r1 <= hi + 1e-9) ? r1 : r2;
+    }
+    x = Math.max(lo, Math.min(hi, x));
+    return tpl.id === 'bi' ? { A: a - x, B: b - x, C: c + x, D: d + x } : { A: a - x, B: b - x, C: c + 2 * x, D: 0 };
+  }
+  function quotient(n){
+    if (tpl.id === 'uni') return n.A > 0 ? n.B / n.A : (n.B > 0 ? Infinity : NaN);
+    const num = tpl.id === 'bi' ? n.C * n.D : n.C * n.C, den = n.A * n.B;
+    return den > 0 ? num / den : (num > 0 ? Infinity : NaN);
+  }
+
+  function update(dt){
+    sim.time += dt;
+    ens.forEach((side, k) => { P = probs(k); for (const b of side) step(b, dt); });
+    const kk = 1 - Math.exp(-dt / 3), ks = 1 - Math.exp(-dt / 1.5);
+    const entry = { t: sim.time, n: [], eq: [], vf: [], vr: [] };
+    ens.forEach((side, k) => {
+      const sd = sim.sd[k], b0 = side[0];
+      let fE = 0, rE = 0; for (const b of side){ fE += b.evF; rE += b.evR; }
+      sd.rE.f += (fE / side.length / dt - sd.rE.f) * kk; sd.rE.r += (rE / side.length / dt - sd.rE.r) * kk;
+      sd.r0.f += (b0.evF / dt - sd.r0.f) * kk; sd.r0.r += (b0.evR / dt - sd.r0.r) * kk;
+      for (const b of side){ b.evF = 0; b.evR = 0; }
+      const nm = meanCounts(side), n0 = cntObj(b0.cnt);
+      for (const s of SK){ sd.smE[s] += (nm[s] - sd.smE[s]) * ks; sd.sm0[s] += (n0[s] - sd.sm0[s]) * ks; }
+      const n = opts.ens ? nm : n0, r = opts.ens ? sd.rE : sd.r0;
+      entry.n.push(n); entry.eq.push(equilibrium(n, k)); entry.vf.push(r.f); entry.vr.push(r.r);
+    });
+    sim.histT += dt;
+    if (sim.histT >= 0.25){
+      sim.histT = 0; chartsDirty = true; sim.hist.push(entry);
+      while (sim.hist.length && sim.hist[0].t < sim.time - 60) sim.hist.shift();
+      while (sim.marks.length && sim.marks[0].t < sim.time - 60) sim.marks.shift();
+    }
+  }
+
+  // Zeichnen
+  function buildSprites(){
+    spriteZ = view.z;
+    const k = cv.width / W * view.z, size = Math.ceil((2 * R + 2) * k);
+    if (!(size > 0)) return;
+    for (const key of SK){
+      const c = document.createElement('canvas'); c.width = c.height = size;
+      const g = c.getContext('2d'); g.scale(k, k);
+      const m = R + 1;
+      g.beginPath(); g.arc(m, m, R, 0, Math.PI * 2); g.fillStyle = C[key] || '#888'; g.fill();
+      g.lineWidth = 0.8; g.strokeStyle = 'rgba(0,0,0,.25)'; g.stroke();
+      g.fillStyle = C[key + 't'] || '#fff'; g.font = '700 9.5px "Atkinson Hyperlegible", sans-serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(SPECIES[key].label, m, m + 0.5);
+      sprites[SI[key]] = { c, size };
+    }
+  }
+  const FL = [null, 'track', 'accent', 'fg'];
+  function drawBox(b, ox, label){
+    const k0 = cv.width / W, k = k0 * view.z, px = ox - view.ox, py = -view.oy, pops = [];
+    const cw = cv.width, ch = cv.height;
+    for (let i = 0; i < b.n; i++){
+      const sp = sprites[b.s[i]]; if (!sp) continue;
+      const sx = (b.x[i] + px) * k, sy = (b.y[i] + py) * k, m = sp.size * 2;
+      if (sx < -m || sy < -m || sx > cw + m || sy > ch + m) continue;
+      if (opts.pulse && b.pop[i] > 0){ pops.push(i); continue; }
+      ctx.drawImage(sp.c, Math.round(sx - sp.size / 2), Math.round(sy - sp.size / 2));
+    }
+    // "Plopp": kurzes Aufblähen und ein kleiner Strahlenkranz
+    for (const i of pops){
+      const sp = sprites[b.s[i]], q = 1 - b.pop[i], sc = 1 + 0.75 * Math.sin(Math.PI * Math.min(1, q * 1.4)), sz = sp.size * sc;
+      ctx.drawImage(sp.c, (b.x[i] + px) * k - sz / 2, (b.y[i] + py) * k - sz / 2, sz, sz);
+    }
+    ctx.setTransform(k, 0, 0, k, px * k, py * k);
+    if (pops.length){
+      ctx.lineWidth = 2; ctx.lineCap = 'round';
+      for (let kind = 1; kind <= 3; kind++){
+        ctx.strokeStyle = C[FL[kind]]; ctx.beginPath(); let any = false;
+        for (const i of pops){
+          if (b.pk[i] !== kind) continue; any = true;
+          const q = 1 - b.pop[i], r1 = R + 3 + q * 8, r2 = r1 + 5 * (1 - q) + 1;
+          for (let a = 0; a < 6; a++){ const an = a * Math.PI / 3 + 0.3; ctx.moveTo(b.x[i] + Math.cos(an) * r1, b.y[i] + Math.sin(an) * r1); ctx.lineTo(b.x[i] + Math.cos(an) * r2, b.y[i] + Math.sin(an) * r2); }
+        }
+        if (any) ctx.stroke();
+      }
+      ctx.lineCap = 'butt';
+    }
+    // markierte Teilchen (Tracer)
+    let anyM = false; ctx.beginPath();
+    for (let i = 0; i < b.n; i++) if (b.mk[i]){ anyM = true; ctx.moveTo(b.x[i] + R + 3.2, b.y[i]); ctx.arc(b.x[i], b.y[i], R + 3.2, 0, Math.PI * 2); }
+    if (anyM){ ctx.lineWidth = 3.5; ctx.strokeStyle = C.canvas; ctx.stroke(); ctx.lineWidth = 2; ctx.strokeStyle = C.fg; ctx.stroke(); }
+    // Beschriftung bleibt unabhängig vom Zoom gleich groß
+    ctx.setTransform(k0, 0, 0, k0, 0, 0);
+    const lx = px * view.z + 12;
+    ctx.font = '500 14px "Lexend", sans-serif'; ctx.textBaseline = 'top'; ctx.fillStyle = C.muted; ctx.textAlign = 'left';
+    if (lx < W - 60) ctx.fillText(label, Math.max(12, lx), 10);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  const startDesc = st => speciesOf().filter(s => st[s] > 0).map(s => s + ' ' + st[s]).join(', ') || 'leer';
+  function draw(){
+    const k = cv.width / W;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = C.canvas; ctx.fillRect(0, 0, cv.width, cv.height);
+    if (opts.cmp){
+      drawBox(ens[0][0], 0, 'Box 1 · Start: ' + startDesc(sim.starts[0]) + (cfg[0].cat ? ' · Katalysator' : ''));
+      drawBox(ens[1][0], boxX(1), 'Box 2 · Start: ' + startDesc(sim.starts[1]) + (cfg[1].cat ? ' · Katalysator' : ''));
+      view.apply(ctx, k); ctx.fillStyle = C.line; ctx.fillRect(boxW(), 0, GAP, H);
+    } else drawBox(ens[0][0], 0, 'Teilchenbox · ' + tpl.title + (cfg[0].cat ? ' · Katalysator' : ''));
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.font = '500 14px "Lexend", sans-serif'; ctx.textBaseline = 'top'; ctx.fillStyle = C.muted; ctx.textAlign = 'right';
+    ctx.fillText(paused ? 'pausiert' : '', W - 12, 10);
+  }
+
+  // Diagramme: Skala wächst mit, schrumpft aber erst beim Neustart wieder
+  const chartState = {};
+  const cstate = key => chartState[key] || (chartState[key] = { ymax: 0 });
+  function drawChart(canvas, series, hlines, st, lw, markOk){
+    if (!canvas.width || !sim) return;
+    const c = canvas.getContext('2d'), k = canvas.width / lw, w = lw, h = canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0); c.clearRect(0, 0, w, h);
+    const l = 38, r = w - 8, t = 22, b = h - 24, hist = sim.hist;
+    let dmax = 1;
+    for (const s of [...series, ...hlines]) for (const p of hist){ const v = s.get(p); if (v > dmax) dmax = v; }
+    st.ymax = Math.max(st.ymax, dmax);
+    const step = [1, 2, 5, 10, 20, 25, 50, 100, 200].find(x => st.ymax / x <= 6) || 200;
+    const ymax = Math.ceil(st.ymax / step) * step;
+    const X = tt => l + (tt - (sim.time - 60)) / 60 * (r - l), Y = v => b - v / ymax * (b - t);
+    c.font = '12px "Atkinson Hyperlegible", sans-serif'; c.fillStyle = C.muted; c.strokeStyle = C.grid; c.lineWidth = 1;
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    for (let v = 0; v <= ymax + 1e-9; v += step){ c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(r, Y(v)); c.stroke(); c.fillText(v, l - 6, Y(v)); }
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    c.fillText('−60 s', l + 14, b + 6); c.fillText('−30 s', (l + r) / 2, b + 6); c.fillText('jetzt', r - 14, b + 6);
+    c.save(); c.beginPath(); c.rect(l, 0, r - l, b + 3); c.clip();
+    // Markierungen: dicht beieinander liegende Beschriftungen untereinander statt übereinander
+    let lastX = -1e9, row = 0;
+    for (const m of sim.marks){
+      if (markOk && !markOk(m)) continue;
+      const x = X(m.t); if (x < l - 1) continue;
+      row = x - lastX < 90 ? row + 1 : 0; lastX = x;
+      c.globalAlpha = 0.7; c.strokeStyle = C.fg; c.lineWidth = 1.2; c.setLineDash([4, 3]);
+      c.beginPath(); c.moveTo(x, t - 4); c.lineTo(x, b); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
+      c.font = '700 12px "Atkinson Hyperlegible", sans-serif'; c.textBaseline = 'top';
+      const right = x > r - 90, tx = x + (right ? -4 : 4), ty = 3 + (row % 3) * 14;
+      c.textAlign = right ? 'right' : 'left';
+      c.lineWidth = 3.5; c.strokeStyle = C.panel || C.bg; c.strokeText(m.label, tx, ty); c.fillStyle = C.fg; c.fillText(m.label, tx, ty);
+    }
+    if (hist.length >= 2){
+      const line = (s, dashDefault) => {
+        c.globalAlpha = s.alpha ?? 1; c.beginPath(); let started = false;
+        for (const p of hist){ const v = s.get(p); if (v === undefined) continue; const x = X(p.t), y = Y(v); started ? c.lineTo(x, y) : c.moveTo(x, y); started = true; }
+        c.strokeStyle = s.color; c.lineWidth = s.width ?? 2.5; c.setLineDash(s.dash ?? dashDefault); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
+      };
+      for (const hl of hlines) line({ width: 1.5, alpha: 0.75, ...hl }, [3, 4]);
+      for (const s of series) line(s, []);
+    }
+    c.restore();
+  }
+  // Diagramme: ohne Vergleich je ein Diagramm; im Vergleich getrennt je Box (gleiche Achsen wählbar) oder überlagert
+  const chartOpts = { mode: 'sep', sameAx: true, focus: 'all' };
+  const keyLine = (color, dash, label, extra = '') => `<span><svg viewBox="0 0 26 8" aria-hidden="true"><line x1="0" y1="4" x2="26" y2="4" style="stroke:${color};stroke-width:3${dash && dash.length ? ';stroke-dasharray:' + dash.join(' ') : ''}${extra}"/></svg>${label}</span>`;
+  const keyN = () => speciesOf().map(s => keyLine(`var(${SPECIES[s].color})`, SPECIES[s].dash, SPECIES[s].label)).join('') + keyLine('var(--muted)', [3, 4], 'berechnetes Gleichgewicht', ';stroke-width:1.5');
+  const keyV = () => keyLine('var(--track)', [], 'v<sub>hin</sub>') + keyLine('var(--accent)', [5, 3], 'v<sub>rück</sub>') + '<span>in Reaktionen pro Sekunde</span>';
+  const nSeries = (k, style) => speciesOf().map(s => ({ get: p => p.n[k] && p.n[k][s], color: C[s], dash: SPECIES[s].dash, ...style }));
+  const nEq = (k, alpha) => speciesOf().map(s => ({ get: p => p.eq[k] && p.eq[k][s], color: C[s], alpha }));
+  const vSeries = (k, style) => [{ get: p => p.vf[k], color: C.track, dash: [], ...style }, { get: p => p.vr[k], color: C.accent, dash: [5, 3], ...style }];
+  function chartSpecs(){
+    if (!opts.cmp) return [
+      { id: 'N', title: 'Teilchenzahlen', cls: 'b3', st: 'N', series: () => nSeries(0, {}), hl: () => nEq(0, 0.75), key: keyN },
+      { id: 'V', title: 'Reaktionsgeschwindigkeiten', cls: 'b4', st: 'V', series: () => vSeries(0, {}), hl: () => [], key: keyV }];
+    if (chartOpts.mode === 'sep'){
+      const out = [];
+      for (const k of [0, 1]){
+        const ax = chartOpts.sameAx ? '' : k;
+        out.push({ id: 'N' + k, title: `Box ${k + 1}: Teilchenzahlen`, cls: 'b3', st: 'N' + ax, box: k, series: () => nSeries(k, {}), hl: () => nEq(k, 0.75), key: keyN, marks: m => m.side === undefined || m.side === k });
+        out.push({ id: 'V' + k, title: `Box ${k + 1}: Reaktionsgeschwindigkeiten`, cls: 'b4', st: 'V' + ax, box: k, series: () => vSeries(k, {}), hl: () => [], key: keyV, marks: m => m.side === undefined || m.side === k });
+      }
+      return out;
+    }
+    // überlagert: Box 1 durchgezogen, Box 2 gestrichelt (bei einem Stoff) bzw. blass (bei allen Stoffen)
+    const f = chartOpts.focus, one = f !== 'all' && speciesOf().includes(f);
+    const box2 = { dash: [7, 5], width: 2.5, alpha: 0.9 }, faint = { alpha: 0.4, width: 2 };
+    return [
+      { id: 'NO', title: 'Teilchenzahlen: Box 1 und Box 2' + (one ? ' · Stoff ' + f : ''), cls: 'b3', st: 'NO',
+        series: () => one ? [{ get: p => p.n[0] && p.n[0][f], color: C[f], dash: [] }, { get: p => p.n[1] && p.n[1][f], color: C[f], ...box2 }] : [...nSeries(0, {}), ...nSeries(1, faint)],
+        hl: () => one ? [{ get: p => p.eq[0] && p.eq[0][f], color: C[f], alpha: 0.75 }, { get: p => p.eq[1] && p.eq[1][f], color: C[f], alpha: 0.4 }] : [...nEq(0, 0.75), ...nEq(1, 0.35)],
+        key: () => one ? keyLine(`var(${SPECIES[f].color})`, [], 'Box 1 (' + f + ')') + keyLine(`var(${SPECIES[f].color})`, [7, 5], 'Box 2 (' + f + ')') + keyLine('var(--muted)', [3, 4], 'berechnetes Gleichgewicht', ';stroke-width:1.5')
+          : keyN() + '<span>Box 1 kräftig, Box 2 blass</span>' },
+      { id: 'VO', title: 'Reaktionsgeschwindigkeiten: Box 1 und Box 2', cls: 'b4', st: 'VO',
+        series: () => [...vSeries(0, {}), ...vSeries(1, faint)], hl: () => [], key: () => keyV() + '<span>Box 1 kräftig, Box 2 blass</span>' }];
+  }
+  let specs = [], chartRO = null;
+  function buildCharts(){
+    specs = chartSpecs();
+    $('chartBar').hidden = !opts.cmp;
+    $('sameAxRow').hidden = chartOpts.mode !== 'sep';
+    $('focusRow').hidden = chartOpts.mode !== 'over';
+    $('focusSeg').innerHTML = '<legend>Stoff im überlagerten Diagramm</legend>' + ['all', ...speciesOf()].map(x =>
+      `<input type="radio" name="focus" id="fc${x}" value="${x}"${x === chartOpts.focus ? ' checked' : ''}><label for="fc${x}">${x === 'all' ? 'Alle' : x}</label>`).join('');
+    $('focusSeg').querySelectorAll('input').forEach(r => r.addEventListener('change', () => { chartOpts.focus = r.value; buildCharts(); }));
+    $('charts').innerHTML = specs.map(sp => `<div class="box chart ${sp.cls}">
+          <div class="chart-head"><h2>${sp.title}</h2><button class="btn sm" type="button" data-big="${sp.id}">Vergrößern</button></div>
+          <canvas id="ch_${sp.id}" aria-label="Diagramm: ${sp.title}, letzte 60 Sekunden"></canvas>
+          <div class="key">${sp.key()}</div></div>`).join('');
+    $('charts').querySelectorAll('[data-big]').forEach(b => b.addEventListener('click', () => openBig(b.dataset.big)));
+    if (chartRO){ chartRO.disconnect(); [cv, $('ovCanvas'), ...specs.map(sp => $('ch_' + sp.id))].forEach(el => chartRO.observe(el)); }
+    if (ovOpen && !specs.some(sp => sp.id === ovOpen)) closeBig();
+    resizeCharts();
+  }
+  function drawCharts(){
+    for (const sp of specs){ const c = $('ch_' + sp.id); if (c) drawChart(c, sp.series(), sp.hl(), cstate(sp.st), 400, sp.marks); }
+    if (ovOpen){ const sp = specs.find(x => x.id === ovOpen); if (sp) drawChart($('ovCanvas'), sp.series(), sp.hl(), cstate(sp.st), 760, sp.marks); }
+  }
+  function openBig(id){
+    const sp = specs.find(x => x.id === id); if (!sp) return;
+    (document.fullscreenElement || document.body).appendChild($('ov'));
+    ovOpen = id; $('ovTitle').textContent = sp.title; $('ovKey').innerHTML = sp.key();
+    $('ov').hidden = false; resize(); $('ovClose').focus();
+  }
+  function closeBig(){ ovOpen = null; $('ov').hidden = true; }
+
+  // K setzen (Regler oder Textfeld) für die gewählte Box und im Diagramm markieren
+  function nearestIdx(v){ let bi = 0, bd = 1e9; KVALS.forEach((x, i) => { const d = Math.abs(Math.log(x / v)); if (d < bd){ bd = d; bi = i; } }); return bi; }
+  function setK(v){
+    v = Math.min(1000, Math.max(0.001, v));
+    $('kText').value = fmtK(v); $('kText').removeAttribute('aria-invalid'); $('kSlider').value = nearestIdx(v);
+    if (v === cfg[active].k) return;
+    cfg[active].k = v; syncK(); markK(active);
+  }
+  function markK(i){
+    const label = (opts.cmp ? 'Box ' + (i + 1) + ': ' : '') + 'K = ' + fmtK(cfg[i].k), lastM = sim.marks[sim.marks.length - 1];
+    if (lastM && lastM.side === i && lastM.label.includes('K =') && sim.time - lastM.t < 1.5){ lastM.label = label; lastM.t = sim.time; }
+    else sim.marks.push({ t: sim.time, label, side: i });
+    chartsDirty = true;
+  }
+
+  // Eingriffe: gewählte Box, auf Wunsch beide
+  const targets = () => opts.cmp && opts.both ? ens : [ens[active]];
+  function addEverywhere(s, k){ for (const side of targets()) for (const b of side) for (let i = 0; i < k; i++) b.addRandom(SI[s]); }
+  function removeEverywhere(s, k){ for (const side of targets()) for (const b of side) b.removeSpecies(SI[s], k); }
+  function addAt(sideIdx, s, x, y){
+    for (const b of ens[sideIdx]) for (let i = 0; i < CLICKN; i++){
+      const a = Math.random() * Math.PI * 2, r = Math.random() * 12;
+      b.add(SI[s], Math.min(b.w - R, Math.max(R, x + Math.cos(a) * r)), Math.min(H - R, Math.max(R, y + Math.sin(a) * r)), b === ens[sideIdx][0] ? 3 : 0);
+    }
+  }
+  function markParticles(){
+    const si = SI[tpl.re[0]];
+    for (const side of targets()){
+      const b = side[0], idx = [];
+      for (let i = 0; i < b.n; i++) if (b.s[i] === si && !b.mk[i]) idx.push(i);
+      for (let i = idx.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+      idx.slice(0, MARKN).forEach(i => { b.mk[i] = 1; });
+    }
+  }
+  function unmark(){ for (const side of targets()) side[0].mk.fill(0); }
+
+  // Oberfläche: Reaktion (gemeinsam) und Einstellungen der gewählten Box
+  function chip(s){ return `<span class="chip" style="background:var(${SPECIES[s].color});color:var(${SPECIES[s].text})">${SPECIES[s].label}</span>`; }
+  function ensureBox2(){
+    if (!Object.keys(cfg[1].start).length || speciesOf().some(s => cfg[1].start[s] === undefined))
+      cfg[1] = { start: mirror(cfg[0].start), k: cfg[0].k, cat: cfg[0].cat };
+  }
+  function buildReaction(){
+    $('eq').textContent = tpl.title;
+    const cc = arr => Object.entries(coef(arr)).map(([s, n]) => 'c' + (n > 1 ? '²' : '') + '(' + SPECIES[s].label + ')').join(' · ');
+    $('mwg').innerHTML = `K = <span class="frac"><span>${cc(tpl.pr)}</span><span>${cc(tpl.re)}</span></span>`;
+    $('bi2Note').hidden = tpl.id !== 'bi2';
+    if (typeof specs !== 'undefined') buildCharts();
+    if (!speciesOf().includes(clickS)) clickS = speciesOf()[0];
+    const cs = $('clickSeg');
+    cs.innerHTML = '<legend>Stoff für Klick</legend>' + speciesOf().map(s =>
+      `<input type="radio" name="clickS" id="cs${s}" value="${s}"${s === clickS ? ' checked' : ''}><label for="cs${s}">${SPECIES[s].label}</label>`).join('');
+    cs.querySelectorAll('input').forEach(r => r.addEventListener('change', () => { clickS = r.value; }));
+  }
+  function buildPanel(){
+    const c = cfg[active], pre = opts.cmp ? 'Box ' + (active + 1) + ': ' : '';
+    $('tabs').hidden = !opts.cmp; $('sumBox').hidden = !opts.cmp; $('bothRow').hidden = !opts.cmp;
+    [0, 1].forEach(i => $('tab' + i).setAttribute('aria-selected', String(i === active)));
+    $('setTitle').textContent = pre + 'Einstellungen';
+    $('startTitle').textContent = pre + 'Startwerte (Teilchenzahl)';
+    $('evalTitle').textContent = pre + 'Auswertung und Eingriffe';
+    $('btnMirror').hidden = !(opts.cmp && active === 1); $('copyRow').hidden = !(opts.cmp && active === 1);
+    $('startHint').textContent = opts.cmp ? 'Eine Änderung der Startwerte startet nur diese Box neu. K und Katalysator wirken sofort.' : 'Eine Änderung der Startwerte startet die Simulation neu. K und Katalysator wirken sofort.';
+    $('kText').value = fmtK(c.k); $('kText').removeAttribute('aria-invalid'); $('kSlider').value = nearestIdx(c.k);
+    $('optCat').checked = c.cat;
+    $('startRows').innerHTML = speciesOf().map(s =>
+      `<div class="startrow">${chip(s)}<input type="range" id="st${s}" min="0" max="${MAXN}" step="10" value="${c.start[s] || 0}" aria-label="Startwert ${s}"><output id="stO${s}">${c.start[s] || 0}</output></div>`).join('');
+    speciesOf().forEach(s => {
+      const inp = $('st' + s);
+      inp.addEventListener('input', () => { $('stO' + s).textContent = inp.value; });
+      inp.addEventListener('change', () => { cfg[active].start[s] = +inp.value; restartActive(); });
+    });
+    $('valRows').innerHTML = speciesOf().map(s =>
+      `<tr><td>${chip(s)}</td><td id="vn${s}">0</td><td id="ve${s}">0</td><td class="act"><button class="btn sm" type="button" data-add="${s}" aria-label="${STEP} ${s} zugeben">+${STEP}</button> <button class="btn sm" type="button" data-rem="${s}" aria-label="${STEP} ${s} entnehmen">−${STEP}</button></td></tr>`).join('');
+    $('valRows').querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => addEverywhere(b.dataset.add, STEP)));
+    $('valRows').querySelectorAll('[data-rem]').forEach(b => b.addEventListener('click', () => removeEverywhere(b.dataset.rem, STEP)));
+    $('btnMark').textContent = MARKN + ' Teilchen ' + tpl.re[0] + ' markieren';
+    $('cmpNote').hidden = !opts.cmp;
+    syncK(); lastUI = '';
+  }
+  function restartActive(){ if (opts.cmp) resetBox(active); else reset(); buildPanel(); }
+  function selectBox(i){ if (!opts.cmp || i === active) return; active = i; buildPanel(); }
+  function syncK(){
+    const p = probs(active);
+    $('kOut2').textContent = fmtK(K(active));
+    $('pInfo').innerHTML = `p<sub>hin</sub> = ${de(p.pf, 3)} · p<sub>rück</sub> = ${de(p.pr, 4)}` + (cfg[active].cat ? ' (mit Katalysator)' : '');
+  }
+
+  const judge = i => {
+    const sd = sim.sd[i], q = quotient(opts.ens ? sd.smE : sd.sm0), k = K(i);
+    if (isNaN(q)) return { q, cls: '', txt: 'Keine Teilchen, die reagieren können.', short: '–' };
+    if (q === Infinity || (q > 0 && Math.log10(q / k) > 0.1)) return { q, cls: 'bwd', txt: 'Q > K: Die Rückreaktion überwiegt. Es entstehen wieder mehr Edukte.', short: 'Q > K, Rückreaktion überwiegt' };
+    if (q === 0 || Math.log10(q / k) < -0.1) return { q, cls: 'fwd', txt: 'Q < K: Die Hinreaktion überwiegt. Es entstehen mehr Produkte.', short: 'Q < K, Hinreaktion überwiegt' };
+    return { q, cls: '', txt: 'Q ≈ K: Gleichgewicht. Hin- und Rückreaktion laufen gleich schnell weiter.', short: 'Gleichgewicht' };
+  };
+  const fq = q => isNaN(q) ? '–' : fmtQ(q);
+  let lastUI = '';
+  function syncUI(){
+    const i = active, n = cntObj(ens[i][0].cnt), eq = equilibrium(n, i);
+    for (const s of speciesOf()){ $('vn' + s).textContent = n[s]; $('ve' + s).textContent = de(eq[s], 0); }
+    const J = ens.map((_, k) => judge(k));
+    $('qOut').textContent = fq(J[i].q);
+    const st = $('status');
+    if (st.textContent !== J[i].txt){ st.textContent = J[i].txt; st.className = 'status ' + J[i].cls; }
+    if (opts.cmp){
+      const html = J.map((j, k) => `<tr class="${k === active ? 'act' : ''}"><td>Box ${k + 1}</td><td>${fmtK(K(k))}${cfg[k].cat ? ' · Kat.' : ''}</td><td>${fq(j.q)}</td><td>${j.short}</td></tr>`).join('');
+      if (html !== lastUI){ $('sumRows').innerHTML = html; lastUI = html; }
+    }
+    const b = ens[i][0], m = [0, 0, 0, 0]; for (let k = 0; k < b.n; k++) if (b.mk[k]) m[b.s[k]]++;
+    const total = m[0] + m[1] + m[2] + m[3];
+    $('markInfo').textContent = total ? 'Markierte Teilchen jetzt: ' + speciesOf().map(s => s + ' ' + m[SI[s]]).join(' · ')
+      : 'Markiere Teilchen, wenn sich die Mengen nicht mehr ändern. Tauchen markierte Teilchen trotzdem in den Produkten auf, laufen Hin- und Rückreaktion weiter: Das Gleichgewicht ist dynamisch.';
+    $('btnPlay').textContent = paused ? 'Start' : 'Pause';
+  }
+
+  // Ereignisse
+  $('tplSeg').insertAdjacentHTML('beforeend', TEMPLATES.map((t, i) =>
+    `<input type="radio" name="tpl" id="tpl${t.id}" value="${i}"${t === tpl ? ' checked' : ''}><label for="tpl${t.id}">${t.title}</label>`).join(''));
+  document.querySelectorAll('input[name="tpl"]').forEach(r => r.addEventListener('change', () => {
+    tpl = TEMPLATES[+r.value]; setRX();
+    cfg[0].start = { ...tpl.start }; cfg[1].start = mirror(cfg[0].start);
+    buildReaction(); reset(); buildPanel();
+  }));
+  $('btnOnlyRe').addEventListener('click', () => { cfg[active].start = { ...tpl.start }; restartActive(); });
+  $('btnOnlyPr').addEventListener('click', () => { cfg[active].start = mirror(tpl.start); restartActive(); });
+  $('btnMirror').addEventListener('click', () => { cfg[1].start = mirror(cfg[0].start); restartActive(); });
+  $('btnCopy1').addEventListener('click', () => {
+    cfg[1] = { start: { ...cfg[0].start }, k: cfg[0].k, cat: cfg[0].cat };
+    markK(1); restartActive();
+  });
+  $('kSlider').addEventListener('input', e => setK(KVALS[+e.target.value]));
+  const applyText = () => {
+    const v = parseFloat($('kText').value.replace(',', '.').trim());
+    if (isFinite(v) && v > 0) setK(v); else $('kText').setAttribute('aria-invalid', 'true');
+  };
+  $('kText').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); applyText(); } });
+  $('kText').addEventListener('blur', () => { if ($('kText').getAttribute('aria-invalid') !== 'true') applyText(); else $('kText').value = fmtK(cfg[active].k); });
+  $('optCat').addEventListener('change', e => { cfg[active].cat = e.target.checked; syncK(); });
+  [0, 1].forEach(i => $('tab' + i).addEventListener('click', () => selectBox(i)));
+  $('tabs').addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ e.preventDefault(); selectBox(1 - active); $('tab' + active).focus(); } });
+  document.querySelectorAll('input[name="chMode"]').forEach(r => r.addEventListener('change', () => { chartOpts.mode = r.value; buildCharts(); }));
+  $('optSameAx').addEventListener('change', e => { chartOpts.sameAx = e.target.checked; buildCharts(); });
+  $('ovClose').addEventListener('click', closeBig);
+  $('ov').addEventListener('click', e => { if (e.target === $('ov')) closeBig(); });
+  $('optPulse').addEventListener('change', e => { opts.pulse = e.target.checked; });
+  $('optEns').addEventListener('change', e => { opts.ens = e.target.checked; });
+  $('optBoth').addEventListener('change', e => { opts.both = e.target.checked; });
+  $('optCmp').addEventListener('change', e => {
+    opts.cmp = e.target.checked;
+    if (opts.cmp) ensureBox2(); else active = 0;
+    reset(); buildPanel(); buildCharts();
+  });
+  $('btnMark').addEventListener('click', markParticles);
+  $('btnUnmark').addEventListener('click', unmark);
+  $('btnPlay').addEventListener('click', () => { paused = !paused; });
+  $('btnReset').addEventListener('click', reset);
+  $('speed').addEventListener('input', e => { speed = +e.target.value; $('speedOut').textContent = String(speed).replace('.', ',') + '×'; });
+  cv.addEventListener('click', e => {
+    const wp = view.toWorld(e.clientX, e.clientY); let x = wp.x; const y = wp.y;
+    let side = 0;
+    if (opts.cmp){ if (x >= boxX(1)){ side = 1; x -= boxX(1); } else if (x > boxW()) return; }
+    addAt(side, clickS, x, y);
+  });
+  document.addEventListener('keydown', e => {
+    const tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (e.key === 'Escape' && ovOpen){ closeBig(); return; }
+    if (e.code === 'Space' && !['BUTTON', 'INPUT', 'LABEL'].includes(tag)){ e.preventDefault(); paused = !paused; }
+    if ((e.key === '1' || e.key === '2') && !['INPUT', 'SELECT', 'TEXTAREA'].includes(tag) && !e.ctrlKey && !e.metaKey && !e.altKey) selectBox(+e.key - 1);
+  });
+
+  function resizeCharts(){
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    for (const sp of specs){ const c = $('ch_' + sp.id); if (c && c.clientWidth){ c.width = Math.round(c.clientWidth * dpr); c.height = Math.round(c.clientWidth * dpr * 220 / 400); } }
+    chartsDirty = true;
+  }
+  function resize(){
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cw = Math.min(2200, Math.round(cv.clientWidth * dpr));
+    if (cw > 0 && cw !== cv.width){ cv.width = cw; cv.height = Math.round(cw * H / W); buildSprites(); }
+    resizeCharts();
+    const oc = $('ovCanvas'); if (ovOpen && oc.clientWidth){ oc.width = Math.round(oc.clientWidth * dpr); oc.height = Math.round(oc.clientWidth * dpr * 400 / 760); }
+    chartsDirty = true;
+  }
+  chartRO = new ResizeObserver(resize); [cv, $('ovCanvas')].forEach(el => chartRO.observe(el));
+  readColors();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (document.fonts) document.fonts.ready.then(readColors);
+
+  buildReaction(); reset(); buildPanel(); buildCharts(); resize();
+  let last = performance.now(), uiT = 0;
+  function frame(now){
+    const real = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!paused){ const dt = real * speed, n = Math.ceil(dt / 0.02); for (let i = 0; i < n; i++) update(dt / n); }
+    draw();
+    if (chartsDirty){ chartsDirty = false; drawCharts(); }
+    uiT += real; if (uiT > 0.15){ uiT = 0; syncUI(); }
+    requestAnimationFrame(frame);
+  }
+  syncUI();
+  requestAnimationFrame(frame);
+})();
+
+</script>
+
+</body>
+</html>

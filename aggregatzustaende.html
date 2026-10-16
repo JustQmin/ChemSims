@@ -212,7 +212,7 @@
       // Stärke der Anziehung je Zustand
       this.epsS = o.epsS || 1.6; this.epsL = o.epsL || 0.8;
       this.tau = o.tau || 1.5;          // Zeitkonstante des Wärmeaustauschs mit der Heizplatte
-      this.gasBoost = o.gasBoost || 3;  // Gasteilchen bewegen sich schneller als Flüssigkeitsteilchen (Modell-Kniff)
+      this.gasBoost = o.gasBoost || 7;  // Gasteilchen bewegen sich schneller als Flüssigkeitsteilchen (Modell-Kniff)
 
       // Enthalpie-Modell (pro Teilchen); Temperaturen in Modelleinheiten
       this.T0 = 0.08; this.Tm = o.Tm || 0.36; this.Tb = o.Tb || 0.5; this.Tmax = o.Tmax || 1.2;
@@ -268,7 +268,7 @@
       const T = this.target(), Ts0 = 0.006, Tsm = 0.36, Tlb = 0.85;
       if (T <= this.Tm) return Math.max(0.004, Ts0 + (T - this.T0) / (this.Tm - this.T0) * (Tsm - Ts0));
       if (T <= this.Tb) return Tsm + (T - this.Tm) / (this.Tb - this.Tm) * (Tlb - Tsm);
-      return Tlb + (T - this.Tb) * 2.0;
+      return Tlb + (T - this.Tb) * 2.5;
     }
     // Sollanzahl fester und gasförmiger Teilchen
     targets() {
@@ -309,7 +309,7 @@
       if (d >= 0.5612) return 0;
       if (d < 0.25) d = 0.25;
       const sr6 = Math.pow(0.5 / d, 6);
-      return 24 * (2 * sr6 * sr6 - sr6) / d;
+      return Math.min(300, 24 * (2 * sr6 * sr6 - sr6) / d);   // begrenzt: schnelle Teilchen werden zusätzlich hart reflektiert
     }
     static wallA(d, e) {
       if (d > 3) return 0;
@@ -389,8 +389,12 @@
         const si = s[i], sj = s[j];
         let eps;
         if (si === 2 || sj === 2) {
-          if (r2 >= r02) continue;        // Gas: nur Abstoßung
-          eps = 1;
+          // Gas: nur Abstoßung, als weiche Feder (bleibt auch bei sehr schnellen Teilchen stabil)
+          if (r2 >= 1) continue;
+          const r = Math.sqrt(r2) || 1e-6, fs = 1500 * (1 - r) / r;
+          const gx = fs * dx, gy = fs * dy;
+          fx[i] -= gx; fy[i] -= gy; fx[j] += gx; fy[j] += gy;
+          continue;
         } else {
           eps = si === 0 ? (sj === 0 ? eSS : eSL) : (sj === 0 ? eSL : eLL);
           if (r2 < 2.25) {

@@ -4,180 +4,203 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Digitales Arbeitsblatt zur glycosidischen Bindung (Chemie J1 Leistungsfach).">
+<meta name="description" content="Lernpfad zum Mechanismus der sauren Hydrolyse von Saccharose (Chemie J1 Leistungsfach).">
 <meta name="material:katalog" content="nein">
-<style>[hidden]{display:none!important}</style>
-<title>Lernpfad Glycosidische Bindung</title>
+<title>Mechanismus Saccharose-Hydrolyse</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-/* Layout: Arbeitsblatt – Kopf, Infokasten, nummerierte Aufgaben mit eingebetteten Darstellungen, Zusatzaufgaben, Merkkasten */
+/* Layout: Lernpfad – Kopf mit Fortschritt, links Molekülbühne (Haworth, 3D auf Knopfdruck), rechts eine Aufgabenkarte; Glossar als eigene Seite */
 :root{
   --bg:#f5f4ef; --panel:#ffffff; --ink:#1c2230; --muted:#5d6676; --line:#d8dbe2; --soft:#eef0f3;
   --react:#D55E00; --up:#E69F00; --upText:#a86f00; --down:#0072B2;
-  --good:#1a7f4b; --bad:#b3261e; --hi:rgba(213,94,0,.16); --onInk:#ffffff;
+  --good:#1a7f4b; --bad:#b3261e; --hi:rgba(0,114,178,.13); --onInk:#ffffff;
   --unitA:0,158,115; --unitB:204,121,167; --unitOp:0.2;
   --font:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#14161b; --panel:#1d2027; --ink:#e7e9ef; --muted:#a3abba; --line:#353a46; --soft:#262a33;
   --react:#F08A4B; --up:#F0B429; --upText:#F0B429; --down:#56B4E9;
-  --good:#4cc38a; --bad:#ff8a80; --hi:rgba(240,138,75,.22); --onInk:#14161b;
+  --good:#4cc38a; --bad:#ff8a80; --hi:rgba(86,180,233,.2); --onInk:#14161b;
   --unitA:43,196,154; --unitB:227,155,196; --unitOp:0.16; color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#14161b; --panel:#1d2027; --ink:#e7e9ef; --muted:#a3abba; --line:#353a46; --soft:#262a33;
   --react:#F08A4B; --up:#F0B429; --upText:#F0B429; --down:#56B4E9;
-  --good:#4cc38a; --bad:#ff8a80; --hi:rgba(240,138,75,.22); --onInk:#14161b;
+  --good:#4cc38a; --bad:#ff8a80; --hi:rgba(86,180,233,.2); --onInk:#14161b;
   --unitA:43,196,154; --unitB:227,155,196; --unitOp:0.16; color-scheme:dark }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
 body{margin:0}
-.wrap{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));max-width:1080px;margin:0 auto}
+.wrap{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));max-width:1280px;margin:0 auto}
 header.top{background:var(--panel);border-bottom:1px solid var(--line)}
-header.top .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:14px}
+header.top .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 header.top .ttl{flex:1 1 auto;min-width:0}
-header.top .kick{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-header.top h1{margin:0;font-size:1.5rem;line-height:1.2}
-.toc{display:flex;gap:6px;flex-wrap:wrap;padding-block:10px 0;font-size:.9rem}
-.toc a{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--panel)}
-.toc a:hover{color:var(--ink);border-color:var(--ink)}
+header.top .kick{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+header.top h1{margin:0;font-size:1.4rem;line-height:1.2;text-wrap:balance}
 button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--down);outline-offset:2px}
-button.btn{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
-button.btn:hover:not(:disabled){border-color:var(--ink)}
-button.btn:disabled{opacity:.4;cursor:default}
-button.btn.primary{background:var(--ink);color:var(--onInk);border-color:var(--ink)}
-button.btn.small{font-size:.86rem;padding:4px 10px}
-main{padding-block:14px 48px;display:grid;gap:18px}
-.info{border-left:5px solid var(--down);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:0}
-.info b.t{display:block;margin-bottom:3px}
-section.auf{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px 18px;display:grid;gap:14px;scroll-margin-top:12px}
-.ahead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.ahead .no{font-weight:700;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;background:var(--ink);color:var(--onInk);border-radius:6px;padding:2px 8px}
-.ahead h2{margin:0;font-size:1.25rem;line-height:1.25;flex:1 1 auto;min-width:0;text-wrap:balance}
-.ahead .min{font-size:.85rem;color:var(--muted)}
-section.auf.extra .ahead .no{background:var(--muted)}
-.ta{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px}
-.ta .tn{font-weight:700}
-.ta p{margin:0 0 8px}
-/* Darstellung */
-.viewer{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
-.panes{position:relative;display:grid;grid-template-columns:1fr 1fr;transition:grid-template-columns .35s ease}
-.viewer.bigH .panes{grid-template-columns:2.3fr 1fr}
-.viewer.big3 .panes{grid-template-columns:1fr 2.3fr}
-.pane{position:relative;height:clamp(250px,32vw,370px);min-width:0;border-right:1px solid var(--line)}
-.pane:last-of-type{border-right:0}
-.viewer.bigH .pane,.viewer.big3 .pane{height:clamp(290px,42vw,520px)}
-.pane svg{display:block;width:100%;height:100%;font-family:var(--font)}
-.pane canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
-.pane .plabel{position:absolute;left:10px;top:7px;font-weight:700;font-size:.85rem;pointer-events:none;color:var(--muted)}
-.pane .ptools{position:absolute;right:6px;top:5px;display:flex;gap:4px}
-.pane .ptools button{font:inherit;font-size:.78rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;padding:3px 8px;cursor:pointer}
-.pane .hint{position:absolute;left:10px;bottom:6px;font-size:.74rem;color:var(--muted);pointer-events:none}
-.cover{position:absolute;inset:0;display:grid;place-items:center;background:var(--panel);z-index:2;text-align:center;padding:20px}
-.cover p{max-width:40ch;margin:0 0 10px}
-.vbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 10px;border-top:1px solid var(--line)}
-.dots{display:flex;gap:5px;flex-wrap:wrap}
-.dots button{min-width:28px;height:28px;border-radius:14px;border:1px solid var(--line);background:var(--panel);font:inherit;font-size:.8rem;cursor:pointer;color:var(--muted);padding:0 7px}
-.dots button.done{background:var(--soft);color:var(--ink)}
-.dots button.cur{background:var(--ink);color:var(--onInk);border-color:var(--ink)}
-.ops{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.vcap{padding:8px 12px 10px;border-top:1px solid var(--line);background:var(--soft);font-size:.95rem;min-height:2.6em}
-.vcap .stepno{display:inline-block;font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 7px;margin-right:6px;background:var(--panel)}
-.pred{border:2px dashed var(--react);border-radius:8px;padding:6px 10px;margin-top:6px;background:var(--panel)}
-.pred b{color:var(--react)}
-.pred.done{border-style:solid;border-width:1px}
-.tagred{font-size:.78rem;border-radius:999px;padding:1px 8px;border:1px solid}
-.tagred.y{color:var(--good);border-color:var(--good)} .tagred.n{color:var(--react);border-color:var(--react)}
-/* Aufgaben-Elemente */
-.revealwrap{margin-top:6px}
-.reveal{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
-.reveal p{margin:0 0 8px}
-.fig{border:1px solid var(--line);border-radius:8px;margin:4px 0 8px;padding:4px;background:var(--panel)}
-.fb{margin-top:6px;font-size:.95rem}
-.fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
-.vorlagebox{margin:4px 0 8px}
-.vorlage{margin:0 0 6px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px;max-width:560px}
-.vorlage img{display:block;width:100%;height:auto;-webkit-touch-callout:default}
-.check{display:grid;gap:4px;margin:6px 0 0;padding:0;list-style:none}
-.check label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
-.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--good);flex:none}
-.checkl{margin-top:8px}
-.match{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;max-width:640px}
-select{font:inherit;font-size:.92rem;padding:4px 6px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
-.toggle-ex{display:grid;grid-template-columns:minmax(0,200px) minmax(0,420px) minmax(0,1fr);gap:12px;align-items:center}
-.toggle-ex.nofis{grid-template-columns:minmax(0,420px) minmax(0,1fr)}
-.toggle-ex svg{width:100%;height:auto;display:block}
-.toggle-ex .tgl{cursor:pointer}
-.tctl{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
-.seg button{font:inherit;font-size:.88rem;border:0;background:var(--panel);padding:5px 11px;cursor:pointer;color:var(--muted)}
-.seg button+button{border-left:1px solid var(--line)}
-.seg button.on{background:var(--ink);color:var(--onInk)}
-.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:9px 14px;border-radius:9px;cursor:pointer;min-height:44px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--ink);color:var(--onInk);border-color:var(--ink)}
+.btn.small{font-size:.86rem;padding:6px 11px;min-height:38px}
+.btn[aria-pressed="true"]{background:var(--soft);border-color:var(--ink)}
+/* Fortschritt */
+.prog{display:flex;gap:6px;flex-wrap:wrap;padding-block:10px 4px}
+.chip{font:inherit;font-size:.84rem;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:5px 12px;min-height:34px;cursor:pointer}
+.chip:disabled{cursor:default}
+.chip.done{color:var(--ink);background:var(--soft)}
+.chip.done span::after{content:" ✓";color:var(--good)}
+.chip.cur{background:var(--ink);color:var(--onInk);border-color:var(--ink);font-weight:700;opacity:1}
+.chip:not(.done):not(.cur):disabled{opacity:.6}
+/* Hauptbereich */
+.app{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);gap:16px;align-items:start;padding-block:10px 40px}
+.stagewrap{position:sticky;top:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stbar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stbar .stlab{font-weight:700;font-size:.85rem;color:var(--muted);padding-left:4px}
+.stbar .sp{flex:1}
+.stbody{display:grid}
+.hw{position:relative}
+.hw svg{display:block;width:100%;height:auto;aspect-ratio:740/360;font-family:var(--font);touch-action:manipulation}
+.hw svg.pick{cursor:pointer}
+.modehint{position:absolute;left:10px;bottom:6px;font-size:.8rem;color:var(--down);font-weight:700;pointer-events:none}
+.d3{position:relative;border-top:1px solid var(--line);height:clamp(260px,34vw,420px)}
+.d3 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.d3tools{position:absolute;right:6px;top:6px}
+.d3hint{position:absolute;left:10px;bottom:6px;font-size:.74rem;color:var(--muted);pointer-events:none}
+.cardwrap{display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px 18px}
+.card .intro{margin:0 0 12px;padding:8px 12px;border-left:4px solid var(--down);background:var(--soft);border-radius:0 8px 8px 0;font-size:.95rem}
+.chead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cno{font-weight:700;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;background:var(--ink);color:var(--onInk);border-radius:6px;padding:2px 8px}
+.ctype{font-size:.8rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+.ctype.rev{color:var(--down);border-color:var(--down)}
+.card h2{margin:8px 0 6px;font-size:1.22rem;line-height:1.25;text-wrap:balance}
+.card .q{margin:0 0 12px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:10px 14px;min-height:48px;cursor:pointer;line-height:1.35}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt[aria-checked="true"]{border-color:var(--down);background:var(--hi);box-shadow:inset 0 0 0 1px var(--down)}
+.opt.wrong{text-decoration:line-through;text-decoration-color:var(--bad);opacity:.55}
+.opt.right{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good);opacity:1}
+.opt:disabled{cursor:default}
+.opts.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opts.tiles .opt{text-align:center;font-size:1.25rem;min-height:64px}
+.fb{margin-top:12px;font-size:.98rem;border-radius:9px}
+.fb:empty{display:none}
+.fb.ok{background:color-mix(in srgb,var(--good) 12%,var(--panel));border-left:4px solid var(--good);padding:8px 12px}
+.fb.no,.fb.part{background:color-mix(in srgb,var(--react) 10%,var(--panel));border-left:4px solid var(--react);padding:8px 12px}
+.fb.info{color:var(--muted);padding:2px 0}
+.genauer{display:block;margin-top:4px;color:var(--muted);font-size:.92rem}
+.tipbox .tip{margin:10px 0 0;padding:8px 12px;border:1px dashed var(--down);border-radius:9px;font-size:.95rem}
+.tipbox .tip b{color:var(--down)}
+.cact{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.acnt{margin:0 0 4px}
+.afterbox{margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+.afterbox p{margin:0 0 8px}
 .small{font-size:.86rem;color:var(--muted)}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:6px}
-.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.merk{margin:0;padding-left:1.2em;display:grid;gap:3px}
-.rezept{border:2px dashed var(--alphaTok, var(--good));border-radius:10px;padding:8px 12px;background:var(--panel)}
-.rezept b.t{display:block;color:var(--good);font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
-section.auf.rez .ahead .no{background:var(--good)}
-section.auf.gloss .ahead .no{background:var(--down)}
+.slots{margin:0 0 10px;padding-left:1.6em;display:grid;gap:6px}
+.slots .empty{display:block;border:1.5px dashed var(--line);border-radius:10px;min-height:48px}
+.ord.pool{display:grid;gap:6px}
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px 12px;align-items:center}
+select{font:inherit;font-size:.95rem;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);min-height:44px;width:100%}
+.vorlage{margin:0 0 8px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px;max-height:420px;overflow:auto}
+.vorlage img{display:block;width:100%;height:auto;-webkit-touch-callout:default}
+.vorlagebox .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.checkl{margin-top:14px}
+.check{display:grid;gap:6px;margin:6px 0;padding:0;list-style:none}
+.check label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.check input{width:22px;height:22px;margin-top:2px;accent-color:var(--good);flex:none}
+.review{list-style:none;margin:8px 0;padding:0;display:grid;gap:6px}
+.rv{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.rvs{text-align:center;line-height:0}
+i.dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:-1px;border:2px solid}
+i.dot.sicher{background:var(--good);border-color:var(--good)}
+i.dot.hilfe{border-color:var(--down);background:linear-gradient(90deg,var(--down) 50%,transparent 50%)}
+i.dot.unsicher{border-color:var(--react)}
+.rvb{grid-column:2;display:flex;gap:6px;flex-wrap:wrap}
+.hist{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+.hist>summary{cursor:pointer;font-weight:700;color:var(--muted);min-height:32px;display:flex;align-items:center}
+.hist .hl{display:grid;gap:4px;margin-top:6px}
+.hist .hl details{border-top:1px solid var(--line);padding:6px 0}
+.hist .hl summary{cursor:pointer;font-size:.92rem}
+.hist .hl p{margin:6px 0 0;font-size:.92rem}
+.hist .hfb{color:var(--muted)}
+.hid{font-weight:700;margin-right:4px}
+.hst{font-size:.8rem;margin-left:6px;color:var(--good)} .hst.unsicher{color:var(--react)} .hst.hilfe{color:var(--down)}
+.chip.reach{color:var(--ink)}
+.wfig{margin-top:8px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:4px}
+.wfig svg{display:block;width:100%;height:auto}
+.infotext p{margin:0 0 10px}
+.infotext .eq,.eq{font-size:1.08rem;text-align:center;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--soft)}
+.steps{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:5px}
+.stepbtn{font:inherit;font-size:.92rem;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:9px;padding:7px 12px;min-height:40px;cursor:pointer}
+.stepbtn.done{color:var(--ink)}
+.stepbtn.cur{border-color:var(--react);color:var(--ink);font-weight:700;box-shadow:inset 4px 0 0 var(--react)}
+.steptext{padding:10px 12px;border-left:4px solid var(--react);background:var(--soft);border-radius:0 9px 9px 0;margin-bottom:10px;min-height:4.5em}
+.pctl{margin-top:4px}
+.task{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px}
+.task h3{margin:0 0 6px;font-size:1.08rem}
+.task p{margin:0 0 10px}
+.tout{margin-top:10px}
+.tip{margin:0;padding:8px 12px;border:1px dashed var(--down);border-radius:9px;font-size:.95rem}
+.solwrap{margin-top:14px}
+.sol{margin-top:10px}
+.vorlage{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(10,12,16,.82);display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 12px max(12px,env(safe-area-inset-left,0px))}
+.lbbar{display:flex;align-items:center;gap:10px;justify-content:space-between;color:#fff;margin-bottom:8px}
+.lbimg{flex:1;overflow:auto;background:#fff;border-radius:10px;-webkit-overflow-scrolling:touch}
+.lbimg img{display:block;width:100%;min-width:640px;height:auto}
 a.gl{color:inherit;text-decoration:underline dotted var(--muted);text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:pointer}
 a.gl:hover{color:var(--down)}
-.glossar{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
-.gle{border:1px solid var(--line);border-radius:10px;padding:10px 12px;scroll-margin:80px;transition:background .6s}
-.gle dt{font-weight:700;margin-bottom:3px}
-.gle dd{margin:0}
-.gle .gex{display:block;margin-top:4px;font-size:.92rem;color:var(--muted)}
+/* Glossar-Seite */
+.gpage{padding-block:14px 48px}
+.ghead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ghead h2{margin:0;font-size:1.35rem}
+#gidx{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+#gidx a{font-size:.86rem;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 11px;background:var(--panel)}
+#glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:12px}
+.gle{display:grid;grid-template-columns:minmax(0,250px) minmax(0,1fr);gap:14px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;scroll-margin-top:12px;transition:background .8s}
+.gle:not(:has(.gfig)){grid-template-columns:1fr}
 .gle.flash{background:var(--hi)}
-.backbtn{position:fixed;right:max(16px, calc(env(safe-area-inset-right, 0px) + 16px));bottom:calc(env(safe-area-inset-bottom, 0px) + 16px);z-index:30;box-shadow:0 6px 18px rgba(0,0,0,.2)}
-.info ol.rules{margin:6px 0;padding-left:1.3em;display:grid;gap:3px}
-.sechead{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 2px -6px}
-details.settings{position:relative}
-details.settings summary{list-style:none;cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:.92rem}
-details.settings summary::-webkit-details-marker{display:none}
-details.settings .sbox{position:absolute;right:0;top:calc(100% + 6px);z-index:20;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;width:min(320px,86vw);display:grid;gap:9px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
-details.settings label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:.95rem}
-details.settings input{width:18px;height:18px;margin-top:2px;accent-color:var(--ink);flex:none}
-@media (max-width:820px){ .toggle-ex,.toggle-ex.nofis{grid-template-columns:1fr} .toggle-ex .fis{max-width:200px} }
-@media (max-width:640px){
-  .panes,.viewer.bigH .panes,.viewer.big3 .panes{grid-template-columns:1fr}
-  .pane,.viewer.bigH .pane,.viewer.big3 .pane{border-right:0;border-bottom:1px solid var(--line);height:280px}
-  .pane .ptools .big{display:none}
-  section.auf{padding:14px 12px}
+.gfig svg{display:block;width:100%;height:auto}
+.gle h3{margin:0 0 4px;font-size:1.08rem}
+.gle p{margin:0 0 6px;font-size:.96rem}
+.gle .gex{color:var(--muted);font-size:.92rem}
+@media (max-width:980px){
+  .app{grid-template-columns:1fr}
+  .stagewrap{position:relative;top:0}
+  .d3{height:clamp(260px,46vw,420px)}
 }
-@media (prefers-reduced-motion: reduce){ .panes{transition:none} }
+@media (max-width:560px){
+  .gle{grid-template-columns:1fr} .gfig{max-width:320px}
+  .opts.tiles{grid-template-columns:1fr 1fr}
+  .match{grid-template-columns:1fr}
+  .card{padding:14px 12px}
+  header.top h1{font-size:1.2rem}
+}
 </style>
 </head>
 <body>
-
-
 <header class="top"><div class="wrap">
-  <div class="ttl"><div class="kick">Arbeitsblatt · Kohlenhydrate</div><h1>Die glycosidische Bindung</h1></div>
-  <details class="settings" id="settings"><summary>Einstellungen</summary>
-    <div class="sbox">
-      <label><input type="checkbox" id="oPred"> <span><b>Vorhersage-Modus</b><br><span class="small">Pfeile im Mechanismus erst nach eigener Überlegung einblenden.</span></span></label>
-      <label><input type="checkbox" id="oUD"> <span>Oben/unten farbig markieren</span></label>
-      <label><input type="checkbox" id="oNum"> <span>C-Atome nummerieren</span></label>
-      <label><input type="checkbox" id="oTint"> <span>Molekülbausteine farbig hinterlegen</span></label>
-      <label><input type="checkbox" id="oH"> <span>H-Atome im Kugel-Stab-Modell</span></label>
-    </div>
-  </details>
-</div><div class="wrap"><nav class="toc" id="toc" aria-label="Aufgaben"></nav></div></header>
-<main class="wrap" id="sheet">
-  <div class="info"><b class="t">Zweifachzucker</b>Saccharose (Haushaltszucker) ist ein Zweifachzucker (Disaccharid). Bei der Hydrolyse entstehen Glucose und Fructose. Die beiden Molekülbausteine sind über eine glycosidische Bindung verknüpft.
-    <div class="legend"><span><i style="background:var(--up)"></i>Substituent zeigt in der Ausgangslage nach oben</span><span><i style="background:var(--down)"></i>… nach unten</span><span><i style="background:rgba(var(--unitA),.45)"></i><i style="background:rgba(var(--unitB),.45)"></i>Molekülbausteine</span></div>
-    <div class="small" style="margin-top:6px">Jede Darstellung zeigt die Haworth-Projektion und ein Kugel-Stab-Modell desselben Moleküls. Mit ⤢ wird eine Darstellung vergrößert. Zeichenaufgaben werden handschriftlich bearbeitet; Vorlagen lassen sich als Bild kopieren. In den Rezept-Bausteinen sammelst du Schritt für Schritt ein Rezept zum Zeichnen von Disacchariden. Unterstrichene Fachbegriffe führen zum Glossar.</div></div>
+  <div class="ttl"><div class="kick">Lernpfad · Kohlenhydrate</div><h1>Wie spaltet Säure die glycosidische Bindung?</h1></div>
+  <button class="btn" type="button" id="gbtn" aria-pressed="false">Glossar</button>
+</div><div class="wrap"><nav class="prog" id="prog" aria-label="Fortschritt"></nav></div></header>
+<main class="wrap app" id="app">
+  <section class="stagewrap" id="stage" aria-label="Molekülbühne"></section>
+  <section class="cardwrap"><div class="card" id="card" aria-live="polite"></div></section>
 </main>
+<main class="wrap gpage" id="gloss" hidden>
+  <div class="ghead"><button class="btn" type="button" id="gback">← zurück zur Aufgabe</button><h2>Glossar</h2></div>
+  <nav id="gidx" aria-label="Begriffe"></nav>
+  <div id="glist"></div>
+</main>
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Vergrößerte Ansicht"><div class="lbbar"><span class="lbt"></span><button class="btn" type="button">Schließen ✕</button></div><div class="lbimg"><img alt=""></div></div>
+<script>"use strict";
+const D3={"suc":{"el":"COCOCOCCOOCCOCOCOCOCOCOHHHHHHHHHHHHHHHHHHHHHHOHHHOHH","x":[[[-2.04,1.64,-2.68],[-3.18,1.05,-3.3],[-1.84,1.13,-1.24],[-0.57,1.6,-0.76],[-0.26,1.13,0.56],[-0.15,-0.29,0.55],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-1.33,1.6,1.57],[-1.13,1.11,2.91],[-2.71,1.13,1.11],[-3.73,1.67,1.97],[-2.98,1.6,-0.32],[-4.25,1.1,-0.77],[-1.16,1.4,-3.29],[-2.15,2.73,-2.69],[-3.9,1.04,-2.63],[-1.84,0.03,-1.28],[0.69,1.61,0.83],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-1.33,2.69,1.63],[-0.17,1.14,3.09],[-2.81,0.04,1.18],[-3.4,1.51,2.87],[-3.04,2.7,-0.34],[-4.85,1.26,-0.02],[-2.22,-1.84,-0.02],[-3.15,-1.58,-0.15],[-2.23,-2.8,-0.15],[-1.42,-1.24,0.2],[-2.3,-3.82,1.23],[-3.25,-3.63,1.28],[-2.25,-4.79,1.28]],[[-2.04,1.64,-2.68],[-3.18,1.05,-3.3],[-1.84,1.13,-1.24],[-0.57,1.6,-0.76],[-0.26,1.13,0.56],[-0.15,-0.29,0.55],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-1.33,1.6,1.57],[-1.13,1.11,2.91],[-2.71,1.13,1.11],[-3.73,1.67,1.97],[-2.98,1.6,-0.32],[-4.25,1.1,-0.77],[-1.16,1.4,-3.29],[-2.15,2.73,-2.69],[-3.9,1.04,-2.63],[-1.84,0.03,-1.28],[0.69,1.61,0.83],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-1.33,2.69,1.63],[-0.17,1.14,3.09],[-2.81,0.04,1.18],[-3.4,1.51,2.87],[-3.04,2.7,-0.34],[-4.85,1.26,-0.02],[-2.38,-1.96,-0.06],[-3.3,-1.7,-0.19],[-2.38,-2.92,-0.19],[-0.92,-0.86,0.34],[-2.3,-3.82,1.23],[-3.25,-3.63,1.28],[-2.25,-4.79,1.28]],[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[1.51,-0.97,0.94],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[-3.78,-2.11,-0.09],[-4.7,-1.85,-0.22],[-3.78,-3.07,-0.22],[-3.72,-1.16,0.28],[-1.56,0.27,0.21],[-1.82,1.19,0.07],[-2.38,-0.23,0.07]],[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[-2.36,-1.62,0.19],[-3.26,-1.27,0.11],[-2.47,-2.58,0.11],[-3.72,-1.16,0.28],[-0.15,-0.29,0.55],[-0.41,0.64,0.42],[-0.98,-0.78,0.42]],[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[-2.36,-1.62,0.19],[-3.27,-1.26,0.11],[-2.47,-2.59,0.11],[-3.72,-1.16,0.28],[-0.15,-0.29,0.55],[-0.41,0.64,0.42],[-1.55,-1.13,0.32]]],"bonds":[[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[45,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51],[6,49]],[[0,1],[0,2],[2,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[45,51],[6,49]]],"charges":[[[45,1]],[[5,1]],[[6,1]],[[49,1]],[[45,1]]],"ud":{"5":"u","27":"u","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","7":"d","16":"u","37":"d","14":"d","35":"u","11":"u","31":"d"},"cn":{"0":6,"2":5,"4":1,"6":2,"7":1,"10":5,"11":6,"13":4,"15":3,"17":2,"19":3,"21":4},"cat":[6,7,8,9,10,11,12,13,14,15,16,28,29,30,31,32,33,34,35,36,37,38,49,50],"leave":[0,1,2,3,4,5,17,18,19,20,21,22,23,24,25,26,27,39,40,41,42,43,44,48],"Cc":6,"Ob":5,"Cl":4,"OA":45,"HP":48,"OW":49,"HW2":51,"rings":[[3,4,17,19,21,2],[9,6,15,13,10]],"flip":{"atoms":[6,7,8,9,10,11,12,13,14,15,16,28,29,30,31,32,33,34,35,36,37,38,49,50,45,46,47,51],"axis":[0.14976,-0.71284,0.68516],"angle":2.65554,"center":[3.534,-1.044,0.152],"push":[1.5,0.3,0.0],"x0":[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[4.71,-1.16,-0.25],[5.28,-2.6,-0.36],[5.59,-2.93,-1.73],[3.54,-1.05,-1.09],[2.37,-0.91,-0.25],[1.82,0.51,-0.42],[0.61,0.64,0.31],[2.79,-1.24,1.18],[2.68,-2.65,1.41],[4.26,-0.85,1.19],[4.36,0.55,1.5],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[4.57,-3.35,-0.02],[6.21,-2.68,0.21],[4.72,-2.94,-2.19],[1.63,-1.63,-0.61],[1.61,0.71,-1.48],[2.53,1.26,-0.08],[0.33,1.57,0.23],[2.2,-0.73,1.94],[1.74,-2.84,1.53],[4.86,-1.39,1.94],[5.14,0.87,0.99],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[7.22,1.19,1.04],[7.99,1.76,0.81],[7.16,1.25,2.01],[-3.72,-1.16,0.28],[5.71,-0.17,-0.59],[5.97,0.15,-1.47],[6.67,0.7,0.44]]}}};
 
-<script>
-const D3={"suc":{"el":"COCOCOCCOOCCOCOCOCOCOCOHHHHHHHHHHHHHHHHHHHHHHOHHHOHH","x":[[[-2.04,1.64,-2.68],[-3.18,1.05,-3.3],[-1.84,1.13,-1.24],[-0.57,1.6,-0.76],[-0.26,1.13,0.56],[-0.15,-0.29,0.55],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-1.33,1.6,1.57],[-1.13,1.11,2.91],[-2.71,1.13,1.11],[-3.73,1.67,1.97],[-2.98,1.6,-0.32],[-4.25,1.1,-0.77],[-1.16,1.4,-3.29],[-2.15,2.73,-2.69],[-3.9,1.04,-2.63],[-1.84,0.03,-1.28],[0.69,1.61,0.83],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-1.33,2.69,1.63],[-0.17,1.14,3.09],[-2.81,0.04,1.18],[-3.4,1.51,2.87],[-3.04,2.7,-0.34],[-4.85,1.26,-0.02],[-2.22,-1.84,-0.02],[-3.15,-1.58,-0.15],[-2.23,-2.8,-0.15],[-1.42,-1.24,0.2],[-2.3,-3.82,1.23],[-3.25,-3.63,1.28],[-2.25,-4.79,1.28]],[[-2.04,1.64,-2.68],[-3.18,1.05,-3.3],[-1.84,1.13,-1.24],[-0.57,1.6,-0.76],[-0.26,1.13,0.56],[-0.15,-0.29,0.55],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-1.33,1.6,1.57],[-1.13,1.11,2.91],[-2.71,1.13,1.11],[-3.73,1.67,1.97],[-2.98,1.6,-0.32],[-4.25,1.1,-0.77],[-1.16,1.4,-3.29],[-2.15,2.73,-2.69],[-3.9,1.04,-2.63],[-1.84,0.03,-1.28],[0.69,1.61,0.83],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-1.33,2.69,1.63],[-0.17,1.14,3.09],[-2.81,0.04,1.18],[-3.4,1.51,2.87],[-3.04,2.7,-0.34],[-4.85,1.26,-0.02],[-2.38,-1.96,-0.06],[-3.3,-1.7,-0.19],[-2.38,-2.92,-0.19],[-0.92,-0.86,0.34],[-2.3,-3.82,1.23],[-3.25,-3.63,1.28],[-2.25,-4.79,1.28]],[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[1.51,-0.97,0.94],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[-3.78,-2.11,-0.09],[-4.7,-1.85,-0.22],[-3.78,-3.07,-0.22],[-3.72,-1.16,0.28],[-1.56,0.27,0.21],[-1.82,1.19,0.07],[-2.38,-0.23,0.07]],[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[-2.36,-1.62,0.19],[-3.26,-1.27,0.11],[-2.47,-2.58,0.11],[-3.72,-1.16,0.28],[-0.15,-0.29,0.55],[-0.41,0.64,0.42],[-0.98,-0.78,0.42]],[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[-2.36,-1.62,0.19],[-3.27,-1.26,0.11],[-2.47,-2.59,0.11],[-3.72,-1.16,0.28],[-0.15,-0.29,0.55],[-0.41,0.64,0.42],[-1.55,-1.13,0.32]]],"bonds":[[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[45,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51],[6,49]],[[0,1],[0,2],[2,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[45,51],[6,49]]],"charges":[[[45,1]],[[5,1]],[[6,1]],[[49,1]],[[45,1]]],"ud":{"5":"u","27":"u","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","7":"d","16":"u","37":"d","14":"d","35":"u","11":"u","31":"d"},"cn":{"0":6,"2":5,"4":1,"6":2,"7":1,"10":5,"11":6,"13":4,"15":3,"17":2,"19":3,"21":4},"cat":[6,7,8,9,10,11,12,13,14,15,16,28,29,30,31,32,33,34,35,36,37,38,49,50],"leave":[0,1,2,3,4,5,17,18,19,20,21,22,23,24,25,26,27,39,40,41,42,43,44,48],"Cc":6,"Ob":5,"Cl":4,"OA":45,"HP":48,"OW":49,"HW2":51,"rings":[[3,4,17,19,21,2],[9,6,15,13,10]],"flip":{"atoms":[6,7,8,9,10,11,12,13,14,15,16,28,29,30,31,32,33,34,35,36,37,38,49,50,45,46,47,51],"axis":[0.14976,-0.71284,0.68516],"angle":2.65554,"center":[3.534,-1.044,0.152],"push":[1.5,0.3,0.0],"x0":[[-4.84,1.34,-2.74],[-5.98,0.75,-3.36],[-4.64,0.83,-1.3],[-3.37,1.3,-0.82],[-3.06,0.83,0.5],[-2.95,-0.59,0.49],[4.71,-1.16,-0.25],[5.28,-2.6,-0.36],[5.59,-2.93,-1.73],[3.54,-1.05,-1.09],[2.37,-0.91,-0.25],[1.82,0.51,-0.42],[0.61,0.64,0.31],[2.79,-1.24,1.18],[2.68,-2.65,1.41],[4.26,-0.85,1.19],[4.36,0.55,1.5],[-4.13,1.3,1.51],[-3.93,0.81,2.85],[-5.51,0.83,1.05],[-6.53,1.37,1.91],[-5.78,1.3,-0.38],[-7.05,0.8,-0.83],[-3.96,1.1,-3.35],[-4.95,2.43,-2.75],[-6.7,0.74,-2.69],[-4.64,-0.27,-1.34],[-2.11,1.31,0.77],[4.57,-3.35,-0.02],[6.21,-2.68,0.21],[4.72,-2.94,-2.19],[1.63,-1.63,-0.61],[1.61,0.71,-1.48],[2.53,1.26,-0.08],[0.33,1.57,0.23],[2.2,-0.73,1.94],[1.74,-2.84,1.53],[4.86,-1.39,1.94],[5.14,0.87,0.99],[-4.13,2.39,1.57],[-2.97,0.84,3.03],[-5.61,-0.26,1.12],[-6.2,1.21,2.81],[-5.84,2.4,-0.4],[-7.65,0.96,-0.08],[7.22,1.19,1.04],[7.99,1.76,0.81],[7.16,1.25,2.01],[-3.72,-1.16,0.28],[5.71,-0.17,-0.59],[5.97,0.15,-1.47],[6.67,0.7,0.44]]}},"mal":{"el":"COCOCOCCOCOCOOCCOCOCOCOHHHHHHHHHHHHHHHHHHHHHHOHHHOHH","x":[[[-3.18,1.96,-2.33],[-4.48,1.38,-2.38],[-2.36,1.45,-1.14],[-1.01,1.92,-1.27],[-0.14,1.44,-0.23],[-0.08,0.01,-0.31],[1.19,-0.55,0.02],[0.94,-1.7,1.0],[0.43,-1.18,2.25],[2.23,-2.48,1.27],[1.93,-3.6,2.12],[2.83,-2.94,-0.07],[4.07,-3.58,0.21],[3.08,-1.83,-0.92],[1.87,-1.11,-1.25],[2.27,-0.0,-2.23],[3.22,0.88,-1.62],[-0.65,1.92,1.15],[0.15,1.49,2.25],[-2.09,1.45,1.36],[-2.62,2.0,2.58],[-2.97,1.91,0.19],[-4.3,1.4,0.36],[-2.67,1.73,-3.27],[-3.29,3.05,-2.29],[-4.82,1.35,-1.45],[-2.38,0.35,-1.19],[0.85,1.87,-0.43],[1.84,0.19,0.52],[0.15,-2.36,0.62],[0.46,-1.94,2.87],[2.94,-1.85,1.82],[2.76,-4.11,2.17],[2.18,-3.67,-0.57],[4.39,-3.89,-0.65],[1.19,-1.79,-1.77],[2.75,-0.43,-3.12],[1.41,0.58,-2.56],[3.97,0.32,-1.36],[-0.64,3.01,1.17],[0.15,0.5,2.26],[-2.14,0.36,1.48],[-1.9,1.93,3.23],[-3.04,3.0,0.21],[-4.51,1.57,1.31],[-2.15,-1.48,-1.01],[-3.07,-1.2,-1.17],[-2.18,-2.44,-1.17],[-1.35,-0.9,-0.74],[-1.42,-1.13,-3.82],[-2.27,-1.12,-4.29],[-0.9,-1.81,-4.29]],[[-3.18,1.96,-2.33],[-4.48,1.38,-2.38],[-2.36,1.45,-1.14],[-1.01,1.92,-1.27],[-0.14,1.44,-0.23],[-0.08,0.01,-0.31],[1.19,-0.55,0.02],[0.94,-1.7,1.0],[0.43,-1.18,2.25],[2.23,-2.48,1.27],[1.93,-3.6,2.12],[2.83,-2.94,-0.07],[4.07,-3.58,0.21],[3.08,-1.83,-0.92],[1.87,-1.11,-1.25],[2.27,-0.0,-2.23],[3.22,0.88,-1.62],[-0.65,1.92,1.15],[0.15,1.49,2.25],[-2.09,1.45,1.36],[-2.62,2.0,2.58],[-2.97,1.91,0.19],[-4.3,1.4,0.36],[-2.67,1.73,-3.27],[-3.29,3.05,-2.29],[-4.82,1.35,-1.45],[-2.38,0.35,-1.19],[0.85,1.87,-0.43],[1.84,0.19,0.52],[0.15,-2.36,0.62],[0.46,-1.94,2.87],[2.94,-1.85,1.82],[2.76,-4.11,2.17],[2.18,-3.67,-0.57],[4.39,-3.89,-0.65],[1.19,-1.79,-1.77],[2.75,-0.43,-3.12],[1.41,0.58,-2.56],[3.97,0.32,-1.36],[-0.64,3.01,1.17],[0.15,0.5,2.26],[-2.14,0.36,1.48],[-1.9,1.93,3.23],[-3.04,3.0,0.21],[-4.51,1.57,1.31],[-2.31,-1.59,-1.07],[-3.22,-1.31,-1.22],[-2.33,-2.55,-1.22],[-0.85,-0.54,-0.57],[-1.42,-1.13,-3.82],[-2.27,-1.12,-4.29],[-0.9,-1.81,-4.29]],[[-3.18,1.96,-2.33],[-4.48,1.38,-2.38],[-2.36,1.45,-1.14],[-1.01,1.92,-1.27],[-0.13,1.78,-0.23],[2.72,-0.29,-0.4],[3.99,-0.85,-0.07],[3.74,-2.0,0.91],[3.23,-1.48,2.16],[5.03,-2.78,1.18],[4.73,-3.9,2.03],[5.63,-3.24,-0.16],[6.87,-3.88,0.12],[5.88,-2.13,-1.01],[4.67,-1.41,-1.34],[5.07,-0.3,-2.32],[6.02,0.58,-1.71],[-0.65,1.92,1.15],[0.15,1.49,2.25],[-2.09,1.45,1.36],[-2.62,2.0,2.58],[-2.97,1.91,0.19],[-4.3,1.4,0.36],[-2.67,1.73,-3.27],[-3.29,3.05,-2.29],[-4.82,1.35,-1.45],[-2.38,0.35,-1.19],[0.85,1.87,-0.43],[4.64,-0.11,0.43],[2.95,-2.66,0.53],[3.26,-2.24,2.78],[5.74,-2.15,1.73],[5.56,-4.41,2.08],[4.98,-3.97,-0.66],[7.19,-4.19,-0.74],[3.99,-2.09,-1.86],[5.55,-0.73,-3.21],[4.21,0.28,-2.65],[6.77,0.02,-1.45],[-0.64,3.01,1.17],[0.15,0.5,2.26],[-2.14,0.36,1.48],[-1.9,1.93,3.23],[-3.04,3.0,0.21],[-4.51,1.57,1.31],[-0.91,-1.74,-1.11],[-1.83,-1.46,-1.27],[-0.93,-2.7,-1.27],[1.95,-0.84,-0.66],[-0.01,-1.55,-0.4],[-0.75,-2.18,-0.43],[0.77,-2.12,-0.43]],[[-3.18,1.96,-2.33],[-4.48,1.38,-2.38],[-2.36,1.45,-1.14],[-1.01,1.92,-1.27],[-0.14,1.44,-0.23],[2.72,-0.29,-0.4],[3.99,-0.85,-0.07],[3.74,-2.0,0.91],[3.23,-1.48,2.16],[5.03,-2.78,1.18],[4.73,-3.9,2.03],[5.63,-3.24,-0.16],[6.87,-3.88,0.12],[5.88,-2.13,-1.01],[4.67,-1.41,-1.34],[5.07,-0.3,-2.32],[6.02,0.58,-1.71],[-0.65,1.92,1.15],[0.15,1.49,2.25],[-2.09,1.45,1.36],[-2.62,2.0,2.58],[-2.97,1.91,0.19],[-4.3,1.4,0.36],[-2.67,1.73,-3.27],[-3.29,3.05,-2.29],[-4.82,1.35,-1.45],[-2.38,0.35,-1.19],[0.85,1.87,-0.43],[4.64,-0.11,0.43],[2.95,-2.66,0.53],[3.26,-2.24,2.78],[5.74,-2.15,1.73],[5.56,-4.41,2.08],[4.98,-3.97,-0.66],[7.19,-4.19,-0.74],[3.99,-2.09,-1.86],[5.55,-0.73,-3.21],[4.21,0.28,-2.65],[6.77,0.02,-1.45],[-0.64,3.01,1.17],[0.15,0.5,2.26],[-2.14,0.36,1.48],[-1.9,1.93,3.23],[-3.04,3.0,0.21],[-4.51,1.57,1.31],[2.03,-1.52,-0.4],[2.08,-2.49,-0.42],[2.96,-1.24,-0.42],[1.95,-0.84,-0.66],[-0.08,-0.01,-0.31],[-0.82,-0.63,-0.34],[0.71,-0.57,-0.34]],[[-3.18,1.96,-2.33],[-4.48,1.38,-2.38],[-2.36,1.45,-1.14],[-1.01,1.92,-1.27],[-0.14,1.44,-0.23],[2.72,-0.29,-0.4],[3.99,-0.85,-0.07],[3.74,-2.0,0.91],[3.23,-1.48,2.16],[5.03,-2.78,1.18],[4.73,-3.9,2.03],[5.63,-3.24,-0.16],[6.87,-3.88,0.12],[5.88,-2.13,-1.01],[4.67,-1.41,-1.34],[5.07,-0.3,-2.32],[6.02,0.58,-1.71],[-0.65,1.92,1.15],[0.15,1.49,2.25],[-2.09,1.45,1.36],[-2.62,2.0,2.58],[-2.97,1.91,0.19],[-4.3,1.4,0.36],[-2.67,1.73,-3.27],[-3.29,3.05,-2.29],[-4.82,1.35,-1.45],[-2.38,0.35,-1.19],[0.85,1.87,-0.43],[4.64,-0.11,0.43],[2.95,-2.66,0.53],[3.26,-2.24,2.78],[5.74,-2.15,1.73],[5.56,-4.41,2.08],[4.98,-3.97,-0.66],[7.19,-4.19,-0.74],[3.99,-2.09,-1.86],[5.55,-0.73,-3.21],[4.21,0.28,-2.65],[6.77,0.02,-1.45],[-0.64,3.01,1.17],[0.15,0.5,2.26],[-2.14,0.36,1.48],[-1.9,1.93,3.23],[-3.04,3.0,0.21],[-4.51,1.57,1.31],[2.03,-1.52,-0.4],[2.08,-2.5,-0.42],[2.97,-1.24,-0.42],[1.95,-0.84,-0.66],[-0.08,-0.01,-0.31],[-0.82,-0.63,-0.34],[1.26,-0.97,-0.37]]],"bonds":[[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[45,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51]],[[0,1],[0,2],[2,3],[3,4],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[49,51],[4,49]],[[0,1],[0,2],[2,3],[3,4],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44],[49,50],[5,48],[45,46],[45,47],[45,51],[4,49]]],"charges":[[[45,1]],[[5,1]],[[4,1]],[[49,1]],[[45,1]]],"ud":{"5":"d","27":"u","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","12":"u","33":"d","10":"d","31":"u","8":"u","29":"d","28":"u","15":"u","35":"d"},"cn":{"0":6,"2":5,"4":1,"6":4,"7":3,"9":2,"11":1,"14":5,"15":6,"17":2,"19":3,"21":4},"cat":[0,1,2,3,4,17,18,19,20,21,22,23,24,25,26,27,39,40,41,42,43,44,49,50],"leave":[5,6,7,8,9,10,11,12,13,14,15,16,28,29,30,31,32,33,34,35,36,37,38,48],"Cc":4,"Ob":5,"Cl":6,"OA":45,"HP":48,"OW":49,"HW2":51,"rings":[[3,4,17,19,21,2],[13,11,9,7,6,14]]},"glc_a":{"el":"COCOCOCOCOCOHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[4,6],[6,7],[6,8],[8,9],[8,10],[10,11],[10,2],[0,12],[0,13],[1,14],[2,15],[4,16],[5,17],[6,18],[7,19],[8,20],[9,21],[10,22],[11,23]],"x":[[-0.99,0.44,-2.41],[-0.2,0.02,-3.52],[-0.39,-0.11,-1.11],[0.98,0.35,-1.05],[1.67,-0.09,0.11],[1.8,-1.5,0.11],[0.97,0.35,1.41],[1.61,-0.21,2.57],[-0.49,-0.1,1.39],[-1.19,0.44,2.52],[-1.19,0.37,0.11],[-2.52,-0.14,0.09],[-1.0,1.53,-2.41],[-2.02,0.08,-2.56],[0.72,0.22,-3.28],[-0.39,-1.2,-1.18],[2.68,0.33,0.1],[2.43,-1.7,-0.61],[1.01,1.44,1.51],[1.82,-1.14,2.33],[-0.57,-1.19,1.5],[-0.6,0.3,3.29],[-1.25,1.46,0.12],[-2.88,0.05,0.98]],"ud":{"5":"d","16":"u","7":"d","18":"u","9":"u","20":"d","11":"d","22":"u","0":"u","15":"d"},"rings":[[3,4,6,8,10,2]],"cn":{"0":6,"2":5,"4":1,"6":2,"8":3,"10":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"11":5,"2":6,"12":7,"3":8,"13":9,"4":10,"14":11}},"glc_b":{"el":"COCOCOCOCOCOHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[4,6],[6,7],[6,8],[8,9],[8,10],[10,11],[10,2],[0,12],[0,13],[1,14],[2,15],[4,16],[5,17],[6,18],[7,19],[8,20],[9,21],[10,22],[11,23]],"x":[[-1.07,0.29,-2.41],[-0.27,-0.12,-3.52],[-0.46,-0.24,-1.11],[0.9,0.24,-1.04],[1.57,-0.25,0.11],[2.89,0.27,0.11],[0.88,0.23,1.4],[1.54,-0.29,2.57],[-0.57,-0.23,1.4],[-1.27,0.31,2.53],[-1.27,0.22,0.11],[-2.59,-0.32,0.09],[-1.09,1.39,-2.42],[-2.09,-0.09,-2.57],[0.64,0.15,-3.29],[-0.44,-1.34,-1.17],[1.64,-1.35,0.08],[3.31,-0.1,-0.69],[0.93,1.32,1.48],[2.48,-0.05,2.46],[-0.63,-1.32,1.51],[-0.69,0.14,3.29],[-1.37,1.31,0.12],[-2.97,-0.13,0.97]],"ud":{"5":"u","16":"d","7":"d","18":"u","9":"u","20":"d","11":"d","22":"u","0":"u","15":"d"},"rings":[[3,4,6,8,10,2]],"cn":{"0":6,"2":5,"4":1,"6":2,"8":3,"10":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"11":5,"2":6,"12":7,"3":8,"13":9,"4":10,"14":11}},"fru_b":{"el":"COCOOCCOCOCOHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[2,4],[4,5],[5,6],[6,7],[5,8],[8,9],[8,10],[10,11],[10,2],[0,12],[0,13],[1,14],[3,15],[5,16],[6,17],[6,18],[7,19],[8,20],[9,21],[10,22],[11,23]],"x":[[2.17,-0.84,-0.78],[2.49,-0.32,-2.08],[0.94,-0.11,-0.25],[1.17,1.3,-0.28],[-0.19,-0.38,-1.09],[-1.38,-0.39,-0.25],[-2.36,0.66,-0.78],[-1.79,1.97,-0.73],[-0.93,-0.11,1.19],[-1.67,-0.87,2.13],[0.53,-0.55,1.15],[1.29,0.07,2.19],[3.04,-0.67,-0.14],[2.0,-1.92,-0.88],[1.71,-0.49,-2.64],[1.8,1.43,-1.01],[-1.83,-1.38,-0.34],[-3.28,0.67,-0.19],[-2.61,0.45,-1.82],[-0.87,1.89,-1.05],[-1.02,0.94,1.47],[-1.23,-0.74,3.0],[0.6,-1.64,1.28],[1.4,1.01,1.91]],"ud":{"3":"u","0":"d","11":"u","22":"d","9":"d","20":"u","6":"u","16":"d"},"rings":[[4,2,10,8,5]],"cn":{"0":1,"2":2,"5":5,"6":6,"8":4,"10":3},"map":{"21":0,"31":1,"22":2,"32":3,"35":4,"25":5,"26":6,"36":7,"24":8,"34":9,"23":10,"33":11}},"cel":{"el":"COCOCOCCOCOCOOCCOCOCOCOHHHHHHHHHHHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44]],"x":[[-2.54,0.38,-2.73],[-3.64,-0.24,-3.38],[-2.4,-0.09,-1.28],[-1.16,0.41,-0.74],[-0.91,-0.09,0.57],[0.34,0.43,1.05],[1.47,-0.09,0.34],[2.07,1.03,-0.53],[1.22,1.38,-1.63],[3.42,0.6,-1.12],[4.02,1.69,-1.84],[4.35,0.11,-0.0],[5.58,-0.33,-0.56],[3.73,-0.97,0.69],[2.53,-0.57,1.35],[2.03,-1.77,2.16],[1.74,-2.86,1.28],[-2.01,0.39,1.54],[-1.81,-0.14,2.87],[-3.37,-0.07,1.03],[-4.42,0.48,1.85],[-3.58,0.39,-0.41],[-4.82,-0.13,-0.91],[-2.68,1.47,-2.77],[-1.64,0.15,-3.29],[-4.4,-0.24,-2.75],[-2.37,-1.19,-1.29],[-0.85,-1.19,0.57],[1.18,-0.92,-0.32],[2.19,1.95,0.05],[0.29,1.3,-1.31],[3.26,-0.2,-1.86],[3.3,2.05,-2.39],[4.59,0.92,0.7],[5.67,0.15,-1.4],[2.76,0.23,2.07],[2.8,-2.11,2.86],[1.12,-1.53,2.72],[2.58,-3.06,0.83],[-1.99,1.48,1.64],[-0.9,0.11,3.12],[-3.48,-1.16,1.11],[-4.16,0.29,2.77],[-3.65,1.48,-0.44],[-5.47,0.05,-0.2]],"ud":{"5":"d","27":"d","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","12":"u","33":"d","10":"d","31":"u","8":"u","29":"d","28":"u","15":"u","35":"d"},"rings":[[3,4,17,19,21,2],[13,11,9,7,6,14]],"cn":{"0":6,"2":5,"4":1,"6":4,"7":3,"9":2,"11":1,"14":5,"15":6,"17":2,"19":3,"21":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"54":5,"44":6,"43":7,"53":8,"42":9,"52":10,"41":11,"51":12,"55":13,"45":14,"46":15,"56":16,"2":17,"12":18,"3":19,"13":20,"4":21,"14":22}},"iso":{"el":"COCOCOCCOCOCOCOCOCOCOCOHHHHHHHHHHHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[9,11],[11,12],[11,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,7],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[6,29],[7,30],[9,31],[10,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44]],"x":[[-0.33,2.17,-2.27],[1.02,1.72,-2.17],[-1.13,1.63,-1.07],[-0.47,2.09,0.13],[-1.1,1.64,1.32],[-1.07,0.21,1.43],[0.19,-0.3,1.9],[0.82,-1.21,0.84],[1.53,-0.38,-0.11],[2.09,-1.14,-1.18],[2.79,-0.27,-2.05],[3.11,-2.16,-0.65],[3.63,-2.97,-1.72],[2.45,-3.06,0.38],[3.43,-3.93,0.99],[1.79,-2.21,1.48],[1.12,-3.08,2.39],[-2.58,2.09,1.38],[-3.25,1.55,2.53],[-3.33,1.63,0.13],[-4.65,2.18,0.12],[-2.59,2.1,-1.13],[-3.26,1.58,-2.28],[-0.31,3.26,-2.27],[-0.74,1.82,-3.22],[1.26,1.86,-1.22],[-1.07,0.53,-1.1],[-0.59,2.08,2.18],[-0.04,-0.86,2.81],[0.88,0.51,2.17],[0.02,-1.74,0.31],[1.3,-1.63,-1.76],[2.12,0.37,-2.37],[3.97,-1.65,-0.21],[3.92,-2.33,-2.4],[1.71,-3.72,-0.08],[3.94,-4.29,0.24],[2.57,-1.69,2.05],[1.76,-3.8,2.58],[-2.63,3.18,1.45],[-2.94,0.63,2.62],[-3.46,0.55,0.12],[-5.0,2.06,1.03],[-2.64,3.19,-1.19],[-4.21,1.77,-2.13]],"ud":{"5":"d","27":"u","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","10":"u","31":"d","12":"d","33":"u","14":"u","35":"d","16":"d","37":"u","6":"u","30":"d"},"rings":[[3,4,17,19,21,2],[8,9,11,13,15,7]],"cn":{"0":6,"2":5,"4":1,"6":6,"7":5,"9":1,"11":2,"13":3,"15":4,"17":2,"19":3,"21":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"56":5,"46":6,"45":7,"55":8,"41":9,"51":10,"42":11,"52":12,"43":13,"53":14,"44":15,"54":16,"2":17,"12":18,"3":19,"13":20,"4":21,"14":22}},"gen":{"el":"COCOCOCCOCOCOCOCOCOCOCOHHHHHHHHHHHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[9,11],[11,12],[11,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,7],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[6,29],[7,30],[9,31],[10,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44]],"x":[[-3.94,0.13,-2.55],[-4.22,1.52,-2.6],[-3.46,-0.33,-1.16],[-2.13,0.15,-0.93],[-1.57,-0.33,0.28],[-0.25,0.19,0.48],[0.68,-0.32,-0.49],[2.08,0.22,-0.16],[2.48,-0.3,1.12],[3.74,0.22,1.53],[4.05,-0.33,2.81],[4.85,-0.19,0.56],[6.12,0.36,0.94],[4.49,0.29,-0.85],[5.45,-0.2,-1.8],[3.09,-0.19,-1.24],[2.76,0.37,-2.51],[-2.4,0.14,1.49],[-1.89,-0.39,2.72],[-3.85,-0.32,1.32],[-4.67,0.21,2.37],[-4.4,0.14,-0.03],[-5.72,-0.37,-0.21],[-4.84,-0.41,-2.85],[-3.16,-0.07,-3.29],[-5.1,1.65,-2.22],[-3.43,-1.43,-1.18],[-1.51,-1.43,0.27],[0.36,0.0,-1.49],[0.68,-1.41,-0.44],[2.01,1.32,-0.09],[3.69,1.31,1.65],[3.32,-0.05,3.38],[4.97,-1.28,0.55],[6.23,0.11,1.88],[4.55,1.39,-0.9],[6.32,-0.01,-1.41],[3.11,-1.28,-1.36],[3.54,0.21,-3.08],[-2.37,1.23,1.58],[-0.93,-0.19,2.7],[-3.92,-1.41,1.41],[-4.17,0.05,3.19],[-4.47,1.24,-0.02],[-6.17,-0.19,0.64]],"ud":{"5":"u","27":"d","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","10":"u","31":"d","12":"d","33":"u","14":"u","35":"d","16":"d","37":"u","6":"u","30":"d"},"rings":[[3,4,17,19,21,2],[8,9,11,13,15,7]],"cn":{"0":6,"2":5,"4":1,"6":6,"7":5,"9":1,"11":2,"13":3,"15":4,"17":2,"19":3,"21":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"56":5,"46":6,"45":7,"55":8,"41":9,"51":10,"42":11,"52":12,"43":13,"53":14,"44":15,"54":16,"2":17,"12":18,"3":19,"13":20,"4":21,"14":22}},"suc_mol":{"el":"COCOCOCCOOCCOCOCOCOCOCOHHHHHHHHHHHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[6,9],[9,10],[10,11],[11,12],[10,13],[13,14],[13,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[15,6],[0,23],[0,24],[1,25],[2,26],[4,27],[7,28],[7,29],[8,30],[10,31],[11,32],[11,33],[12,34],[13,35],[14,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44]],"x":[[-2.04,1.64,-2.68],[-3.18,1.05,-3.3],[-1.84,1.13,-1.24],[-0.57,1.6,-0.76],[-0.26,1.13,0.56],[-0.15,-0.29,0.55],[1.16,-0.81,0.87],[1.45,-0.74,2.39],[1.55,0.63,2.84],[2.21,-0.11,0.16],[3.0,-1.07,-0.57],[2.75,-0.87,-2.07],[3.6,-1.73,-2.82],[2.62,-2.46,-0.07],[3.41,-2.81,1.07],[1.18,-2.27,0.37],[0.32,-2.46,-0.77],[-1.33,1.6,1.57],[-1.13,1.11,2.91],[-2.71,1.13,1.11],[-3.73,1.67,1.97],[-2.98,1.6,-0.32],[-4.25,1.1,-0.77],[-1.16,1.4,-3.29],[-2.15,2.73,-2.69],[-3.9,1.04,-2.63],[-1.84,0.03,-1.28],[0.69,1.61,0.83],[2.39,-1.22,2.66],[0.63,-1.2,2.95],[2.35,0.98,2.39],[4.05,-0.86,-0.35],[2.97,0.17,-2.35],[1.71,-1.06,-2.34],[3.36,-1.61,-3.76],[2.74,-3.25,-0.82],[4.29,-3.05,0.74],[0.85,-2.98,1.14],[-0.43,-1.84,-0.63],[-1.33,2.69,1.63],[-0.17,1.14,3.09],[-2.81,0.04,1.18],[-3.4,1.51,2.87],[-3.04,2.7,-0.34],[-4.85,1.26,-0.02]],"ud":{"5":"u","27":"u","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","7":"d","16":"u","37":"d","14":"d","35":"u","11":"u","31":"d"},"rings":[[3,4,17,19,21,2],[9,6,15,13,10]],"cn":{"0":6,"2":5,"4":1,"6":2,"7":1,"10":5,"11":6,"13":4,"15":3,"17":2,"19":3,"21":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"11":5,"22":6,"21":7,"31":8,"35":9,"25":10,"26":11,"36":12,"24":13,"34":14,"23":15,"33":16,"2":17,"12":18,"3":19,"13":20,"4":21,"14":22}},"mal_mol":{"el":"COCOCOCCOCOCOOCCOCOCOCOHHHHHHHHHHHHHHHHHHHHHH","b":[[0,1],[0,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[7,9],[9,10],[9,11],[11,12],[11,13],[13,14],[14,15],[15,16],[4,17],[17,18],[17,19],[19,20],[19,21],[21,22],[21,2],[14,6],[0,23],[0,24],[1,25],[2,26],[4,27],[6,28],[7,29],[8,30],[9,31],[10,32],[11,33],[12,34],[14,35],[15,36],[15,37],[16,38],[17,39],[18,40],[19,41],[20,42],[21,43],[22,44]],"x":[[-3.18,1.96,-2.33],[-4.48,1.38,-2.38],[-2.36,1.45,-1.14],[-1.01,1.92,-1.27],[-0.14,1.44,-0.23],[-0.08,0.01,-0.31],[1.19,-0.55,0.02],[0.94,-1.7,1.0],[0.43,-1.18,2.25],[2.23,-2.48,1.27],[1.93,-3.6,2.12],[2.83,-2.94,-0.07],[4.07,-3.58,0.21],[3.08,-1.83,-0.92],[1.87,-1.11,-1.25],[2.27,-0.0,-2.23],[3.22,0.88,-1.62],[-0.65,1.92,1.15],[0.15,1.49,2.25],[-2.09,1.45,1.36],[-2.62,2.0,2.58],[-2.97,1.91,0.19],[-4.3,1.4,0.36],[-2.67,1.73,-3.27],[-3.29,3.05,-2.29],[-4.82,1.35,-1.45],[-2.38,0.35,-1.19],[0.85,1.87,-0.43],[1.84,0.19,0.52],[0.15,-2.36,0.62],[0.46,-1.94,2.87],[2.94,-1.85,1.82],[2.76,-4.11,2.17],[2.18,-3.67,-0.57],[4.39,-3.89,-0.65],[1.19,-1.79,-1.77],[2.75,-0.43,-3.12],[1.41,0.58,-2.56],[3.97,0.32,-1.36],[-0.64,3.01,1.17],[0.15,0.5,2.26],[-2.14,0.36,1.48],[-1.9,1.93,3.23],[-3.04,3.0,0.21],[-4.51,1.57,1.31]],"ud":{"5":"d","27":"u","18":"d","39":"u","20":"u","41":"d","22":"d","43":"u","0":"u","26":"d","12":"u","33":"d","10":"d","31":"u","8":"u","29":"d","28":"u","15":"u","35":"d"},"rings":[[3,4,17,19,21,2],[13,11,9,7,6,14]],"cn":{"0":6,"2":5,"4":1,"6":4,"7":3,"9":2,"11":1,"14":5,"15":6,"17":2,"19":3,"21":4},"map":{"6":0,"16":1,"5":2,"15":3,"1":4,"54":5,"44":6,"43":7,"53":8,"42":9,"52":10,"41":11,"51":12,"55":13,"45":14,"46":15,"56":16,"2":17,"12":18,"3":19,"13":20,"4":21,"14":22}}};
-</script>
-<script>
-"use strict";
 /* ================= Grundlagen ================= */
 const $ = (s,r=document)=>r.querySelector(s);
 const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
@@ -631,15 +654,6 @@ function disaccH(kind){
 /* Vorlagen: Ringgerüste ohne Substituenten */
 function skeleton(sug,M=I3,vb=VB_ONE,tint){ const F=newFrame(vb); addRing(F,'R',sug,pose(300,222,M),{bare:true,tint}); return F; }
 
-/* ================= 3D-Szenen ================= */
-function ringCentroid(key){ const d=D3[key]; const r=d.rings[0]; const c=[0,0,0]; r.forEach(i=>{ for(let k=0;k<3;k++) c[k]+=d.x[i][k]/r.length; }); return c; }
-function d3seq(states){
-  const mols=states.map(s=>{ const m=mol3(s.key,s.unit); m.hi=(s.hi||[]).map(mp=>mapIdx(s.key,mp)); m.fit=fitOf([m.X],m.el); return m; });
-  return { at(t){ const n=mols.length; if(n===1) return {...mols[0], hi:mols[0].hi.map(i=>[i,1])};
-    const k=Math.min(Math.floor(t),n-2), f=clamp(t-k,0,1), a=mols[k], b=mols[k+1];
-    if(states[k].key===states[k+1].key) return {...a, hi:[...a.hi.map(i=>[i,1-ss(f)]), ...b.hi.map(i=>[i,ss(f)])]};
-    return f<0.5 ? {...a, hi:a.hi.map(i=>[i,1]), op:1-ss(f*2)} : {...b, hi:b.hi.map(i=>[i,1]), op:ss(f*2-1)}; } };
-}
 function d3mech(key,order){
   const d=D3[key], SX=s=>s==='pre'?d.flip.x0:d.x[s], SB=s=>d.bonds[s==='pre'?4:s], SC=s=>d.charges[s==='pre'?4:s];
   const fit=fitOf(order.map(SX),d.el), HX3={Ob:d.Ob,Cc:d.Cc,Ow:d.OW};
@@ -658,340 +672,761 @@ function d3mech(key,order){
     return {el:d.el, X, bonds, charges, hi:[...hiOf(a).map(i=>[i,1-e]),...hiOf(b).map(i=>[i,e])], ud:d.ud, cn:d.cn, unit:d._u, fit}; } };
 }
 
-/* ================= Darstellung: Haworth | 3D ================= */
-let VID=0;
-function Viewer(host,sc){
-  const id='v'+(++VID);
-  host.classList.add('viewer');
-  host.innerHTML=`<div class="panes">
-      <div class="pane ph"><svg viewBox="0 0 720 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Haworth-Projektion"></svg><div class="plabel">Haworth-Projektion</div><div class="ptools"><button class="big" type="button">⤢ größer</button></div></div>
-      <div class="pane p3"><canvas aria-label="3D-Kugel-Stab-Modell"></canvas><div class="plabel">Kugel-Stab-Modell</div><div class="ptools"><button class="rs" type="button" title="Blickrichtung zurücksetzen">Blick ↺</button><button class="big" type="button">⤢ größer</button></div><div class="hint">Ziehen: drehen · Mausrad/zwei Finger: zoomen</div></div>
-      <div class="cover" hidden><div><p></p><button class="btn primary" type="button">Darstellung aufdecken</button></div></div>
-    </div>
-    <div class="vbar"><div class="dots"></div><div class="row ctrls"><button class="btn bp" type="button">◀ Zurück</button><button class="btn primary bn" type="button">Weiter ▶</button></div><div class="ops"></div></div>
-    <div class="vcap" aria-live="polite"></div>`;
-  const svg=$('svg',host), V=makeV3($('canvas',host),$('.rs',host)), cap=$('.vcap',host);
-  let t=0, anim=null; const rev={};
-  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const cache={}, frameK=k=>sc.nocache?sc.frame(k):(cache[k]||(cache[k]=sc.frame(k)));
-  const gated=k=>SET.pred && sc.pred && sc.pred[k] && sc.arrows && sc.arrows[k] && sc.arrows[k].length && !rev[k];
-  function hFrame(){ if(sc.n===1) return frameK(0); const k=Math.min(Math.floor(t),sc.n-2), f=t-k;
-    if(sc.trans&&sc.trans[k]) return f<1e-4?frameK(k):(f>0.9999?frameK(k+1):sc.trans[k](ss(f))); return mix(frameK(k),frameK(k+1),ss(f)); }
-  function draw(){ const F=hFrame(); let ar=null, op=0;
-    if(sc.arrows){ const k=Math.round(t); if(sc.arrows[k]&&sc.arrows[k].length&&!gated(k)){ ar=sc.arrows[k]; op=ss((t-k+0.25)*4)*(1-ss((t-k)*4)); } }
-    svg.setAttribute('viewBox',F.vb); svg.innerHTML=renderFrame(F,PAL,{arrows:ar,arrowOp:op,mid:id});
-    const m=sc.d3?sc.d3.at(t):null; if(m&&m.fit) V.setFit(m.fit[0],m.fit[1]); V.set(m); }
-  function panel(){ const k=Math.round(t), st=sc.steps[Math.min(k,sc.steps.length-1)];
-    const tt=typeof st.t==='function'?st.t():st.t, xx=typeof st.x==='function'?st.x():st.x;
-    let h=`${sc.n>1?`<span class="stepno">${k+1}/${sc.n}</span>`:''}<b>${tt}</b> ${xx}`;
-    if(sc.pred&&sc.pred[k]&&sc.arrows&&sc.arrows[k]&&sc.arrows[k].length&&SET.pred)
-      h+= gated(k) ? `<div class="pred"><b>Vorhersage:</b> ${sc.pred[k]} <button class="btn small" type="button">Pfeile einblenden</button></div>` : `<div class="pred done"><b>Vorhersage:</b> ${sc.pred[k]}</div>`;
-    cap.innerHTML=h; if(window.linkify) linkify(cap); const rb=$('.pred button',cap); if(rb) rb.onclick=reveal;
-    $$('.dots button',host).forEach((b,i)=>{ b.classList.toggle('cur',i===k); b.classList.toggle('done',i<k); });
-    $('.bp',host).disabled=k<=0; $('.bn',host).disabled=k>=sc.n-1&&!gated(k);
-    $('.bn',host).textContent=gated(k)?'Pfeile einblenden ▶':'Weiter ▶'; }
-  function reveal(){ rev[Math.round(t)]=true; draw(); panel(); }
-  function animateTo(target){ cancelAnimationFrame(anim); V.align(()=>animateRaw(target)); }
-  function animateRaw(target){ const t0=t, d=Math.abs(target-t0);
-    if(d<1e-4||reduce){ t=target; draw(); panel(); return; }
-    const dur=Math.min(2600,1200*d), start=performance.now();
-    const step=now=>{ const u=clamp((now-start)/dur,0,1); t=lerp(t0,target,u); draw(); if(u<1) anim=requestAnimationFrame(step); else { t=target; draw(); panel(); } };
-    anim=requestAnimationFrame(step); }
-  $('.bp',host).onclick=()=>animateTo(Math.max(0,Math.round(t)-1));
-  $('.bn',host).onclick=()=>{ const k=Math.round(t); if(gated(k)) reveal(); else if(k<sc.n-1) animateTo(k+1); };
-  const dots=$('.dots',host); for(let i=0;i<sc.n;i++){ const b=document.createElement('button'); b.type='button'; b.textContent=i+1; b.onclick=()=>animateTo(i); dots.appendChild(b); }
-  if(sc.n<2){ dots.hidden=true; $('.ctrls',host).hidden=true; }
-  if(sc.ops) sc.ops($('.ops',host), ()=>{ draw(); panel(); }, cb=>V.align(cb));
-  $$('.big',host).forEach((b,i)=>b.onclick=()=>{ const cls=i===0?'bigH':'big3', on=!host.classList.contains(cls);
-    host.classList.remove('bigH','big3'); if(on) host.classList.add(cls); $$('.big',host).forEach(x=>x.textContent=(on&&x===b)?'⤡ kleiner':'⤢ größer'); });
-  if(sc.cover){ const c=$('.cover',host); c.hidden=false; $('p',c).innerHTML=sc.cover; $('button',c).onclick=()=>c.hidden=true; }
-  draw(); panel();
-  const api={draw, panel, redraw(){ draw(); panel(); }}; VIEWERS.push(api); return api;
-}
-const VIEWERS=[];
-
-/* ================= Bausteine des Arbeitsblatts ================= */
-function figSVG(F,o={}){ return svgString(F,PAL,{...o},o.w||null).replace(/width="[^"]*" height="[^"]*"/,'style="width:100%;height:auto;display:block"'); }
-function revealBtn(label,content){ const w=document.createElement('div'); w.className='revealwrap';
-  w.innerHTML=`<button class="btn small" type="button">${label}</button><div class="reveal" hidden></div>`;
-  const b=$('button',w), r=$('.reveal',w);
-  b.onclick=()=>{ r.hidden=!r.hidden; if(!r.hidden&&!r.dataset.f){ r.innerHTML=typeof content==='function'?content():content; r.dataset.f=1; bindChecks(r); } b.textContent=r.hidden?label:label.replace('anzeigen','ausblenden'); };
-  return w; }
-const CHECKS=store.get('lp2-checks',{});
-function checklistHTML(id,items){ return `<div class="checkl"><b>Prüfliste</b><ul class="check">${items.map((c,i)=>`<li><label><input type="checkbox" data-ck="${id}:${i}" ${CHECKS[id+':'+i]?'checked':''}> <span>${c}</span></label></li>`).join('')}</ul></div>`; }
-function bindChecks(r){ $$('input[data-ck]',r).forEach(c=>c.onchange=()=>{ CHECKS[c.dataset.ck]=c.checked; store.set('lp2-checks',CHECKS); }); }
-function vorlageEl(make,alt){
-  const box=document.createElement('div'); box.className='vorlagebox';
-  box.innerHTML=`<div class="vorlage"><img alt="${esc(alt)}"></div><div class="row"><button class="btn small" type="button">Vorlage kopieren</button><span class="small">Alternativ: Bild gedrückt halten → „Kopieren“.</span></div><div class="small fbcopy"></div>`;
-  const v=make(); let blob=null;
-  svgToPng(v.svg,v.w,v.h,2).then(r=>{ blob=r.blob; $('img',box).src=r.url; }).catch(()=>{ $('.vorlage',box).innerHTML=v.svg; });
-  $('button',box).onclick=()=>{ const fb=$('.fbcopy',box), no=()=>fb.textContent='Kopieren ist hier nicht möglich. Bitte das Bild gedrückt halten oder einen Bildschirmausschnitt verwenden.';
-    try{ if(!blob||!window.ClipboardItem) throw 0; navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(()=>fb.textContent='Vorlage kopiert.').catch(no); }catch(e){ no(); } };
-  return box; }
-
-/* Interaktiv: Substituenten oben/unten festlegen (zufälliger Start, Rückmeldung nur richtig/falsch) */
-function toggleWidget(host,cfg){
-  const {sug,M=I3,cs,fis,name,vb='105 85 390 290'}=cfg; let st={};
-  host.classList.add('toggle-ex'); if(!fis) host.classList.add('nofis');
-  host.innerHTML=`${fis?'<div class="fis"></div>':''}<div class="hw"></div><div class="tctl"><button class="btn small primary" type="button" data-k>Überprüfen</button><button class="btn small" type="button" data-r>Neu mischen</button><div class="fb"></div></div>`;
-  const reset=()=>{ // mindestens eine Position richtig und eine falsch, damit „alles umschalten“ nicht zum Ziel führt
-    do{ st={}; cs.forEach(c=>st[c]=Math.random()<0.5); } while(cs.every(c=>st[c])||cs.every(c=>!st[c]));
-    $('.fb',host).textContent=''; drawEx(); };
-  const drawEx=()=>{ const over={};
-    cs.forEach(c=>{ const s=sug.subs[c], up=st[c]?s.u:s.d, dn=st[c]?s.d:s.u;
-      const sn=l=>l==='CH2OH'?(sug.ring==='fur'&&c==='C2'?1:6):null; over[c+'.u']={lab:up,tag:null,subnum:sn(up)}; over[c+'.d']={lab:dn,tag:null,subnum:sn(dn)}; });
-    const F=newFrame(vb); addRing(F,'R',sug,pose(300,222,M),{over,tint:cfg.tint}); F.caps.push({x:300,y:362,t:name,size:16});
-    let hit=''; cs.forEach(c=>{ const u=F.atoms['R.'+c+'.u'], d=F.atoms['R.'+c+'.d'], y0=Math.min(u.y,d.y), y1=Math.max(u.y,d.y), x0=Math.min(u.x,d.x);
-      hit+=`<rect class="tgl" data-c="${c}" x="${x0-28}" y="${y0-15}" width="${Math.abs(u.x-d.x)+56}" height="${y1-y0+30}" rx="9" fill="rgba(127,127,127,.06)" stroke="${PAL.muted}" stroke-opacity=".4" stroke-dasharray="4 3"/>`; });
-    $('.hw',host).innerHTML=svgString(F,PAL,{ud:false,mid:'t'+name.length}).replace('</svg>',hit+'</svg>').replace(/width="[^"]*" height="[^"]*"/,'');
-    if(fis) $('.fis',host).innerHTML=fischerSVG(fis,PAL,{color:SET.ud}).svg.replace(/width="[^"]*" height="[^"]*"/,'');
-    $$('.tgl',host).forEach(r=>r.onclick=()=>{ st[r.dataset.c]=!st[r.dataset.c]; $('.fb',host).textContent=''; drawEx(); }); };
-  $('[data-r]',host).onclick=reset;
-  $('[data-k]',host).onclick=()=>{ const ok=cs.every(c=>st[c]); const fb=$('.fb',host); fb.className='fb '+(ok?'ok':'no'); fb.textContent=ok?'Richtig.':'Noch nicht richtig.'; };
-  reset(); return {redraw:()=>drawEx()};
-}
-/* Interaktiv: Zuordnung (Rückmeldung nur gesamt) */
-function matchWidget(host,items,opts){
-  host.innerHTML=`<div class="match">${items.map((it,i)=>`<label for="${host.id}m${i}">${it[0]}</label><select id="${host.id}m${i}"><option value="">– auswählen –</option>${opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`).join('')}</div><div class="row" style="margin-top:8px"><button class="btn small primary" type="button">Überprüfen</button></div><div class="fb"></div>`;
-  $('button',host).onclick=()=>{ const ok=items.every((it,i)=>$('#'+host.id+'m'+i,host).value===it[1]);
-    const fb=$('.fb',host); fb.className='fb '+(ok?'ok':'no'); fb.textContent=ok?'Alles richtig.':'Noch nicht alles richtig.'; };
-}
-
-/* ================= Inhalte des Arbeitsblatts ================= */
-const stripMech=F=>({...F, charges:[], hi:[]});
-const part=(F,pal,o,extra)=>({svg:svgString(F,pal,o), vb:F.vb, ...extra});
-const FIG=(F,o)=>`<div class="fig">${figSVG(F,o)}</div>`;
-
-/* --- Szene: Fructose wenden/kippen/drehen (mit Drehachse) --- */
-function sceneRot(){
-  const R={M:I3, anim:null, axis:null, op:null};
-  const OPS={z:{ax:[0,0,1],label:'Drehachse: Blickachse',name:'Wenden',txt:'Drehung um 180° um die Blickachse (die Achse zeigt auf dich). Links und rechts sowie oben und unten werden vertauscht; das Ring-O-Atom bleibt hinten.'},
-             x:{ax:[1,0,0],label:'Drehachse: waagrecht',name:'Kippen',txt:'Drehung um 180° um die waagrechte Achse. Vorne und hinten sowie oben und unten werden vertauscht; links und rechts bleiben.'},
-             y:{ax:[0,1,0],label:'Drehachse: senkrecht',name:'Drehen',txt:'Drehung um 180° um die senkrechte Achse, wie ein Teller auf dem Tisch. Oben bleibt oben; links/rechts und vorne/hinten werden vertauscht.'}};
-  return { n:1, nocache:true,
-    frame:()=>{ const F=single(SUG.fruB,'R',{M:R.M, vb:'80 30 440 390', tint:'B'}); if(R.axis) F.axis={...R.axis, ring:'R'}; return F; },
-    d3:{ at(){ const m=mol3('fru_b','B'), c=ringCentroid('fru_b'), f=fitOf([m.X],m.el); return {...m, M:R.M, fit:[c,f[1]+0.6], axis:R.axis?{d:OPS[R.axis.type].ax, op:R.axis.op}:null}; } },
-    ops(el,redraw,align){ el.innerHTML=`<button class="btn" type="button" data-op="z">⇋ Wenden</button><button class="btn" type="button" data-op="x">⇵ Kippen</button><button class="btn" type="button" data-op="y">↻ Drehen</button><button class="btn" type="button" data-op="0">Ausgangslage</button>`;
-      const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      $$('[data-op]',el).forEach(b=>b.onclick=()=>{ const o=b.dataset.op; if(R.anim) return;
-        if(o==='0'){ R.M=I3; R.axis=null; R.op=null; align(()=>redraw()); return; }
-        R.anim=1; R.op=o; align(()=>{ const O=OPS[o], M0=R.M, t0=performance.now(), T1=reduce?1:500, T2=reduce?1:1700, T3=reduce?1:700;
-          const step=now=>{ const t=now-t0; let rot=0, op=1;
-            if(t<T1){ op=ss(t/T1); } else if(t<T1+T2){ rot=ss((t-T1)/T2); } else { rot=1; op=1-ss((t-T1-T2)/T3); }
-            R.axis={type:o,op,label:O.label}; R.M=mm(Raxis(O.ax,Math.PI*rot),M0); redraw();
-            if(t<T1+T2+T3) R.anim=requestAnimationFrame(step); else { R.anim=null; R.axis=null; R.M=mm(Raxis(O.ax,Math.PI),M0).map(r=>r.map(v=>Math.round(v*1e6)/1e6)); redraw(); } };
-          R.anim=requestAnimationFrame(step); }); }); },
-    steps:[{t:()=>R.op?OPS[R.op].name+':':'Lageänderungen des Rings:', x:()=>R.op?OPS[R.op].txt:'Wähle eine Bewegung. Die Drehachse wird eingeblendet; das Kugel-Stab-Modell wird zuerst in dieselbe Blickrichtung gebracht und dreht sich dann mit.'}] };
-}
-/* --- Szene: Halbacetal/Acetal --- */
-function sceneAcetal(){ return { n:3,
-  frame:k=>{ if(k===0){ const F=single(SUG.glcA,'G',{cap:'α-D-Glucopyranose',tint:'A'}); F.hi=['G.C1','G.O','G.C1.d']; return F; }
-    if(k===1){ const F=single(SUG.fruB,'F',{cap:'β-D-Fructofuranose',tint:'B'}); F.hi=['F.C2','F.O','F.C2.u']; return F; }
-    const F=disaccH('suc'); F.hi=['G.C1','F.C2','Ob','G.O','F.O']; return F; },
-  d3:d3seq([{key:'glc_a',unit:'A',hi:[1,15,11]},{key:'fru_b',unit:'B',hi:[22,35,32]},{key:'suc_mol',hi:[1,22,11,15,35]}]),
-  steps:[{t:'α-D-Glucopyranose.',x:'Am anomeren C1-Atom sind das Ring-O-Atom und eine Hydroxygruppe gebunden.'},
-         {t:'β-D-Fructofuranose.',x:'Am anomeren C2-Atom sind das Ring-O-Atom und eine Hydroxygruppe gebunden.'},
-         {t:'Saccharose.',x:'Das C1-Atom des Glucose-Bausteins und das C2-Atom des Fructose-Bausteins sind über ein O-Atom verknüpft.'}] }; }
-/* --- Szene: Hydrolyse --- */
-function sceneHydro(key){ const fr=key==='suc';
-  return { n:5, frame:k=>mechH(key,k), arrows:arrowsSpalt(key), d3:d3mech(key,[0,1,2,3,4]),
-    pred:['Welches Atom wird protoniert?','Welche Bindung wird gespalten, und wo verbleibt das bindende Elektronenpaar?','Welches Teilchen reagiert als Nucleophil mit dem Carbokation?','Welches Teilchen nimmt das Proton auf?',null],
-    steps:[
-      {t:'Ausgangsstoffe.',x:`${fr?'Saccharose':'Maltose'} und Oxonium-Ionen in wässriger Lösung.`},
-      {t:'Schritt 1 – Protonierung.',x:'Ein freies Elektronenpaar des verbrückenden O-Atoms bindet ein Proton eines Oxonium-Ions. Statt eines Alkoholat-Ions (schlechte Abgangsgruppe) kann nun ein neutrales Alkohol-Molekül abgespalten werden.'},
-      {t:'Schritt 2 – Spaltung der glycosidischen Bindung.',x:fr?'Die Bindung zwischen dem verbrückenden O-Atom und dem C2-Atom des Fructose-Bausteins wird heterolytisch gespalten; das bindende Elektronenpaar verbleibt am O-Atom. Es entstehen α-D-Glucose und ein Carbokation am C2-Atom. Es ist mesomeriestabilisiert: Ein freies Elektronenpaar des Ring-O-Atoms kann die positive Ladung übernehmen (Grenzformel mit C=O⁺).':'Die Bindung zwischen dem verbrückenden O-Atom und dem C1-Atom des linken Glucose-Bausteins wird heterolytisch gespalten. Das O-Atom verbleibt als Hydroxygruppe am C4-Atom des rechten Bausteins. Das Carbokation am C1-Atom ist durch ein freies Elektronenpaar des Ring-O-Atoms mesomeriestabilisiert.'},
-      {t:'Schritt 3 – Nucleophiler Angriff.',x:`Ein Wassermolekül reagiert mit einem freien Elektronenpaar als Nucleophil mit dem elektrophilen C-Atom. Da das Carbokation trigonal-planar gebaut ist, ist der Angriff von beiden Seiten möglich; es entstehen α- und β-Anomer (hier dargestellt: ${fr?'β':'α'}).`},
-      {t:'Schritt 4 – Deprotonierung.',x:fr?'Ein Wassermolekül nimmt ein Proton auf. Es entstehen β-D-Fructose und wieder ein Oxonium-Ion. Bilanz: C₁₂H₂₂O₁₁ + H₂O → C₆H₁₂O₆ (Glucose) + C₆H₁₂O₆ (Fructose).':'Ein Wassermolekül nimmt ein Proton auf. Es entstehen zwei Glucose-Moleküle und ein Oxonium-Ion.'}] }; }
-/* --- Szene: Bildung --- */
-function sceneBild(){ return { n:6, frame:k=>k===0?mechH('suc',4,{flip:0}):mechH('suc',[4,3,2,1,0][k-1]),
-  trans:[f=>mechH('suc',4,{flip:f})], arrows:arrowsBild('suc'), d3:d3mech('suc',['pre',4,3,2,1,0]),
-  pred:[null,'Welche Hydroxygruppe wird protoniert?','Welches Teilchen wird abgespalten?','Welches Atom reagiert als Nucleophil mit dem Carbokation?','Welches Teilchen nimmt das Proton auf?',null],
-  steps:[
-    {t:'Ausgangsstoffe.',x:'α-D-Glucopyranose, β-D-Fructofuranose und Oxonium-Ionen.'},
-    {t:'Ausrichtung.',x:'Der Fructose-Baustein wird gewendet dargestellt. Die Hydroxygruppe am C2-Atom zeigt nun zur Hydroxygruppe am C1-Atom der Glucose.'},
-    {t:'Schritt 1 – Protonierung.',x:'Die Hydroxygruppe am anomeren C2-Atom der Fructose wird protoniert. So entsteht mit Wasser eine gute Abgangsgruppe; nach deren Abspaltung bildet sich am C2-Atom das mesomeriestabilisierte Carbokation.'},
-    {t:'Schritt 2 – Abspaltung von Wasser.',x:'Ein Wassermolekül wird abgespalten; es entsteht das Carbokation.'},
-    {t:'Schritt 3 – Nucleophiler Angriff.',x:'Das O-Atom der Hydroxygruppe am C1-Atom der Glucose reagiert als Nucleophil mit dem Carbokation.'},
-    {t:'Schritt 4 – Deprotonierung.',x:'Ein Wassermolekül nimmt ein Proton auf. Saccharose ist entstanden, das Oxonium-Ion liegt wieder vor.'}] }; }
-/* --- Szene: Baukasten --- */
-const BAU_INFO={
-  mal:{name:'Maltose', bind:'α(1→4)-glycosidische Bindung', red:true, txt:'Malzzucker; Abbauprodukt der Stärke, entsteht z. B. beim Keimen von Getreide (Mälzen). Die beiden Ringe stehen gewinkelt zueinander.', why:''},
-  cel:{name:'Cellobiose', bind:'β(1→4)-glycosidische Bindung', red:true, txt:'Abbauprodukt der Cellulose. Durch die β-Verknüpfung ist der zweite Ring um 180° gedreht (in der Haworth-Projektion gekippt); das Molekül ist gestreckt.', why:'Halbacetal-Gruppe am C1-Atom des rechten Bausteins.'},
-  iso:{name:'Isomaltose', bind:'α(1→6)-glycosidische Bindung', red:true, txt:'In geringen Mengen in Honig enthalten.', why:'Halbacetal-Gruppe am C1-Atom des rechten Bausteins.'},
-  gen:{name:'Gentiobiose', bind:'β(1→6)-glycosidische Bindung', red:true, txt:'Kommt in der Enzianwurzel vor.', why:'Halbacetal-Gruppe am C1-Atom des rechten Bausteins.'},
-  suc:{name:'Saccharose', bind:'α(1↔2)β-glycosidische Bindung', red:false, txt:'Haushaltszucker aus Zuckerrohr und Zuckerrübe.', why:''},
-  none:{name:'kein gebräuchliches Disaccharid', bind:'β(1↔2)', red:null, txt:'Diese Verknüpfung hat keinen gebräuchlichen Namen.', why:''}
+/* ================= Molekülbühne: saure Hydrolyse von Disacchariden =================
+   Zustände k: 0 Disaccharid (+H3O+) · 1 protoniert · 2 Carbokation · 3 Oxonium am anomeren C · 4 Produkte
+   L: Baustein, der abgespalten wird (behält das verbrückende Sauerstoffatom), C: Baustein mit Carbokation
+   Optionen: acid (H3O+), nuc (angreifendes Wasser), base (Wasser als Base) */
+SUG.galB={ ring:'pyr', anomC:'C1', subs:{C1:{u:'OH',d:'H'},C2:{u:'H',d:'OH'},C3:{u:'OH',d:'H'},C4:{u:'OH',d:'H'},C5:{u:'CH2OH',d:'H'}}, subnum:{'C5.u':6} };
+const MC={
+  suc:{ L:{id:'G',sug:SUG.glcA,C:'C1',sl:'d',tint:'A',cx:190,cy:200}, C:{id:'F',sug:SUG.fruB,C:'C2',sl:'u',tint:'B',M:Rz(Math.PI),preCx:520}, sg:1, vy:1, gap:112,
+        names:{D:'Saccharose',L:'α-D-Glucose',C:'β-D-Fructose',Lu:'Glucose-Baustein',Cu:'Fructose-Baustein',Lg:'Glucose-Bausteins',Cg:'Fructose-Bausteins'}, Cn:'C2', Ln:'C1' },
+  mal:{ C:{id:'A',sug:SUG.glcA,C:'C1',sl:'d',tint:'A',cx:190,cy:200}, L:{id:'B',sug:SUG.glcB,C:'C4',sl:'d',tint:'B'}, sg:-1, vy:1, gap:96,
+        names:{D:'Maltose',C:'α-D-Glucose',L:'β-D-Glucose',Cu:'linker Glucose-Baustein',Lu:'rechte Glucose-Baustein',Cg:'linken Glucose-Bausteins',Lg:'rechten Glucose-Bausteins'}, Cn:'C1', Ln:'C4' },
+  cel:{ C:{id:'A',sug:SUG.glcB,C:'C1',sl:'u',tint:'A',cx:190,cy:230}, L:{id:'B',sug:SUG.glcB,C:'C4',sl:'d',tint:'B',M:Rx(Math.PI)}, sg:-1, vy:-1, gap:96,
+        names:{D:'Cellobiose',C:'β-D-Glucose',L:'β-D-Glucose',Cu:'linker Glucose-Baustein',Lu:'rechte Glucose-Baustein',Cg:'linken Glucose-Bausteins',Lg:'rechten Glucose-Bausteins'}, Cn:'C1', Ln:'C4' },
+  lac:{ C:{id:'A',sug:SUG.galB,C:'C1',sl:'u',tint:'A',cx:190,cy:230}, L:{id:'B',sug:SUG.glcB,C:'C4',sl:'d',tint:'B',M:Rx(Math.PI)}, sg:-1, vy:-1, gap:96,
+        names:{D:'Lactose',C:'β-D-Galactose',L:'β-D-Glucose',Cu:'Galactose-Baustein',Lu:'Glucose-Baustein',Cg:'Galactose-Bausteins',Lg:'Glucose-Bausteins'}, Cn:'C1', Ln:'C4' }
 };
-function sceneBau(){
-  const B={an:'a', p:'c4'}, kind=()=>B.p==='f2'?(B.an==='a'?'suc':'none'):B.p==='c4'?(B.an==='a'?'mal':'cel'):(B.an==='a'?'iso':'gen');
-  return { n:1, nocache:true,
-    frame:()=>{ const k=kind(); if(k==='none'){ const F=newFrame(VB_TWO); F.caps.push({x:360,y:240,t:'keine Darstellung',size:18}); return F; } return disaccH(k); },
-    d3:{ at(){ const k=kind(); if(k==='none') return {el:'',X:[],bonds:[],note:'keine Darstellung'}; const key={mal:'mal_mol',cel:'cel',iso:'iso',gen:'gen',suc:'suc_mol'}[k]; const m=mol3(key); m.fit=fitOf([m.X],m.el); return m; } },
-    ops(el,redraw){ el.innerHTML=`<span class="small">Glucose:</span><div class="seg" data-g="an"><button type="button" data-v="a" class="on">α</button><button type="button" data-v="b">β</button></div>
-      <span class="small">verknüpft mit:</span><div class="seg" data-g="p"><button type="button" data-v="c4" class="on">Glucose, C4</button><button type="button" data-v="c6">Glucose, C6</button><button type="button" data-v="f2">Fructose, C2</button></div>`;
-      $$('.seg',el).forEach(g=>$$('button',g).forEach(b=>b.onclick=()=>{ B[g.dataset.g]=b.dataset.v; $$('button',g).forEach(x=>x.classList.toggle('on',x===b)); redraw(); })); },
-    steps:[{t:()=>BAU_INFO[kind()].name+':', x:()=>{ const I=BAU_INFO[kind()]; return `${I.bind}. ${I.txt}`; }}] };
+function mPoses(m,k,fl=1){
+  const c=MC[m], sh=k>=2?1:0, L=c.L, C=c.C;
+  if(c.sg>0){
+    const PL0=pose(L.cx,L.cy,L.M||I3), Lc=ringVertex(L.sug,L.C,PL0);
+    const Mf=C.M||I3, t0=ringVertex(C.sug,C.C,pose(0,0,Mf)), fcx=Lc.x+c.gap-t0.x, fcy=Lc.y-t0.y;
+    const PC= (C.preCx!=null&&fl<1) ? pose(lerp(C.preCx,fcx,fl),fcy,Rz(Math.PI*fl)) : pose(fcx+48*sh,fcy,Mf);
+    return {PL:pose(L.cx-62*sh,L.cy,L.M||I3), PC, PL0, PC0:pose(fcx,fcy,Mf)};
+  }
+  const PC0=pose(C.cx,C.cy,C.M||I3), Cc=ringVertex(C.sug,C.C,PC0), t0=ringVertex(L.sug,L.C,pose(0,0,L.M||I3));
+  const lcx=Cc.x+c.gap-t0.x, lcy=Cc.y-t0.y;
+  return {PC:pose(C.cx-48*sh,C.cy,C.M||I3), PL:pose(lcx+62*sh,lcy,L.M||I3), PC0, PL0:pose(lcx,lcy,L.M||I3)};
+}
+function mGeo(m){ const c=MC[m], {PL0,PC0}=mPoses(m,0), Lc=ringVertex(c.L.sug,c.L.C,PL0), Cc=ringVertex(c.C.sug,c.C.C,PC0);
+  const Ob0={x:(Lc.x+Cc.x)/2, y:Cc.y+46*c.vy}; return {Ob0, offL:{x:Ob0.x-Lc.x,y:Ob0.y-Lc.y}, offC:{x:Ob0.x-Cc.x,y:Ob0.y-Cc.y}}; }
+const VBC={};
+function mFrame(m,k,o={}){
+  const c=MC[m], sg=c.sg, vy=c.vy, F=newFrame(VBC[m]||'0 0 740 360'), {PL,PC}=mPoses(m,k), g=mGeo(m);
+  const Lid=c.L.id, Cid=c.C.id, La=Lid+'.'+c.L.C, Ca=Cid+'.'+c.C.C;
+  addRing(F,Lid,c.L.sug,PL,{omit:[c.L.C+'.'+c.L.sl],tint:c.L.tint});
+  addRing(F,Cid,c.C.sug,PC,{omit:[c.C.C+'.'+c.C.sl],tint:c.C.tint});
+  const A=(id,p,lab)=>atom(F,id,p.x,p.y,lab), R=(x,y)=>({x:g.Ob0.x+x*sg, y:g.Ob0.y+y*vy}), add=(p,x,y)=>({x:p.x+x*sg,y:p.y+y*vy});
+  const LA=F.atoms[La], CA=F.atoms[Ca];
+  const Ob= k<=1 ? g.Ob0 : {x:LA.x+g.offL.x, y:LA.y+g.offL.y};
+  const W={x:CA.x+g.offC.x, y:CA.y+g.offC.y};
+  const sol=o.bare!==true;   // Teilchen der Lösung (Oxonium-Ion, Wassermoleküle)
+  A('Ob',Ob,'O'); bond(F,La,'Ob'); if(k<=1) bond(F,Ca,'Ob');
+  if(sol){
+    // Oxonium-Ion bzw. Wassermolekül (Katalysator)
+    // beim nucleophilen Angriff (k=2) wird nur das angreifende Wassermolekül gezeigt
+    const Oa=R(-40,114); if(k!==2){ A('Oa',Oa,'O'); A('Ha1',add(Oa,-34,0),'H'); A('Ha2',add(Oa,0,38),'H'); bond(F,'Oa','Ha1'); bond(F,'Oa','Ha2'); }
+    if(k===0){ A('Hp',add(Oa,22,-32),'H'); bond(F,'Oa','Hp'); F.charges.push({at:'Oa'}); }
+    // Wassermolekül, das als Nucleophil angreift
+    const N= k<=2 ? R(40,128) : W;
+    if(k>=2){ A('Ow',N,'O'); A('Hw1',add(N,-36,0),'H'); A('Hw2',add(N,0,40),'H'); bond(F,'Ow','Hw1'); bond(F,'Ow','Hw2'); if(k>=3) bond(F,Ca,'Ow'); }
+    // in Schritt 4 nimmt dasselbe Wassermolekül (aus Schritt 1) das Proton wieder auf: Oxonium-Ion zurückgebildet
+    if(k===4){ const h=add(Oa,22,-32); F.atoms.Hw2.x=h.x; F.atoms.Hw2.y=h.y; F.bonds=F.bonds.filter(b=>!(b.a==='Ow'&&b.b==='Hw2')); bond(F,'Oa','Hw2'); }
+  }
+  if(k>=1){ A('Hp',{x:Ob.x,y:Ob.y+40*vy},'H'); bond(F,'Ob','Hp'); }
+  F.charges.push(...[[],[{at:'Ob'}],[{at:Ca}],[{at:'Ow'}],[{at:'Oa'}]][k].filter(ch=>sol||ch.at!=='Ow'&&ch.at!=='Oa'));
+  if(k===4&&o.names!==false){ const off=vy>0?132:-132; F.caps.push({x:F.rc[Lid].x,y:F.rc[Lid].y+off,t:c.names.L,size:16}); F.caps.push({x:F.rc[Cid].x,y:F.rc[Cid].y+off,t:c.names.C,size:16}); }
+  F.k=k; F.m=m; autoCharges(F); return F;
+}
+/* Ladungen frei neben das Atom setzen */
+function autoCharges(F){ F.charges.forEach(ch=>{ if(ch.dx!=null) return; const a=F.atoms[ch.at]; if(!a) return;
+  const pts=[]; for(const id in F.atoms){ const b=F.atoms[id]; if(id!==ch.at&&(b.op??1)>0.3){ pts.push(b); if(b.lab==='OH'||b.lab==='CH2OH'||b.lab==='H2O'||b.lab==='H3O+'){ pts.push({x:b.x+14,y:b.y},{x:b.x-14,y:b.y}); } } }
+  F.bonds.forEach(bd=>{ if(bd.a!==ch.at&&bd.b!==ch.at) return; const o=F.atoms[bd.a===ch.at?bd.b:bd.a]; if(o) for(let t=0.25;t<=0.75;t+=0.25) pts.push({x:a.x+(o.x-a.x)*t,y:a.y+(o.y-a.y)*t}); });
+  lpDirs(F,ch.at).forEach(d=>pts.push({x:a.x+d[0]*15,y:a.y+d[1]*15}));
+  if(a.num!=null&&F.rc[a.ring]){ const rc=F.rc[a.ring]; let dx=a.x-rc.x, dy=a.y-rc.y; const L=Math.hypot(dx,dy)||1; pts.push({x:a.x+dx/L*19+(dx>0?6:-6), y:a.y+dy/L*15+(Math.abs(dy/L)<0.3?-11:0)}); }
+  let best=null, bs=-1; for(let ang=-90;ang<270;ang+=15){ const r=ang*Math.PI/180, R=a.lab==='C'?21:20, p={x:a.x+Math.cos(r)*R, y:a.y+Math.sin(r)*R};
+    const s=Math.min(...pts.map(q=>Math.hypot(q.x-p.x,q.y-p.y)))-(Math.sin(r)>0.5?2:0); if(s>bs){ bs=s; best=[p.x-a.x,p.y-a.y]; } }
+  ch.dx=best[0]; ch.dy=best[1]; }); }
+/* Ansichtsfenster je Disaccharid aus allen Zuständen */
+function vbOf(m){ if(VBC[m]) return VBC[m]; let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  [[0,{}],[1,{}],[2,{}],[3,{}],[4,{}]].forEach(([k,o])=>{ const F=mFrame(m,k,o); for(const id in F.atoms){ const a=F.atoms[id]; if((a.op??1)<0.3) continue;
+    const w={CH2OH:66,OH:36,'H3O+':34,H2O:32}[a.lab]??18; x0=Math.min(x0,a.x-w); x1=Math.max(x1,a.x+w); y0=Math.min(y0,a.y-30); y1=Math.max(y1,a.y+26); } F.caps.forEach(c=>{ y1=Math.max(y1,c.y+10); y0=Math.min(y0,c.y-20); }); });
+  const W=Math.max(x1-x0,600), H=y1-y0; return VBC[m]=`${Math.round(x0-(W-(x1-x0))/2-6)} ${Math.round(y0-6)} ${Math.round(W+12)} ${Math.round(H+12)}`; }
+/* Wenden des Fructose-Bausteins (fl: 0 … 1), Bausteine noch getrennt; Substituenten blenden während der Drehung aus */
+function flipFrame(fl){
+  const F=newFrame(vbOf('suc')), {PL,PC}=mPoses('suc',0,fl);
+  addRing(F,'G',SUG.glcA,PL,{tint:'A'}); addRing(F,'F',SUG.fruB,PC,{tint:'B'});
+  const so=clamp(Math.abs(fl-0.5)*4-0.6,0,1); for(const id in F.atoms){ const a=F.atoms[id]; if(a.ring==='F'&&a.sub) a.op=so; }
+  if(fl>0.02&&fl<0.98) F.axis={type:'z', ring:'F', op:Math.sin(Math.PI*fl), label:'Wenden'};
+  F.m='suc'; F.k=-1; return F;
 }
 
+/* ---------- freie Elektronenpaare (aus den Bindungen berechnet) ---------- */
+function nbrs(F,id){ const out=[]; F.bonds.forEach(b=>{ if((b.op??1)<0.5) return; if(b.a===id&&F.atoms[b.b]) out.push(F.atoms[b.b]); if(b.b===id&&F.atoms[b.a]) out.push(F.atoms[b.a]); }); return out; }
+function lpDirs(F,id){
+  const a=F.atoms[id]; if(!a||a.lab!=='O'||(a.op??1)<0.5) return [];
+  const nb=nbrs(F,id); const n=nb.length; if(!n) return [];
+  const nl=n>=3?1:(n===2?2:3), TAU=Math.PI*2;
+  const ang=nb.map(b=>Math.atan2(b.y-a.y,b.x-a.x)).map(t=>(t+TAU)%TAU).sort((x,y)=>x-y);
+  const gaps=ang.map((t,i)=>{ const t2=i+1<ang.length?ang[i+1]:ang[0]+TAU; return {s:t,w:t2-t}; }).sort((x,y)=>y.w-x.w);
+  let out=[];
+  if(n===1){ const g=gaps[0]; out=[g.s+g.w*0.25,g.s+g.w*0.5,g.s+g.w*0.75]; }
+  else if(nl===2){ const g=gaps[0]; if(g.w>3.3||gaps.length<2) out=[g.s+g.w/3,g.s+2*g.w/3]; else out=[gaps[0].s+gaps[0].w/2,gaps[1].s+gaps[1].w/2]; }
+  else { const g=gaps[0]; out=[g.s+g.w/2]; }
+  return out.map(t=>[Math.cos(t),Math.sin(t)]);
+}
+function lpPoint(F,id,i){ const a=F.atoms[id], d=lpDirs(F,id)[i]; if(!a||!d) return null; return {x:a.x+d[0]*16, y:a.y+d[1]*16, nx:-d[1], ny:d[0], at:id}; }
+function allLps(F,ids){ const out=[]; (ids||Object.keys(F.atoms)).forEach(id=>{ lpDirs(F,id).forEach((d,i)=>out.push({id:'lp:'+id+':'+i, at:id, i, ...lpPoint(F,id,i)})); }); return out; }
+const lpsOf=(m='suc')=>['Ob','Oa','Ow',MC[m].L.id+'.O',MC[m].C.id+'.O'];
 
-/* ================= Aufgaben des Arbeitsblatts ================= */
-const REZ=(n,txt)=>`<div class="rezept"><b class="t">Rezept-Baustein ${n}</b>${txt}</div>`;
-const SHEET=[
- { id:'a1', no:'1', title:'Fructose in der Haworth-Projektion', build(el){
-   el.innerHTML=`<div class="info"><b class="t">Info: Fructose in der Haworth-Projektion</b>D-Fructose (Fruchtzucker) ist eine Ketohexose: Die Carbonylgruppe liegt am C2-Atom. Beim Ringschluss reagiert die Hydroxygruppe am C5-Atom als Nucleophil mit dem Carbonyl-C-Atom (intramolekulare Halbacetalbildung). Es entsteht ein Fünfring aus vier C-Atomen und einem O-Atom, die Furanose-Form. Das C2-Atom wird dabei zu einem neuen Chiralitätszentrum, dem anomeren C-Atom.
-   <ol class="rules"><li>Hydroxygruppen, die in der Fischer-Projektion <b>rechts</b> stehen, zeigen in der Haworth-Projektion <b>nach unten</b>, links stehende <b>nach oben</b>. (Man kippt die Fischer-Projektion gedanklich um 90° im Uhrzeigersinn.)</li>
-   <li><b>Ausnahme C5:</b> Seine Hydroxygruppe wird zum Ring-O-Atom. Dazu dreht sich die C4–C5-Bindung; die CH₂OH-Gruppe (C6) steht deshalb bei D-Zuckern <b>oben</b> und das H-Atom unten, bei L-Zuckern ist es umgekehrt.</li>
-   <li><b>Anomeres C-Atom:</b> Steht die Hydroxygruppe am anomeren C-Atom (bei Fructose am C2-Atom, bei Glucose am C1-Atom) auf derselben Seite wie die CH₂OH-Gruppe am C5-Atom, liegt das <b>β-Anomer</b> vor; steht sie auf der Gegenseite, liegt das <b>α-Anomer</b> vor.</li></ol>
-   <span class="small">In wässriger Lösung liegt freie Fructose überwiegend als Sechsring (Pyranose) vor; in Saccharose ist sie als Fünfring gebunden.</span></div>
-   <div class="ta"><span class="tn">a)</span><div><p><b>Lege fest</b>, welche Substituenten in β-D-Fructofuranose oben und welche unten stehen. Tippe dazu auf ein C-Atom: Seine beiden Substituenten tauschen dann die Plätze.</p><div id="w1a"></div></div></div>
-   ${REZ(1,'<b>Notiere</b> in deinem Rezept, wie du einen Baustein aus der Fischer-Projektion in die Haworth-Projektion überträgst: Ringgröße, Lage des Ring-O-Atoms, Lage der Substituenten, anomeres C-Atom.')}
-   <div class="info"><b class="t">Info: Lage des Rings</b>Damit in der Haworth-Projektion von Saccharose das anomere C2-Atom der Fructose neben dem anomeren C1-Atom der Glucose liegt, wird der Fructose-Ring gewendet gezeichnet, d. h. um 180° um die Blickachse gedreht. Da nur die Blickrichtung geändert wird, bleibt die Konfiguration aller Chiralitätszentren erhalten. Probiere die drei möglichen Lageänderungen aus:</div>
-   <div id="v1"></div>
-   <div class="ta"><span class="tn">b)</span><div><p>Der Fructose-Ring unten ist bereits gewendet, seine Substituenten stehen aber noch nicht richtig. <b>Drehe</b> die Substituenten durch Antippen der C-Atome in die Lage, die sie nach dem Wenden einnehmen.</p><div id="w1b"></div></div></div>
-   ${REZ(2,'<b>Notiere</b>, wann ein Baustein gewendet oder gekippt gezeichnet wird und was sich dabei an den Substituenten ändert.')}`;
-   toggleWidget($('#w1a',el),{sug:SUG.fruB,cs:['C2','C3','C4','C5'],fis:'fru',name:'β-D-Fructofuranose',tint:'B'});
-   Viewer($('#v1',el),sceneRot());
-   toggleWidget($('#w1b',el),{sug:SUG.fruB,M:Rz(Math.PI),cs:['C2','C3','C4','C5'],name:'β-D-Fructofuranose, gewendet',tint:'B'});
- }},
- { id:'a2', no:'2', title:'Halbacetal und Acetal', build(el){
-   el.innerHTML=`<div class="info"><b class="t">Info: Halbacetal, Acetal und glycosidische Bindung</b><b>Halbacetal:</b> Ein C-Atom trägt eine Hydroxygruppe (–OH) und eine Alkoxygruppe (–OR). In den Ringformen der Monosaccharide ist das anomere C-Atom ein Halbacetal-C-Atom.<br>
-   <b>Acetal (Vollacetal):</b> Ein C-Atom trägt zwei Alkoxygruppen. Es entsteht, wenn die Hydroxygruppe am anomeren C-Atom unter Abspaltung von Wasser mit einer Hydroxygruppe eines zweiten Moleküls reagiert.<br>
-   <b>Glycosidische Bindung:</b> Bindung vom anomeren C-Atom über das O-Atom zum zweiten Molekül. Sie ist Teil eines Acetals und keine gewöhnliche Etherbindung: Anders als Ether wird sie in saurer Lösung leicht hydrolysiert.</div>
-   <div id="v2"></div>
-   <div class="ta"><span class="tn">a)</span><div><p><b>Ordne</b> den C-Atomen die passende Bezeichnung <b>zu</b>.</p><div id="w2a"></div></div></div>
-   <div class="ta"><span class="tn">b)</span><div><p><b>Begründe</b>, warum Saccharose im Gegensatz zu Glucose keine reduzierende Wirkung zeigt.</p></div></div>
-   ${REZ(3,'<b>Notiere</b>, welche C-Atome bei der Verknüpfung über ein O-Atom verbunden werden und welches Teilchen dabei abgespalten wird.')}`;
-   Viewer($('#v2',el),sceneAcetal());
-   matchWidget($('#w2a',el),[['C1-Atom in α-D-Glucopyranose','H'],['C5-Atom in α-D-Glucopyranose','N'],['C2-Atom in β-D-Fructofuranose','H'],['C1-Atom des Glucose-Bausteins in Saccharose','A'],['C2-Atom des Fructose-Bausteins in Saccharose','A']],
-     [['H','Halbacetal'],['A','Acetal'],['N','weder noch']]);
- }},
- { id:'a3', no:'3', title:'Säurekatalysierte Hydrolyse von Saccharose', build(el){
-   el.innerHTML=`<div class="info"><b class="t">Info: Hydrolyse von Acetalen</b>Acetale sind in neutraler und alkalischer Lösung beständig, in saurer Lösung werden sie hydrolysiert; Oxonium-Ionen wirken als Katalysator. Der Mechanismus ist die Umkehrung der säurekatalysierten Acetalbildung. Das bei der Hydrolyse von Saccharose entstehende Gemisch aus Glucose und Fructose heißt Invertzucker: Der Drehwinkel der Lösung kehrt sich von +66,5° (Saccharose) zu etwa −20° um, weil Fructose (−92°) stärker links dreht als Glucose rechts (+52,7°).</div>
-   <div id="v3"></div>
-   <div class="ta"><span class="tn">a)</span><div><p><b>Formuliere</b> den Reaktionsmechanismus der säurekatalysierten Hydrolyse von Saccharose. <b>Ergänze</b> dazu in der Vorlage die Pfeile für die Elektronenpaarverschiebungen, die beteiligten freien Elektronenpaare und die Ladungen.</p><div id="vl3"></div></div></div>
-   <div class="ta"><span class="tn">b)</span><div><p><b>Erläutere</b> die Funktion der Oxonium-Ionen. <b>Begründe</b>, warum die Bindung zwischen dem verbrückenden O-Atom und dem C2-Atom des Fructose-Bausteins gespalten wird.</p></div></div>`;
-   Viewer($('#v3',el),sceneHydro('suc'));
-   $('#vl3',el).appendChild(vorlageEl(()=>sheet('Säurekatalysierte Hydrolyse von Saccharose',[0,1,2,3,4].map(k=>part(stripMech(mechH('suc',k)),PRINT,{ud:false,num:false,tint:false},{label:['Ausgangsstoffe','Schritt 1','Schritt 2','Schritt 3','Schritt 4'][k], w:640, x:60, gap:4}))),'Vorlage: Zwischenstufen der Hydrolyse ohne Pfeile'));
- }},
- { id:'a4', no:'4', title:'Bildung der glycosidischen Bindung', build(el){
-   el.innerHTML=`<div class="info"><b class="t">Info: Kondensation</b>Die Bildung der glycosidischen Bindung ist die Umkehrung der Hydrolyse, eine Kondensationsreaktion: C₆H₁₂O₆ + C₆H₁₂O₆ ⇌ C₁₂H₂₂O₁₁ + H₂O. Mechanistisch entspricht sie der säurekatalysierten Bildung eines Acetals aus einem Halbacetal und einem Alkohol. In verdünnter wässriger Lösung liegt das Gleichgewicht weit auf der Seite der Monosaccharide. Lebewesen verknüpfen Zucker deshalb enzymatisch über energiereiche, „aktivierte“ Bausteine.</div>
-   <div id="v4"></div>
-   <div class="ta"><span class="tn">a)</span><div><p><b>Vergleiche</b> die Teilschritte der Bildung mit denen der Hydrolyse. <b>Erläutere</b>, warum der Fructose-Baustein vor der Reaktion gewendet dargestellt wird.</p></div></div>`;
-   Viewer($('#v4',el),sceneBild());
- }},
- { id:'a5', no:'5', title:'Maltose', build(el){
-   el.innerHTML=`<div class="info"><b class="t">Info: Benennung der glycosidischen Bindung</b>Die Bezeichnung nennt die Stellung (α oder β) am anomeren C-Atom des ersten Bausteins und die Nummern der verknüpften C-Atome. Maltose besteht aus zwei Glucose-Bausteinen mit α(1→4)-glycosidischer Bindung: Das C1-Atom des ersten Bausteins (α-Stellung) ist über ein O-Atom mit dem C4-Atom des zweiten verknüpft. Sind beide anomeren C-Atome beteiligt, schreibt man einen Doppelpfeil, z. B. α(1↔2)β bei Saccharose.</div>
-   <div class="ta"><span class="tn">a)</span><div><p><b>Zeichne</b> Maltose in der Haworth-Projektion. <b>Kennzeichne</b> das Acetal-C-Atom und das Halbacetal-C-Atom. <b>Begründe</b>, ob Maltose reduzierend wirkt.</p><div id="vl5"></div></div></div>
-   <div class="ta"><span class="tn">b)</span><div><p><b>Vergleiche</b> deine Zeichnung mit der Darstellung. <b>Untersuche</b> anschließend, wie sich die Struktur ändert, wenn du das Anomer der Glucose oder den Verknüpfungspartner wechselst.</p></div></div>
-   <div id="v5"></div>
-   ${REZ(4,'<b>Notiere</b>, wie du die glycosidische Bindung benennst und wie du an der Struktur entscheidest, ob ein Disaccharid reduzierend wirkt.')}`;
-   Viewer($('#v5',el),sceneBau());
-   $('#vl5',el).appendChild(vorlageEl(()=>{ const F=newFrame('25 82 640 290'), {PL,PC}=cfgPoses(CFG.mal); addRing(F,'A',SUG.glcA,PC,{bare:true}); addRing(F,'B',SUG.glcB,PL,{bare:true}); return {svg:svgString(F,PRINT,{bg:true,ud:false,num:true,tint:false},900), w:900, h:900*290/640}; },'Vorlage: zwei Glucose-Ringgerüste'));
- }}
-];
-const EXTRA=[
- { id:'z1', no:'Z1', title:'Saccharose aus den Fischer-Projektionen', build(el){
-   el.innerHTML=`<div class="ta"><span class="tn"></span><div><p><b>Zeichne</b> Saccharose ausgehend von den Fischer-Projektionen von D-Glucose und D-Fructose in der Haworth-Projektion. Verwende dein Rezept. <b>Benenne</b> die glycosidische Bindung.</p><div id="vlz1"></div></div></div>`;
-   $('#vlz1',el).appendChild(vorlageEl(()=>{ const a=fischerSVG('glc',PRINT,{bg:true}), b=fischerSVG('fru',PRINT,{bg:true}); return sheet('Fischer-Projektionen',[{svg:a.svg,vb:`0 0 ${a.w} ${a.h}`,w:270,x:80,gap:-a.h*270/a.w},{svg:b.svg,vb:`0 0 ${b.w} ${b.h}`,w:270,x:410,gap:20},{label:'Saccharose in der Haworth-Projektion',space:400}]); },'Fischer-Projektionen von D-Glucose und D-Fructose'));
- }},
- { id:'z2', no:'Z2', title:'Hydrolyse von Maltose', build(el){
-   el.innerHTML=`<div class="ta"><span class="tn"></span><div><p><b>Formuliere</b> den Reaktionsmechanismus der säurekatalysierten Hydrolyse von Maltose. <b>Vergleiche</b> mit der Hydrolyse von Saccharose: An welchem C-Atom entsteht hier das Carbokation?</p></div></div>`;
- }}
-];
-function buildRezept(el){
-  el.innerHTML=`<p><b>Fasse</b> deine vier Rezept-Bausteine zu einem Rezept <b>zusammen</b>, mit dem du beliebige Disaccharide in der Haworth-Projektion zeichnen kannst. Ergänze zu jedem Schritt ein Beispiel.</p><div id="vlr"></div>`;
-  $('#vlr',el).appendChild(vorlageEl(()=>{ const W=760, heads=['1  Bausteine in der Haworth-Projektion zeichnen','2  Lage der Bausteine anpassen','3  Bausteine verknüpfen','4  Bindung benennen und Eigenschaften ableiten'];
-    let y=70, b=''; heads.forEach(h=>{ b+=`<text x="24" y="${y}" font-size="18" font-weight="700" fill="#111">${esc(h)}</text><rect x="24" y="${y+10}" width="${W-48}" height="190" fill="none" stroke="#bbb" stroke-dasharray="6 6"/>`; y+=232; });
-    return {svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${y}" width="${W}" height="${y}" font-family="Arial, Helvetica, sans-serif"><rect width="${W}" height="${y}" fill="#fff"/><text x="24" y="36" font-size="22" font-weight="700" fill="#111">Rezept: Disaccharide in der Haworth-Projektion zeichnen</text>${b}</svg>`, w:W, h:y}; },'Vorlage: Rezeptkarte'));
+/* ---------- Antippziele ---------- */
+function catOf(id,F){
+  const a=F.atoms[id]; if(!a) return 'none';
+  if(['Ob','Oa','Ow','Ob2','Hp','Hw1','Hw2','Hb1','Hb2','Ha1','Ha2'].includes(id)) return id;
+  if(/\.O$/.test(id)) return 'ringO';
+  if(a.lab==='C') return 'C';
+  if(a.lab==='OH') return 'hydroxy';
+  if(a.lab==='CH2OH') return 'ch2oh';
+  if(a.lab==='H') return 'H';
+  return 'other';
+}
+const LRAD={'H3O+':27,'H2O':22,'CH2OH':24,'OH':16,'O':14,'C':13,'H':12};
+const bkey=(a,b)=>[a,b].sort().join('|');
+function segDist(p,a,b){ const dx=b.x-a.x, dy=b.y-a.y, L2=dx*dx+dy*dy||1; let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/L2; t=clamp(t,0.12,0.88);
+  return Math.hypot(p.x-(a.x+t*dx), p.y-(a.y+t*dy)); }
+function labCenter(F,a){ let cx=a.x; if(a.lab==='OH'||a.lab==='CH2OH'){ const rc=F.rc[a.ring]; const left=rc&&(a.inner?a.x>rc.x+2:a.x<rc.x-((a.lab==='OH')?0.25:0.72)*rc.s); cx=a.x+(left?-1:1)*(a.lab==='OH'?8:22); } if(a.lab==='H2O'||a.lab==='H3O+') cx=a.x+2; return cx; }
+function hitTest(F,p,kinds,lpIds){
+  let best=null, bd=1e9; const consider=(obj,d,lim)=>{ if(d<lim&&d<bd){ bd=d; best=obj; } };
+  if(kinds.has('lp')) allLps(F,lpIds).forEach(l=>consider({kind:'lp',id:l.id,at:l.at},Math.hypot(p.x-l.x,p.y-l.y)-9,9));
+  if(kinds.has('atom')) for(const id in F.atoms){ const a=F.atoms[id]; if(!a.lab||(a.op??1)<0.5) continue;
+    const r=LRAD[a.lab]??14; consider({kind:'atom',id},Math.hypot(p.x-labCenter(F,a),p.y-a.y)-r*0.55,r*0.45+14); }
+  if(kinds.has('bond')) F.bonds.forEach(b=>{ const A=F.atoms[b.a], B=F.atoms[b.b]; if(!A||!B||(b.op??1)<0.5) return; consider({kind:'bond',id:bkey(b.a,b.b),a:b.a,b:b.b},segDist(p,A,B),14); });
+  if(best) return best;
+  if(kinds.has('ring')) for(const r in F.rc){ const c=F.rc[r]; consider({kind:'ring',id:r},Math.hypot((p.x-c.x)/1.6,(p.y-c.y)/1.1)/c.s*90,95); }
+  return best;
 }
 
-/* ================= Glossar ================= */
+/* ---------- Pfeile, Ladungen, Elektronenpaare als Überlagerung ---------- */
+function stageCentroid(F){ const rs=Object.values(F.rc); return {x:rs.reduce((s,r)=>s+r.x,0)/rs.length, y:rs.reduce((s,r)=>s+r.y,0)/rs.length}; }
+function lpFor(F,at,tgt){ const ds=lpDirs(F,at); if(!ds.length) return null; let bi=0, bd=1e9; ds.forEach((d,i)=>{ const p=lpPoint(F,at,i); const dd=Math.hypot(p.x-tgt.x,p.y-tgt.y); if(dd<bd){ bd=dd; bi=i; } }); return lpPoint(F,at,bi); }
+function uaGeom(F,ar){
+  const P=id=>F.atoms[id], cen=stageCentroid(F);
+  const tId=ar.t.id, T=P(tId); if(!T) return null;
+  if(ar.s.kind==='bond'){ const [a,b]=ar.s.id.split('|');
+    if(a===tId||b===tId){ const g1=arrowGeom(F,{from:{bond:[a,b]},to:{atom:tId},bend:1}), g2=arrowGeom(F,{from:{bond:[a,b]},to:{atom:tId},bend:-1});
+      if(!g1) return null; const d=g=>Math.hypot(g.C.x-cen.x,g.C.y-cen.y); return ar.bend? (ar.bend>0?g1:g2) : (d(g1)>=d(g2)?g1:g2); } }
+  let S;
+  if(ar.s.kind==='lp'){ const [,at,i]=ar.s.id.split(':'); const l=i==='*'?lpFor(F,at,T):lpPoint(F,at,+i); if(!l) return null; S={x:l.x,y:l.y}; }
+  else if(ar.s.kind==='bond'){ const [a,b]=ar.s.id.split('|'); const A=P(a),B=P(b); if(!A||!B) return null; S={x:(A.x+B.x)/2,y:(A.y+B.y)/2}; }
+  else { const A=P(ar.s.id); if(!A) return null; const r=(LRAD[A.lab]??14)+4, dx=T.x-A.x, dy=T.y-A.y, L=Math.hypot(dx,dy)||1; S={x:A.x+dx/L*r, y:A.y+dy/L*r}; }
+  const rt=(LRAD[T.lab]??14)+2, ex=T.x-S.x, ey=T.y-S.y, EL=Math.hypot(ex,ey)||1;
+  const E={x:T.x-ex/EL*rt, y:T.y-ey/EL*rt}, len=Math.hypot(E.x-S.x,E.y-S.y)||1, off=Math.max(len*0.38,24);
+  const mm_={x:(S.x+E.x)/2,y:(S.y+E.y)/2}, n={x:-(E.y-S.y)/len, y:(E.x-S.x)/len};
+  const C1={x:mm_.x+n.x*off,y:mm_.y+n.y*off}, C2={x:mm_.x-n.x*off,y:mm_.y-n.y*off};
+  const pick=ar.bend? (ar.bend>0?C1:C2) : (Math.hypot(C1.x-cen.x,C1.y-cen.y)>=Math.hypot(C2.x-cen.x,C2.y-cen.y)?C1:C2);
+  return {S,E,C:pick};
+}
+function chargeSVG(x,y,sign,col,bg,op=1,dashed=false){
+  const d=sign==='+'?`M${f2(x-4.5)},${f2(y)}H${f2(x+4.5)}M${f2(x)},${f2(y-4.5)}V${f2(y+4.5)}`:(sign==='-'?`M${f2(x-4.5)},${f2(y)}H${f2(x+4.5)}`:'');
+  return `<g opacity="${op}"><circle cx="${f2(x)}" cy="${f2(y)}" r="8.5" fill="${bg}" stroke="${col}" stroke-width="1.8" ${dashed?'stroke-dasharray="3 2"':''}/>${d?`<path d="${d}" stroke="${col}" stroke-width="1.9"/>`:`<text x="${f2(x)}" y="${f2(y+0.5)}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${col}">0</text>`}</g>`; }
+function chargePos(F,id){ const a=F.atoms[id]; if(!a) return null; const FF={...F,charges:[{at:id}]}; autoCharges(FF); const c=FF.charges[0]; return {x:a.x+c.dx, y:a.y+c.dy}; }
+/* gemeinsame Zeichenroutine für Bühne und Bilder */
+function overlaySVG(F,o,pal,mid){
+  let s=''; const col=pal.react;
+  (o.sel||[]).forEach(x=>{ if(x.kind==='atom'){ const a=F.atoms[x.id]; if(!a) return; const r=(LRAD[a.lab]??14)+5;
+        s+=`<ellipse cx="${f2(labCenter(F,a))}" cy="${f2(a.y)}" rx="${r+(a.lab&&a.lab.length>2?8:0)}" ry="${r}" fill="${pal.hi}" stroke="${x.c||pal.down}" stroke-width="2.4"/>`; }
+    if(x.kind==='bond'){ const [a,b]=x.id.split('|'); const A=F.atoms[a],B=F.atoms[b]; if(!A||!B) return; s+=`<line x1="${f2(A.x)}" y1="${f2(A.y)}" x2="${f2(B.x)}" y2="${f2(B.y)}" stroke="${x.c||pal.down}" stroke-width="11" stroke-linecap="round" opacity=".38"/>`; }
+    if(x.kind==='lp'){ const [,at,i]=x.id.split(':'); const l=lpPoint(F,at,+i); if(l) s+=`<circle cx="${f2(l.x)}" cy="${f2(l.y)}" r="10" fill="none" stroke="${x.c||pal.down}" stroke-width="2.4"/>`; }
+    if(x.kind==='ring'){ const c=F.rc[x.id]; s+=`<ellipse cx="${f2(c.x)}" cy="${f2(c.y)}" rx="${f2(c.s*1.75)}" ry="${f2(c.s*1.2)}" fill="none" stroke="${x.c||pal.down}" stroke-width="2.4" stroke-dasharray="7 5"/>`; } });
+  if(o.lps){ const lo=o.lpOp??1; allLps(F,o.lps).forEach(l=>{ s+=`<line x1="${f2(l.x-l.nx*5.5)}" y1="${f2(l.y-l.ny*5.5)}" x2="${f2(l.x+l.nx*5.5)}" y2="${f2(l.y+l.ny*5.5)}" stroke="${pal.ink}" stroke-width="2.2" stroke-linecap="round" opacity="${lo}"/>`; }); }
+  (o.charges||[]).forEach(c=>{ const p=chargePos(F,c.at); if(p) s+=chargeSVG(p.x,p.y,c.sign,c.col||pal.down,pal.bg,c.op??1,!!c.dashed); });
+  (o.arrows||[]).forEach(ar=>{ const g=uaGeom(F,ar); if(!g) return; const c=ar.col||col;
+    s+=`<path d="M${f2(g.S.x)},${f2(g.S.y)} Q${f2(g.C.x)},${f2(g.C.y)} ${f2(g.E.x)},${f2(g.E.y)}" fill="none" stroke="${c}" stroke-width="2.8" stroke-linecap="round" marker-end="url(#${c===pal.down?'ahb':'aha'}${mid||''})" opacity="${ar.op??1}"/>`; });
+  (o.labels||[]).forEach(l=>{ s+=`<text x="${f2(l.x)}" y="${f2(l.y)}" text-anchor="middle" font-size="15" font-weight="700" fill="${l.col||pal.down}">${esc(l.t)}</text>`; });
+  s+=`<defs><marker id="aha${mid||''}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${pal.react}"/></marker><marker id="ahb${mid||''}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${pal.down}"/></marker></defs>`;
+  return s;
+}
+/* Mechanismus-Pfeile je Schritt; Hydrolyse: Schritt s führt von Zustand s-1 nach s */
+function mechArrows(step,dir='h'){
+  if(dir==='h') return [null,
+    [{s:{kind:'lp',id:'lp:Ob:*'},t:{id:'Hp'}},{s:{kind:'bond',id:bkey('Oa','Hp')},t:{id:'Oa'}}],
+    [{s:{kind:'bond',id:'@CO'},t:{id:'Ob'}}],
+    [{s:{kind:'lp',id:'lp:Ow:*'},t:{id:'@C'}}],
+    [{s:{kind:'lp',id:'lp:Oa:*'},t:{id:'Hw2'}},{s:{kind:'bond',id:bkey('Ow','Hw2')},t:{id:'Ow'}}]][step];
+  // Bildung (Kondensation): Schritt 1 = 4→3, 2 = 3→2, 3 = 2→1, 4 = 1→0
+  return [null,
+    [{s:{kind:'lp',id:'lp:Ow:*'},t:{id:'Hw2'}},{s:{kind:'bond',id:bkey('Oa','Hw2')},t:{id:'Oa'}}],
+    [{s:{kind:'bond',id:'@COw'},t:{id:'Ow'}}],
+    [{s:{kind:'lp',id:'lp:Ob:*'},t:{id:'@C'}}],
+    [{s:{kind:'lp',id:'lp:Oa:*'},t:{id:'Hp'}},{s:{kind:'bond',id:bkey('Ob','Hp')},t:{id:'Ob'}}]][step];
+}
+function resolveArrows(m,arrs){ const c=MC[m], Ca=c.C.id+'.'+c.C.C;
+  return (arrs||[]).map(a=>{ const s={...a.s}, t={...a.t};
+    if(s.id==='@CO') s.id=bkey('Ob',Ca); if(s.id==='@COw') s.id=bkey('Ow',Ca); if(t.id==='@C') t.id=Ca; return {...a,s,t}; }); }
+
+/* ---------- Bühne (Haworth + 3D auf Knopfdruck) ---------- */
+function Stage(host){
+  host.innerHTML=`<div class="stbar"><span class="stlab">Haworth-Projektion</span><span class="sp"></span>
+      <button class="btn small" type="button" data-replay hidden>↻ Animation</button>
+      <button class="btn small" type="button" data-num aria-pressed="true">C-Nummern</button>
+      <button class="btn small" type="button" data-3d aria-pressed="false">3D-Modell</button></div>
+    <div class="stbody"><div class="hw"><svg preserveAspectRatio="xMidYMid meet" role="img" aria-label="Haworth-Projektion"></svg><div class="modehint" aria-live="polite"></div></div>
+      <div class="d3" hidden><canvas aria-label="Kugel-Stab-Modell"></canvas><div class="d3tools"><button class="btn small" type="button" data-rs>Blick ↺</button></div><div class="d3hint">Ziehen: drehen · zwei Finger: zoomen</div></div></div>`;
+  const svg=$('svg',host), V=makeV3($('canvas',host),$('[data-rs]',host)), d3box=$('.d3',host), hint=$('.modehint',host), b3=$('[data-3d]',host);
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MECH=d3mech('suc',[0,1,2,3,4]), FLIP=d3mech('suc',['pre',4,0]);
+  let frame=null, anim=null, d3t={seq:MECH,t:0}, onPick=null, mode=null, overlay={}, token=0, want3d=false;
+  const S={num:true};
+  function cur3(){ if(!frame||frame.m!=='suc') return; const m=d3t.seq.at(d3t.t); if(m.fit) V.setFit(m.fit[0],m.fit[1]*0.8); V.set(m); }
+  function draw(){ const F=frame; if(!F) return; svg.setAttribute('viewBox',F.vb); const vb=F.vb.split(' ').map(Number); svg.style.aspectRatio=vb[2]+'/'+vb[3];
+    svg.innerHTML=renderFrame(F,PAL,{mid:'r',ud:false,num:S.num})+overlaySVG(F,overlay,PAL,'s');
+    if(!d3box.hidden) cur3(); }
+  function frameOf(c){ const m=c.m||'suc'; vbOf(m); if(c.flip!=null) return flipFrame(c.flip); return mFrame(m,c.k,c); }
+  function show3d(){ const can=(frame&&frame.m==='suc'); b3.hidden=!can; const on=can&&want3d; d3box.hidden=!on; b3.setAttribute('aria-pressed',on); if(on){ V.resize(); cur3(); } }
+  S.set=(c,ov={})=>{ token++; cancelAnimationFrame(anim); frame=frameOf(c); overlay=ov; d3t=c.flip!=null?{seq:FLIP,t:c.flip}:{seq:MECH,t:c.k??0}; show3d(); draw(); };
+  S.overlay=ov=>{ overlay=ov; draw(); };
+  S.frame=()=>frame;
+  S.busy=()=>!!S._busy;
+  const wait=ms=>new Promise(r=>setTimeout(r,reduce?0:ms));
+  /* Übergang: Pfeile kurz zeigen, dann langsame Bewegung */
+  S.play=(a,b,o={})=>new Promise(res=>{
+    const my=++token; cancelAnimationFrame(anim); const FA=frameOf(a), FB=frameOf(b), ov0=o.overlay||{};
+    const seq=o.seq||MECH, t0=o.t0??(a.k??0), t1=o.t1??(b.k??0), hold=o.hold??900, dur=reduce?1:(o.dur||3600);
+    const done=()=>{ S._busy=false; res(); };
+    S._busy=true;
+    const run=async()=>{ frame=FA; overlay=ov0; draw(); await wait(hold); if(my!==token) return done();
+      const start=performance.now();
+      const step=now=>{ if(my!==token) return done(); const u=clamp((now-start)/dur,0,1);
+        frame=o.trans? o.trans(ss(u)) : mix(FA,FB,ss(u)); frame.m=FA.m;
+        const fa=1-ss(u/0.3);
+        overlay={arrows:(ov0.arrows||[]).map(x=>({...x,op:fa})), charges:(ov0.charges||[]).map(c=>({...c,op:fa})), lps:ov0.lps};
+        if(FA.m==='suc') d3t={seq, t:lerp(t0,t1,ss(u))}; draw();
+        if(u<1) anim=requestAnimationFrame(step); else { frame=FB; overlay=o.end||{}; d3t={seq, t:t1}; draw(); done(); } };
+      anim=requestAnimationFrame(step); };
+    if(!d3box.hidden) V.align(run); else run();
+  });
+  S.flipDemo=async()=>{ const a={flip:0}, b={flip:1}; S.set(a); const my=token;
+    await S.play(a,b,{trans:f=>flipFrame(f),seq:FLIP,t0:0,t1:1,dur:4200,hold:700}); if(token!==my+1) return;
+    await S.play(b,{k:0,acid:false},{seq:FLIP,t0:1,t1:2,dur:1800,hold:500}); };
+  S.listen=(kinds,cb,o={})=>{ mode={kinds:new Set(kinds),lpIds:o.lpIds}; onPick=cb; svg.classList.add('pick'); hint.textContent=o.hint||''; };
+  S.stop=()=>{ mode=null; onPick=null; svg.classList.remove('pick'); hint.textContent=''; };
+  svg.addEventListener('click',e=>{ if(!mode||!onPick||S._busy) return; const pt=svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+    const m=svg.getScreenCTM(); if(!m) return; const p=pt.matrixTransform(m.inverse()); onPick(hitTest(frame,p,mode.kinds,mode.lpIds)); });
+  b3.onclick=()=>{ want3d=!want3d; show3d(); };
+  const bn=$('[data-num]',host); bn.onclick=()=>{ S.num=!S.num; SET.num=S.num; bn.setAttribute('aria-pressed',S.num); draw(); if(!d3box.hidden) cur3(); };
+  const rp=$('[data-replay]',host); S.setReplay=fn=>{ rp.hidden=!fn; rp.onclick=fn||null; };
+  S.redraw=draw;
+  return S;
+}
+/* statisches Bild eines Zustands (für Vorlagen und Musterlösungen) */
+function mechSVG(m,k,o,pal,ov={}){ const F=mFrame(m,k,{...o,names:false}); if(o.noCharge) F.charges=[]; F.caps=[]; F.hi=[];
+  return {svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${F.vb}" font-family="${pal.font}">${renderFrame(F,pal,{mid:'p'+m+k,ud:false,num:true})}${overlaySVG(F,ov,pal,'p'+m+k)}</svg>`, vb:F.vb}; }
+
+/* ================= Glossar (eigene Seite, mit Grafiken) ================= */
+const gS={ ink:'style="fill:var(--ink)"', mu:'style="fill:var(--muted)"', re:'style="fill:var(--react)"', dn:'style="fill:var(--down)"' };
+const gT=(x,y,t,o={})=>`<text x="${x}" y="${y}" text-anchor="${o.a||'middle'}" dominant-baseline="central" font-size="${o.s||18}" font-weight="${o.w||400}" ${gS[o.c||'ink']}>${t}</text>`;
+const gL=(x1,y1,x2,y2,c='ink',w=2.2,dash='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--${c==='ink'?'ink':c==='mu'?'muted':c==='re'?'react':'down'});stroke-width:${w}${dash?';stroke-dasharray:'+dash:''}" stroke-linecap="round"/>`;
+const gDots=(x,y,ang)=>{ const a=ang*Math.PI/180, nx=-Math.sin(a), ny=Math.cos(a); return [-1,1].map(k=>`<circle cx="${(x+nx*4*k).toFixed(1)}" cy="${(y+ny*4*k).toFixed(1)}" r="2.4" ${gS.ink}/>`).join(''); };
+const gLp=(x,y,dir,r=17)=>{ const a=dir*Math.PI/180, cx=x+Math.cos(a)*r, cy=y+Math.sin(a)*r, nx=-Math.sin(a), ny=Math.cos(a); return `<line x1="${(cx-nx*6).toFixed(1)}" y1="${(cy-ny*6).toFixed(1)}" x2="${(cx+nx*6).toFixed(1)}" y2="${(cy+ny*6).toFixed(1)}" style="stroke:var(--ink);stroke-width:2.2" stroke-linecap="round"/>`; };
+const gPlus=(x,y,s='+',c='re')=>`<circle cx="${x}" cy="${y}" r="8" style="fill:var(--panel);stroke:var(--${c==='re'?'react':'down'});stroke-width:1.6"/><path d="M${x-4.2},${y}H${x+4.2}${s==='+'?`M${x},${y-4.2}V${y+4.2}`:''}" style="stroke:var(--${c==='re'?'react':'down'});stroke-width:1.8"/>`;
+const gArc=(x1,y1,cx,cy,x2,y2,c='re')=>`<path d="M${x1},${y1} Q${cx},${cy} ${x2},${y2}" fill="none" style="stroke:var(--${c==='re'?'react':'down'});stroke-width:2.4" marker-end="url(#gm-${c})"/>`;
+const gArr=(x1,y,x2,c='mu')=>`<path d="M${x1},${y}H${x2}" style="stroke:var(--${c==='mu'?'muted':'react'});stroke-width:2" marker-end="url(#gm-mu)"/>`;
+const gDefs=`<defs><marker id="gm-re" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--react)"/></marker><marker id="gm-dn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--down)"/></marker><marker id="gm-mu" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker></defs>`;
+const gSvg=(vb,inner,lab)=>`<svg viewBox="${vb}" role="img" aria-label="${esc(lab||'')}" font-family="var(--font)">${gDefs}${inner}</svg>`;
+/* Zuckerfiguren mit dem Haworth-Renderer */
+function gSugar(F,o={}){ return `<svg viewBox="${F.vb}" role="img" aria-label="${esc(o.lab||'')}" font-family="var(--font)">${renderFrame(F,PAL,{mid:'g'+(o.mid||''),ud:false,num:o.num??true})}${o.extra||''}</svg>`; }
+const GFIG={
+  haworth:()=>{ const F=newFrame('80 70 460 300'); addRing(F,'R',SUG.glcB,pose(300,222),{tint:'A'});
+    const ex=gL(150,345,250,345,'dn',1.6)+gT(140,345,'vorne (dicke Kante)',{a:'end',s:14,c:'dn'})+gL(300,108,300,125,'dn',1.6)+gT(300,95,'hinten: Ring-Sauerstoffatom',{s:14,c:'dn'});
+    F.caps.push({x:300,y:362,t:'dicke Kante: vorne · Ring-Sauerstoffatom: hinten',size:15}); F.vb='80 70 460 310';
+    return gSugar(F,{lab:'Haworth-Projektion von β-D-Glucose',mid:'h'}); },
+  anomer:()=>{ const F=newFrame('105 85 390 290'); addRing(F,'R',SUG.glcA,pose(300,222),{tint:'A'}); F.hi=['R.C1','R.O','R.C1.d'];
+    F.caps.push({x:300,y:370,t:'α-D-Glucose: anomeres Kohlenstoffatom C1',size:15}); return gSugar(F,{lab:'Anomeres Kohlenstoffatom',mid:'a'}); },
+  glyc:()=>{ vbOf('suc'); const F=mFrame('suc',0,{bare:true}); F.hi=['Ob','G.C1','F.C2']; const v=F.vb.split(' ').map(Number); F.vb=`${v[0]} ${v[1]} ${v[2]} ${v[3]-150}`; return gSugar(F,{lab:'Glycosidische Bindung in Saccharose',mid:'gb',num:true}); },
+  ep:()=>gSvg('0 0 300 150',gT(150,62,'O',{s:24})+gL(138,72,104,100)+gL(162,72,196,100)+gT(94,108,'H',{s:22})+gT(206,108,'H',{s:22})+gLp(150,62,-125)+gLp(150,62,-55)
+    +gT(150,14,'freie Elektronenpaare',{s:14,c:'re'})+gL(118,24,132,36,'re',1.4)+gL(182,24,168,36,'re',1.4)+gT(150,138,'bindende Elektronenpaare',{s:14,c:'dn'}),'Wassermolekül mit freien Elektronenpaaren'),
+  pfeil:()=>gSvg('0 0 340 150',gT(40,70,'O',{s:22})+gLp(40,70,0,17)+gArc(60,62,90,30,118,62)+gT(132,70,'H⁺',{s:20})+gT(85,128,'neue Bindung entsteht',{s:14,c:'mu'})
+    +gT(205,70,'C',{s:22})+gL(217,70,263,70)+gT(275,70,'O',{s:22})+gArc(238,62,250,30,272,52)+gT(240,128,'Bindung bricht',{s:14,c:'mu'}),'Elektronenpaarpfeile'),
+  prot:()=>gSvg('0 0 380 150',gT(22,60,'R',{s:20})+gL(32,60,58,60)+gT(70,60,'O',{s:22})+gL(82,60,108,60)+gT(120,60,'R′',{s:20})+gLp(70,60,-90,16)+gLp(70,60,90,16)
+    +gT(70,110,'+ H₃O⁺',{s:18})+gArr(150,70,200)+gT(175,52,'Protonierung',{s:12,c:'mu'})
+    +gT(222,60,'R',{s:20})+gL(232,60,258,60)+gT(270,60,'O',{s:22})+gL(282,60,308,60)+gT(320,60,'R′',{s:20})+gLp(270,60,-90,16)+gL(270,72,270,96)+gT(270,108,'H',{s:20})+gPlus(254,78)+gT(345,110,'+ H₂O',{s:18}),'Protonierung eines Ethers'),
+  ladung:()=>gSvg('0 0 390 170',
+    gT(62,58,'O',{s:22})+gL(50,66,28,84)+gL(74,66,96,84)+gT(22,92,'H',{s:18})+gT(102,92,'H',{s:18})+gLp(62,58,-125)+gLp(62,58,-55)+gT(62,128,'2 Bindungen,',{s:12,c:'mu'})+gT(62,144,'2 freie EP: neutral',{s:12,c:'mu'})
+    +gT(195,58,'O',{s:22})+gL(183,66,161,84)+gL(207,66,229,84)+gL(195,46,195,26)+gT(155,92,'H',{s:18})+gT(235,92,'H',{s:18})+gT(195,16,'H',{s:18})+gLp(195,58,90,16)+gPlus(215,44)+gT(195,128,'3 Bindungen,',{s:12,c:'mu'})+gT(195,144,'1 freies EP: positiv',{s:12,c:'mu'})
+    +gT(325,58,'C',{s:22})+gL(313,64,289,80)+gL(337,64,361,80)+gL(325,46,325,24)+gPlus(347,44)+gT(325,128,'3 Bindungen,',{s:12,c:'mu'})+gT(325,144,'kein freies EP: positiv',{s:12,c:'mu'}),'Ladung an O- und Kohlenstoffatomen'),
+  hetero:()=>gSvg('0 0 360 140',gT(40,60,'A',{s:22})+gL(54,60,96,60)+gT(110,60,'B',{s:22})+gArc(72,52,92,22,108,46)+gArr(140,60,190)
+    +gT(215,60,'A',{s:22})+gPlus(232,46)+gT(262,60,'+',{s:20,c:'mu'})+gT(300,60,'B',{s:22})+gLp(300,60,0,16)+gPlus(318,42,'-','dn')
+    +gT(180,108,'Das bindende Elektronenpaar bleibt bei B.',{s:13,c:'mu'})+gT(180,126,'Es entstehen Ionen.',{s:13,c:'mu'}),'Heterolytische Spaltung'),
+  carbokation:()=>{ const cat=(x,l,r,u,lab)=>gT(x,62,'C',{s:20})+gL(x-11,62,x-30,62)+gL(x+11,62,x+30,62)+gL(x,50,x,32)+gT(x-40,62,l,{s:16})+gT(x+40,62,r,{s:16})+gT(x,22,u,{s:16})+gPlus(x+16,46)+gT(x,98,lab,{s:13,c:'mu'});
+    return gSvg('0 0 400 150',cat(62,'H','R','H','primär')+gT(132,62,'<',{s:18,c:'mu'})+cat(200,'R','R','H','sekundär')+gT(270,62,'<',{s:18,c:'mu'})+cat(338,'R','R','R','tertiär')
+      +gT(200,132,'Stabilität nimmt mit der Zahl der Alkylreste (R) zu.',{s:13,c:'mu'}),'Stabilität von Carbokationen'); },
+  nucel:()=>gSvg('0 0 320 140',gT(70,60,'H₂O',{s:22})+gLp(84,60,0,15)+gArc(102,52,150,20,198,52)+gT(216,60,'C',{s:22})+gPlus(234,44)+gL(204,68,190,86,'ink',2)+gL(228,68,242,86,'ink',2)+gL(216,48,216,30,'ink',2)
+    +gT(70,108,'Nucleophil',{s:15,w:700,c:'dn'})+gT(70,126,'gibt Elektronenpaar',{s:12,c:'mu'})+gT(216,108,'Elektrophil',{s:15,w:700,c:'re'})+gT(216,126,'nimmt Elektronenpaar auf',{s:12,c:'mu'}),'Nucleophil und Elektrophil'),
+  abgang:()=>gSvg('0 0 400 150',gT(20,60,'R',{s:20})+gL(30,60,56,60)+gT(68,60,'O',{s:22})+gL(80,60,106,60)+gT(118,60,'R′',{s:20})+gL(68,72,68,94)+gT(68,106,'H',{s:18})+gPlus(86,44)+gArc(42,54,50,26,62,46)
+    +gArr(150,60,196)+gT(222,60,'R',{s:20})+gPlus(237,44)+gT(258,60,'+',{s:20,c:'mu'})+gT(284,60,'H',{s:18})+gL(292,60,310,60)+gT(322,60,'O',{s:22})+gL(334,60,352,60)+gT(364,60,'R′',{s:18})
+    +`<path d="M276,82 V90 H378 V82" fill="none" style="stroke:var(--down);stroke-width:1.6"/>`+gT(327,110,'Abgangsgruppe:',{s:13,c:'dn'})+gT(327,128,'neutrales Molekül',{s:13,c:'dn'}),'Abgangsgruppe'),
+  kat:()=>gSvg('0 0 340 190',gL(30,170,320,170,'mu',1.5)+gL(30,170,30,14,'mu',1.5)+gT(18,90,'Energie',{s:12,c:'mu'}).replace('<text','<text transform="rotate(-90 18 90)"')
+    +`<path d="M40,120 H80 C120,120 130,30 170,30 C210,30 220,140 260,140 H310" fill="none" style="stroke:var(--muted);stroke-width:2;stroke-dasharray:6 5"/>`
+    +`<path d="M40,120 H80 C100,120 105,78 125,78 C140,78 145,100 160,100 C175,100 180,72 200,72 C220,72 225,140 260,140 H310" fill="none" style="stroke:var(--react);stroke-width:2.6"/>`
+    +gL(196,16,218,16,'mu',2,'6 5')+gT(224,16,'ohne Katalysator',{s:12,c:'mu',a:'start'})+gL(196,34,218,34,'re',2.6)+gT(224,34,'mit Katalysator',{s:12,c:'re',a:'start'})+gT(58,108,'Edukte',{s:12,c:'mu'})+gT(290,128,'Produkte',{s:12,c:'mu'}),'Energiediagramm mit und ohne Katalysator'),
+  hydro:()=>gSvg('0 0 380 140',gT(70,40,'A–O–B + H₂O',{s:18})+gT(300,40,'A–OH + HO–B',{s:18})+gArr(150,32,226)+`<path d="M226,52 H150" style="stroke:var(--muted);stroke-width:2" marker-end="url(#gm-mu)"/>`
+    +gT(188,18,'Hydrolyse',{s:13,c:'re'})+gT(188,70,'Kondensation',{s:13,c:'dn'})+gT(190,112,'Bei Saccharose: A = Glucose-, B = Fructose-Baustein',{s:13,c:'mu'}),'Hydrolyse und Kondensation'),
+  mesomerie:()=>gSvg('0 0 340 130',gT(50,60,'C',{s:22})+gPlus(66,44)+gL(62,60,98,60)+gT(110,60,'O',{s:22})+gLp(110,60,-90,16)+gLp(110,60,90,16)+gArc(110,82,100,104,82,68)
+    +`<path d="M150,60 H190" style="stroke:var(--muted);stroke-width:2" marker-end="url(#gm-mu)" marker-start="url(#gm-mu)"/>`
+    +gT(230,60,'C',{s:22})+gL(242,56,278,56)+gL(242,64,278,64)+gT(290,60,'O',{s:22})+gLp(290,60,-90,16)+gPlus(308,44)+gT(170,112,'zwei Grenzformeln desselben Teilchens',{s:13,c:'mu'}),'Mesomere Grenzformeln'),
+  bronsted:()=>gSvg('0 0 380 120',gT(45,50,'HCl',{s:20})+gT(90,50,'+',{s:18,c:'mu'})+gT(140,50,'H₂O',{s:20})+gArr(178,50,218)+gT(258,50,'Cl⁻',{s:20})+gT(292,50,'+',{s:18,c:'mu'})+gT(336,50,'H₃O⁺',{s:20})
+    +gT(45,86,'Säure',{s:13,c:'re'})+gT(45,104,'H⁺-Donator',{s:11,c:'mu'})+gT(140,86,'Base',{s:13,c:'dn'})+gT(140,104,'H⁺-Akzeptor',{s:11,c:'mu'}),'Säure und Base'),
+  iEff:()=>gSvg('-20 0 340 130',gT(150,62,'C',{s:22})+gPlus(168,46)+[[-1,0],[1,0],[0,-1]].map(([dx,dy])=>{ const x2=150+dx*62, y2=62+dy*48; return gL(150+dx*12,62+dy*12,x2-dx*12,y2-dy*12)+gT(x2+dx*8,y2+dy*6,'CH₃',{s:16})+`<path d="M${150+dx*46},${62+dy*36-(dy?0:10)} L${150+dx*24},${62+dy*20-(dy?0:10)}" style="stroke:var(--down);stroke-width:2" marker-end="url(#gm-dn)"/>`; }).join('')
+    +gT(150,116,'Alkylreste schieben Elektronendichte zum positiv geladenen Kohlenstoffatom.',{s:12,c:'mu'}),'+I-Effekt')
+};
+/* id, Titel, Suchmuster, Definition, Zusatz (hier im Lernpfad), Grafik */
 const GL=[
- ['disaccharid','Disaccharid (Zweifachzucker)','Disaccharid[a-zäöüß]*|Zweifachzucker[a-zäöüß]*','Kohlenhydrat aus zwei Monosaccharid-Bausteinen, die über eine glycosidische Bindung verknüpft sind. Disaccharide aus zwei Hexosen haben die Summenformel C₁₂H₂₂O₁₁.','Saccharose (Glucose + Fructose), Maltose (Glucose + Glucose).'],
- ['monosaccharid','Monosaccharid (Einfachzucker)','Monosaccharid[a-zäöüß]*|Einfachzucker[a-zäöüß]*','Kohlenhydrat, das sich nicht in kleinere Zuckerbausteine hydrolysieren lässt: ein Polyhydroxyaldehyd (Aldose) oder Polyhydroxyketon (Ketose).','Glucose und Fructose, beide C₆H₁₂O₆.'],
- ['ketose','Ketose, Ketohexose','Ketohexose[n]?|Ketose[n]?','Monosaccharid mit einer Ketogruppe (C=O innerhalb der Kohlenstoffkette); eine Ketohexose hat sechs C-Atome. Gegenstück: Aldose mit Aldehydgruppe am C1-Atom.','Fructose: Carbonylgruppe am C2-Atom. Glucose ist eine Aldohexose.'],
- ['fischer','Fischer-Projektion','Fischer-Projektion(?:en)?','Darstellung der offenkettigen Form: Die C-Kette steht senkrecht, das C1-Atom oben. Waagrechte Bindungen zeigen zum Betrachter, senkrechte vom Betrachter weg.','D-Glucose: Hydroxygruppe am C5-Atom rechts.'],
- ['haworth','Haworth-Projektion','Haworth-Projektion(?:en)?','Darstellung der Ringform: Der Ring liegt waagrecht, die vordere Kante ist dick gezeichnet, das Ring-O-Atom liegt hinten. Die Substituenten zeigen senkrecht nach oben oder unten.','Fischer-Projektion rechts → Haworth-Projektion unten.'],
- ['dl','D- und L-Zucker','[DL]-Zucker[a-zäöüß]*','Einteilung nach der Stellung der Hydroxygruppe am Chiralitätszentrum mit der höchsten Nummer (bei Hexosen C5) in der Fischer-Projektion: rechts = D, links = L.','In der Natur kommen fast nur D-Zucker vor, z. B. D-Glucose und D-Fructose.'],
- ['chiral','Chiralitätszentrum','Chiralitätszentr(?:um|en)','C-Atom mit vier verschiedenen Substituenten. Es gibt zwei spiegelbildliche Anordnungen (Konfigurationen).','C2 bis C5 in offenkettiger Glucose; in der Ringform zusätzlich das anomere C-Atom.'],
- ['konfig','Konfiguration','Konfiguration(?:en)?','Räumliche Anordnung der Substituenten an einem Chiralitätszentrum. Sie ändert sich nur, wenn Bindungen gelöst und neu geknüpft werden – nicht beim Drehen, Wenden oder Kippen einer Darstellung.','α- und β-Glucose unterscheiden sich nur in der Konfiguration am C1-Atom.'],
- ['ringform','Furanose, Pyranose','Furanose|Pyranose','Ringformen der Monosaccharide: Furanose = Fünfring aus vier C-Atomen und einem O-Atom, Pyranose = Sechsring aus fünf C-Atomen und einem O-Atom.','β-D-Fructofuranose, α-D-Glucopyranose.'],
- ['anomer','Anomer, anomeres C-Atom','[αβ]-Anomer[a-z]*|Anomer[a-z]*|anomere[nmrs]?','Beim Ringschluss wird das Carbonyl-C-Atom zu einem neuen Chiralitätszentrum, dem anomeren C-Atom. Die beiden Ringformen, die sich nur dort unterscheiden, heißen Anomere: α (Hydroxygruppe auf der Gegenseite der CH₂OH-Gruppe am C5-Atom) und β (auf derselben Seite).','Anomeres C-Atom der Glucose: C1; der Fructose: C2.'],
- ['mutarotation','Mutarotation','Mutarotation','Änderung des Drehwinkels einer frisch hergestellten Zuckerlösung, weil sich α- und β-Anomer über die offenkettige Form ineinander umwandeln, bis sich ein Gleichgewicht eingestellt hat.','Glucose: von +112° (α) bzw. +18,7° (β) zu +52,7°.'],
- ['carbonyl','Carbonylgruppe','Carbonylgruppe[n]?|Carbonyl-C-Atom[s]?','Funktionelle Gruppe C=O: in Aldehyden am Kettenende (Aldehydgruppe), in Ketonen innerhalb der Kette (Ketogruppe). Das C-Atom ist positiv polarisiert (δ+).','Glucose: Aldehydgruppe am C1-Atom; Fructose: Ketogruppe am C2-Atom.'],
- ['hydroxy','Hydroxygruppe','Hydroxygruppe[n]?','Funktionelle Gruppe –OH, gebunden an ein C-Atom.','Offenkettige Glucose besitzt fünf Hydroxygruppen.'],
- ['alkoxy','Alkoxygruppe','Alkoxygruppe[n]?','Gruppe –OR: Das O-Atom ist zusätzlich an ein weiteres C-Atom (Rest R) gebunden.','Das Ring-O-Atom am anomeren C-Atom; das verbrückende O-Atom in Saccharose.'],
- ['halbacetal','Halbacetal','Halbacetal[a-zäöüß]*|halbacetalisch[a-z]*','C-Atom, das eine Hydroxygruppe und eine Alkoxygruppe trägt. Entsteht durch nucleophile Addition eines Alkohols an eine Carbonylgruppe, bei Monosacchariden intramolekular beim Ringschluss.','C1-Atom von α-D-Glucopyranose.'],
- ['acetal','Acetal (Vollacetal)','(?:Voll)?[Aa]cetal[a-zäöüß]*','C-Atom, das zwei Alkoxygruppen trägt. Entsteht säurekatalysiert aus einem Halbacetal und einem Alkohol unter Abspaltung von Wasser. Acetale sind in neutraler und alkalischer Lösung beständig und werden in saurer Lösung hydrolysiert.','Ein C-Atom mit zwei O–C-Bindungen und ohne Hydroxygruppe, z. B. R–CH(OR′)–OR″.'],
- ['glycosid','glycosidische Bindung','glycosidische[nmrs]? Bindung(?:en)?|[Gg]lycosid[a-zäöüß]*','Bindung vom anomeren C-Atom über ein O-Atom zu einem C-Atom eines zweiten Moleküls; Teil eines Acetals. Benannt nach der Stellung am anomeren C-Atom (α/β) und den verknüpften C-Atomen.','Maltose: α(1→4)-glycosidische Bindung.'],
- ['kondensation','Kondensation','Kondensation[a-zäöüß]*','Reaktion, bei der zwei Moleküle unter Abspaltung eines kleinen Moleküls, hier Wasser, verknüpft werden.','Glucose + Fructose → Saccharose + H₂O.'],
- ['hydrolyse','Hydrolyse','Hydrolyse[n]?|hydrolysiert[a-z]*','Spaltung einer Bindung durch Reaktion mit Wasser; Umkehrung der Kondensation.','Saccharose + H₂O → Glucose + Fructose.'],
- ['katalysator','Katalysator, Säurekatalyse','Katalysator(?:en)?|[Ss]äurekatalys[a-zäöüß]*','Ein Katalysator beschleunigt eine Reaktion, indem er die Aktivierungsenergie senkt; er wird nicht verbraucht und verändert die Lage des Gleichgewichts nicht. Bei der Säurekatalyse wirken Oxonium-Ionen als Katalysator.','H₃O⁺ bei der Hydrolyse von Saccharose.'],
- ['oxonium','Oxonium-Ion','Oxonium-Ion(?:en)?','H₃O⁺; entsteht in wässriger Lösung durch Protolyse einer Säure und kann ein Proton abgeben.','HCl + H₂O → H₃O⁺ + Cl⁻'],
- ['deprot','Deprotonierung','[Dd]eprotonier[a-zäöüß]*','Abgabe eines Protons (H⁺); Umkehrung der Protonierung.','Ein Wassermolekül nimmt ein Proton auf, es entsteht H₃O⁺.'],
- ['prot','Protonierung','[Pp]rotonier[a-zäöüß]*','Aufnahme eines Protons (H⁺) durch ein Teilchen mit freiem Elektronenpaar; das Teilchen wird dabei positiv geladen.','H₂O + H⁺ → H₃O⁺'],
- ['abgang','Abgangsgruppe','Abgangsgruppe[n]?','Atom oder Atomgruppe, die bei einer Bindungsspaltung mit dem bindenden Elektronenpaar abgeht. Gute Abgangsgruppen sind stabile, energiearme Teilchen wie H₂O oder Alkohol-Moleküle; OH⁻ und Alkoholat-Ionen sind schlechte Abgangsgruppen.','Durch Protonierung wird aus –OH die Abgangsgruppe H₂O.'],
- ['hetero','heterolytische Spaltung','heterolytisch[a-zäöüß]*','Bindungsspaltung, bei der das bindende Elektronenpaar vollständig bei einem der beiden Atome verbleibt; es entstehen Ionen.','H–Cl → H⁺ + Cl⁻'],
- ['carbokation','Carbokation','Carbokation(?:en|s)?','Teilchen mit einem positiv geladenen C-Atom, das nur drei Bindungspartner hat. Es ist trigonal-planar gebaut und elektrophil. Es ist umso stabiler, je mehr Nachbaratome die Ladung ausgleichen.','(CH₃)₃C⁺ (tertiäres Carbokation).'],
- ['mesomerie','Mesomerie','[Mm]esomerie[a-zäöüß]*','Beschreibung eines Teilchens durch mehrere Grenzformeln, die sich nur in der Verteilung von Elektronenpaaren unterscheiden. Die tatsächliche Elektronenverteilung liegt dazwischen; die Ladung ist verteilt, das Teilchen ist stabilisiert.','Carbonat-Ion CO₃²⁻ mit drei Grenzformeln.'],
- ['nucleophil','Nucleophil, nucleophiler Angriff','[Nn]ucleophile[nmrs]? Angriff[a-z]*|[Nn]ucleophil[a-z]*','Nucleophil: Teilchen mit freiem Elektronenpaar, das damit eine Bindung zu einem positiv polarisierten oder positiv geladenen Atom ausbildet. Diese Bindungsbildung heißt nucleophiler Angriff.','Wassermolekül, Hydroxygruppe eines Alkohols.'],
- ['elektrophil','Elektrophil','[Ee]lektrophil[a-z]*','Teilchen oder Atom mit Elektronenmangel (positiv polarisiert oder geladen), das ein Elektronenpaar aufnehmen kann.','Carbonyl-C-Atom (δ+), H⁺.'],
- ['lp','freies Elektronenpaar','freie[ns]? Elektronenpaar(?:e|en)?','Elektronenpaar eines Atoms, das nicht an einer Bindung beteiligt ist; in Strukturformeln als Strich oder zwei Punkte am Atom gezeichnet.','Das O-Atom im Wassermolekül hat zwei freie Elektronenpaare.'],
- ['ev','Elektronenpaarverschiebung','Elektronenpaarverschiebung(?:en)?','Im Reaktionsmechanismus durch einen gebogenen Pfeil dargestellt. Der Pfeil beginnt am Elektronenpaar (freies Elektronenpaar oder Bindung) und zeigt dorthin, wo das Elektronenpaar hingeht.','Pfeil vom freien Elektronenpaar eines O-Atoms zu einem Proton.'],
- ['reduz','reduzierende Wirkung','reduzierende[nr]? Wirkung|reduzierend[a-z]*','Ein Zucker wirkt reduzierend, wenn er in alkalischer Lösung eine Aldehydgruppe bilden kann, die z. B. Ag⁺ (Tollens-Probe) oder Cu²⁺ (Benedict-Probe) reduziert. Bei Ringformen muss sich dazu der Ring öffnen können.','Silberspiegel bei der Tollens-Probe mit Glucose.'],
- ['invert','Invertzucker','Invertzucker[a-zäöüß]*','Gemisch aus gleichen Teilen Glucose und Fructose aus der Hydrolyse von Saccharose. Der Name kommt von der Umkehr des Drehwinkels (Inversion) von +66,5° zu etwa −20°.','Invertzuckercreme.'],
- ['lage','Wenden, Kippen, Drehen','[Ww]enden|gewendet[a-z]*|[Kk]ippen|gekippt[a-z]*','Lageänderungen eines Rings um 180°: Wenden (Achse in Blickrichtung) und Kippen (waagrechte Achse) vertauschen oben und unten; Drehen (senkrechte Achse) nicht. Die Konfiguration bleibt immer erhalten.','Der zweite Ring in Cellobiose ist gekippt gezeichnet.']
+ ['abgang','Abgangsgruppe','Abgangsgruppe[n]?','Atom oder Atomgruppe, die bei einer Reaktion zusammen mit dem bindenden Elektronenpaar vom Molekül abgespalten wird. Gute Abgangsgruppen sind stabile, neutrale Moleküle wie Wasser oder ein Alkohol. Starke Basen wie Hydroxid- oder Alkoholat-Ionen sind schlechte Abgangsgruppen.','Hier: Nach der Protonierung wird der Glucose-Baustein als neutrales Molekül abgespalten.','abgang'],
+ ['anomer','Anomeres Kohlenstoffatom','anomere[nmrs]? Kohlenstoffatom[s]?|Anomer(?:e|en)?','Das Kohlenstoffatom, das beim Ringschluss aus dem Kohlenstoffatom der Carbonylgruppe entsteht. Es ist als einziges Kohlenstoffatom an zwei Sauerstoffatome gebunden: an das Ring-Sauerstoffatom und an das Sauerstoffatom einer Hydroxygruppe bzw. einer glycosidischen Bindung. Die beiden möglichen Anordnungen heißen α- und β-Anomer.','Glucose: C1-Atom, Fructose: C2-Atom. In Saccharose sind beide anomeren Kohlenstoffatome über das verbrückende Sauerstoffatom verknüpft.','anomer'],
+ ['bronsted','Säure und Base (nach Brønsted)','Protonendonator|Protonenakzeptor|Base(?=[ .,)])','Eine Säure gibt Protonen (H⁺) ab (Protonendonator), eine Base nimmt Protonen auf (Protonenakzeptor). Eine Base braucht dazu ein freies Elektronenpaar.','Hier: H₃O⁺ ist Protonendonator; in Schritt 4 nimmt ein Wassermolekül als Base ein Proton auf.','bronsted'],
+ ['carbokation','Carbokation','Carbokation(?:en|s)?','Ion mit einem positiv geladenen Kohlenstoffatom, das nur drei Bindungspartner und damit nur ein Elektronensextett hat. Es ist trigonal-planar gebaut und reagiert als Elektrophil. Carbokationen sind umso stabiler, je mehr Alkylreste am positiv geladenen Kohlenstoffatom sitzen (tertiär > sekundär > primär); ein benachbartes Sauerstoffatom mit freiem Elektronenpaar stabilisiert zusätzlich.','Hier: Am C2-Atom des Fructose-Bausteins entsteht ein Carbokation.','carbokation'],
+ ['ep','Freies Elektronenpaar','freie[snm]? Elektronenpaar(?:e|en)?','Elektronenpaar der Valenzschale, das an keiner Bindung beteiligt ist. In Strukturformeln wird es als Strich am Atom gezeichnet. Ein neutrales Sauerstoffatom mit zwei Bindungen hat zwei freie Elektronenpaare.','Mit einem freien Elektronenpaar kann ein Atom ein Proton binden oder als Nucleophil reagieren.','ep'],
+ ['pfeil','Elektronenpaarpfeil','Elektronenpaarpfeil(?:e|en)?|Elektronenpaarverschiebung(?:en)?','Gebogener Pfeil in einem Reaktionsmechanismus. Er zeigt, wohin ein Elektronenpaar wandert. Er beginnt immer an einem freien Elektronenpaar oder an einer Bindung und endet dort, wo eine neue Bindung oder ein neues freies Elektronenpaar entsteht.','Ein Pfeil beginnt nie an einem Proton oder an einem positiv geladenen Atom.','pfeil'],
+ ['elektrophil','Elektrophil','Elektrophil(?:e|en)?|elektrophile[nmrs]?','Teilchen mit Elektronenmangel („elektronenliebend“), das ein Elektronenpaar aufnimmt und damit eine neue Bindung bildet, z. B. ein Carbokation oder ein Proton.','Hier: Das Carbokation am C2-Atom der Fructose.','nucel'],
+ ['glyc','Glycosidische Bindung','glycosidische[nmrs]? Bindung(?:en)?','Bindung zwischen dem anomeren Kohlenstoffatom eines Zuckerbausteins und einem Atom eines weiteren Moleküls, meist einem Sauerstoffatom. Sie entsteht durch Kondensation und wird durch Hydrolyse gespalten.','In Saccharose verbindet ein Sauerstoffatom das C1-Atom der Glucose mit dem C2-Atom der Fructose.','glyc'],
+ ['haworth','Haworth-Projektion','Haworth-Projektion(?:en)?','Darstellung der Ringform eines Zuckers: Der Ring liegt waagrecht und wird perspektivisch von schräg oben gesehen; die dick gezeichnete Kante zeigt zum Betrachter, das Ring-Sauerstoffatom liegt hinten. Die Substituenten stehen senkrecht oberhalb oder unterhalb der Ringebene.','Die Abbildung zeigt β-D-Glucose.','haworth'],
+ ['hetero','Heterolytische Spaltung','heterolytisch(?:e[nmrs]?)?(?: Spaltung| gespalten)?','Spaltung einer Atombindung, bei der das bindende Elektronenpaar vollständig bei einem der beiden Atome bleibt, meist beim elektronegativeren. Es entstehen Ionen. Bei der homolytischen Spaltung erhält dagegen jedes Atom ein Elektron, und es entstehen Radikale.','Hier: Das Elektronenpaar der Bindung zwischen dem verbrückenden Sauerstoffatom und dem C2-Atom bleibt beim Sauerstoffatom, am C2-Atom entsteht ein Carbokation.','hetero'],
+ ['hydro','Hydrolyse und Kondensation','Hydrolyse|hydrolysiert|Kondensation','Hydrolyse: Spaltung einer Bindung unter Aufnahme eines Wassermoleküls. Kondensation: Verknüpfung zweier Moleküle unter Abspaltung eines Wassermoleküls. Beide Reaktionen sind Umkehrungen voneinander.','Saccharose + Wasser → Glucose + Fructose ist eine Hydrolyse.','hydro'],
+ ['iEff','+I-Effekt (induktiver Effekt)','\\+I-Effekt','Alkylreste schieben Elektronendichte über die Bindungen zu einem benachbarten Atom. Dadurch wird eine positive Ladung an einem Kohlenstoffatom teilweise ausgeglichen, das Carbokation wird stabilisiert.','Je mehr Alkylreste am positiv geladenen Kohlenstoffatom sitzen, desto stärker ist die Stabilisierung.','iEff'],
+ ['kat','Katalysator','Katalysator(?:en|s)?','Stoff, der eine Reaktion beschleunigt, indem er einen anderen Reaktionsweg mit geringerer Aktivierungsenergie ermöglicht. Er nimmt an der Reaktion teil, wird aber am Ende zurückgebildet und taucht deshalb in der Gesamtgleichung nicht auf. Die Lage des Gleichgewichts ändert er nicht.','Hier: H₃O⁺ wird in Schritt 1 verbraucht und in Schritt 4 zurückgebildet.','kat'],
+ ['mech','Reaktionsmechanismus','Reaktionsmechanismus|Mechanismus|Mechanismen','Beschreibung einer Reaktion in Einzelschritten: welche Bindungen brechen und entstehen, wohin Elektronenpaare wandern und welche Zwischenstufen auftreten. Elektronenpaarpfeile und Ladungen machen jeden Schritt sichtbar.','Saure Hydrolyse von Saccharose: Protonierung → heterolytische Spaltung → nucleophiler Angriff → Deprotonierung.',null],
+ ['mesomerie','Mesomerie','Mesomerie|mesomere[nmrs]? Grenzformel(?:n)?','Lässt sich die Elektronenverteilung eines Teilchens nicht durch eine einzige Strukturformel beschreiben, zeichnet man mehrere Grenzformeln. Das tatsächliche Teilchen liegt „dazwischen“; die Ladung ist auf mehrere Atome verteilt, was das Teilchen stabilisiert.','Ein freies Elektronenpaar des Ring-Sauerstoffatoms stabilisiert das benachbarte Carbokation.','mesomerie'],
+ ['nucleophil','Nucleophil, nucleophiler Angriff','Nucleophil(?:e|en)?|nucleophile[nmrs]? Angriff[s]?|nucleophile[nmrs]?','Nucleophil („kernliebend“): Teilchen mit freiem Elektronenpaar, das damit eine neue Bindung zu einem positiv geladenen oder positiv polarisierten Atom bildet, z. B. H₂O, OH⁻ oder Cl⁻. Diesen Schritt nennt man nucleophilen Angriff.','Hier: Ein Wassermolekül greift das Carbokation am C2-Atom an.','nucel'],
+ ['oxonium','Oxonium-Ion','Oxonium-Ion(?:en|s)?','H₃O⁺: Ion aus einem Wassermolekül und einem Proton. Das Sauerstoffatom hat drei Bindungen und ein freies Elektronenpaar und ist deshalb positiv geladen. Oxonium-Ionen entstehen, wenn eine Säure wie HCl mit Wasser reagiert; sie bestimmen den sauren Charakter einer Lösung.','Auch ein Sauerstoffatom in einem organischen Molekül, das ein Proton aufgenommen hat (–OH₂⁺ oder R–OH⁺–R), ist ein Oxonium-Ion.','ladung'],
+ ['ladung','Ladung eines Atoms bestimmen','positive[n]? Ladung|Elektronensextett','Man vergleicht die Elektronen eines Atoms in der Strukturformel mit denen des neutralen Atoms: Jedes freie Elektronenpaar zählt mit 2, jede Bindung mit 1 Elektron. Ein Sauerstoffatom ist mit 2 Bindungen und 2 freien Elektronenpaaren neutral, mit 3 Bindungen und 1 freien Elektronenpaar positiv. Ein Kohlenstoffatom mit nur 3 Bindungen und ohne freies Elektronenpaar ist positiv.','Sauerstoffatom: 6 Valenzelektronen. Mit 3 Bindungen und 1 freien Elektronenpaar sind ihm 3 + 2 = 5 Elektronen zugeordnet → Ladung +1.','ladung'],
+ ['prot','Protonierung, Deprotonierung','Protonierung|Deprotonierung|protoniert(?:e[nmrs]?)?|deprotoniert(?:e[nmrs]?)?','Protonierung: Ein Teilchen nimmt ein Proton (H⁺) auf und bindet es mit einem freien Elektronenpaar. Deprotonierung: Ein Teilchen gibt ein Proton ab; das bindende Elektronenpaar bleibt zurück.','Hier: In Schritt 1 wird das verbrückende Sauerstoffatom protoniert, in Schritt 4 wird das Sauerstoffatom am C2-Atom deprotoniert.','prot']
 ];
 let GLRX=null;
-function linkify(root,self){
-  if(!GLRX) GLRX=new RegExp('(^|[^A-Za-zÄÖÜäöüß0-9])(?:'+GL.map(g=>'('+g[2]+')').join('|')+')','g');
+function linkify(root){
+  if(!GLRX) GLRX=new RegExp('(^|[^A-Za-zÄÖÜäöüß0-9+])(?:'+GL.map(g=>'('+g[2]+')').join('|')+')','g');
   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
-    let p=n.parentNode; while(p&&p!==root){ if(/^(A|BUTTON|SELECT|OPTION|LABEL|SCRIPT|STYLE|TEXT|svg|SVG|H1|H2|H3|DT)$/.test(p.nodeName)||p.classList&&['toc','no','plabel','hint','legend','ptools'].some(c=>p.classList.contains(c))) return NodeFilter.FILTER_REJECT; p=p.parentNode; }
-    return GLRX.test(n.nodeValue)?(GLRX.lastIndex=0,NodeFilter.FILTER_ACCEPT):NodeFilter.FILTER_REJECT; }});
+    let p=n.parentNode; while(p&&p!==root.parentNode){ if(/^(A|BUTTON|SELECT|OPTION|LABEL|SCRIPT|STYLE|TEXT|svg|SVG|H1|H2|H3|SUMMARY)$/.test(p.nodeName)||(p.classList&&['chead','nolink'].some(c=>p.classList.contains(c)))) return NodeFilter.FILTER_REJECT; p=p.parentNode; }
+    GLRX.lastIndex=0; return GLRX.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT; }});
   const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+  const self=root.dataset&&root.dataset.gl;
   nodes.forEach(n=>{ const t=n.nodeValue; let last=0, m; const frag=document.createDocumentFragment(); GLRX.lastIndex=0;
     while((m=GLRX.exec(t))){ const gi=m.slice(2).findIndex(x=>x!==undefined); const word=m[2+gi]; const start=m.index+m[1].length; const id=GL[gi][0];
-      if(id===self){ continue; }
+      if(id===self) continue;
       frag.appendChild(document.createTextNode(t.slice(last,start)));
       const a=document.createElement('a'); a.href='#gl-'+id; a.className='gl'; a.textContent=word; frag.appendChild(a); last=start+word.length; }
     if(last===0) return; frag.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(frag,n); });
 }
-function buildGlossar(el){
-  const sorted=[...GL].sort((a,b)=>a[1].localeCompare(b[1],'de'));
-  el.innerHTML=`<dl class="glossar">${sorted.map(g=>`<div class="gle" id="gl-${g[0]}"><dt>${g[1]}</dt><dd><span class="gdef">${g[3]}</span> <span class="gex"><b>Beispiel:</b> ${g[4]}</span></dd></div>`).join('')}</dl>`;
-  $$('.gle',el).forEach(e=>linkify(e,e.id.slice(3)));
+function buildGlossar(){
+  const el=$('#glist'); const sorted=[...GL].sort((a,b)=>a[1].replace(/^\+/,'').localeCompare(b[1].replace(/^\+/,''),'de'));
+  el.innerHTML=sorted.map(g=>`<article class="gle" id="gl-${g[0]}" data-gl="${g[0]}">${g[5]?`<div class="gfig">${GFIG[g[5]]()}</div>`:''}<div class="gtx"><h3>${g[1]}</h3><p>${g[3]}</p>${g[4]?`<p class="gex">${g[4]}</p>`:''}</div></article>`).join('');
+  $$('.gle',el).forEach(e=>linkify(e));
+  $('#gidx').innerHTML=sorted.map(g=>`<a href="#gl-${g[0]}" class="gi">${g[1]}</a>`).join('');
 }
 
-/* ================= Start ================= */
-readPal();
-Object.assign(SET, {tint:true}, store.get('lp2-set', {}));
-const sheetEl=$('#sheet'), toc=$('#toc');
-function addSection(id,label,title,build,cls=''){ const sec=document.createElement('section'); sec.className='auf '+cls; sec.id=id;
-  sec.innerHTML=`<div class="ahead"><span class="no">${label}</span><h2>${title}</h2></div><div class="abody"></div>`;
-  sheetEl.appendChild(sec); build($('.abody',sec)); toc.insertAdjacentHTML('beforeend',`<a href="#${id}">${label}</a>`); }
-SHEET.forEach(S=>addSection(S.id,'Aufgabe '+S.no,S.title,S.build));
-const zh=document.createElement('div'); zh.className='sechead'; zh.textContent='Zusatzaufgaben'; sheetEl.appendChild(zh);
-EXTRA.forEach(S=>addSection(S.id,'Zusatz '+S.no.slice(1),S.title,S.build,'extra'));
-addSection('rezept','Rezept','Disaccharide in der Haworth-Projektion zeichnen',buildRezept,'rez');
-linkify(sheetEl);
-addSection('glossar','Glossar','Fachbegriffe',buildGlossar,'gloss');
-// Glossar-Links: zurück zur Textstelle
-const back=document.createElement('button'); back.className='btn backbtn'; back.type='button'; back.hidden=true; back.textContent='↩ zurück zum Text'; document.body.appendChild(back);
-let backY=0;
-document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closest('a.gl'); if(!a) return; e.preventDefault();
-  backY=window.scrollY; const tg=document.getElementById(a.getAttribute('href').slice(1)); if(!tg) return;
-  tg.scrollIntoView({behavior:'smooth',block:'center'}); tg.classList.remove('flash'); void tg.offsetWidth; tg.classList.add('flash'); back.hidden=false; });
-back.onclick=()=>{ window.scrollTo({top:backY,behavior:'smooth'}); back.hidden=true; };
-// Einstellungen
-const SMAP={oPred:'pred',oUD:'ud',oNum:'num',oH:'H',oTint:'tint'};
-for(const id in SMAP){ const c=$('#'+id); c.checked=!!SET[SMAP[id]]; c.onchange=()=>{ SET[SMAP[id]]=c.checked; store.set('lp2-set',SET); refreshAll(); }; }
-function refreshAll(){ readPal(); if(SET.tint===false) PAL.uOp=0; VIEWERS.forEach(v=>v.redraw()); }
-document.addEventListener('click',e=>{ const d=$('#settings'); if(d.open&&!d.contains(e.target)) d.open=false; });
-const mq=window.matchMedia('(prefers-color-scheme: dark)');
-mq.addEventListener&&mq.addEventListener('change',refreshAll);
-new MutationObserver(refreshAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-refreshAll();
+/* ================= Karten des Lernpfads ================= */
+const SECS=['Orientierung','1 Protonierung','2 Spaltung','3 Angriff','4 Deprotonierung','Überblick','Zeichnen','Üben'];
+const AR={ s1:resolveArrows('suc',mechArrows(1)), s2:resolveArrows('suc',mechArrows(2)), s3:resolveArrows('suc',mechArrows(3)), s4:resolveArrows('suc',mechArrows(4)) };
+const red=a=>a.map(x=>({...x}));
+const srcAt=ar=>ar.s.kind==='bond'?null:(ar.s.kind==='lp'?ar.s.id.split(':')[1]:ar.s.id);
+const isBond=(ar,a,b)=>ar.s.kind==='bond'&&ar.s.id===bkey(a,b);
+const isH=id=>['H','Hp','Hw1','Hw2','Hb1','Hb2'].includes(catOf(id,STAGE.frame()));
+const PRECISE=' <span class="genauer">Genauer: Der Pfeil beginnt am freien Elektronenpaar.</span>';
+const GEN='Elektronenpaarpfeile beginnen an einem freien Elektronenpaar oder an einer Bindung und zeigen dorthin, wo eine neue Bindung oder ein freies Elektronenpaar entsteht.';
+const H_START='Pfeile zeigen, wohin Elektronen wandern. Sie beginnen immer an einem Elektronenpaar – an einem freien Elektronenpaar oder an einer Bindung, nie an einem Wasserstoffatom.';
+function oneArrow(arrs){ if(!arrs.length) return {nocount:true, fb:'Setze zuerst einen Pfeil: Startpunkt markieren, dann das Ziel.'};
+  if(arrs.length>1) return {fb:'Für diesen Schritt genügt ein Pfeil. Entferne überzählige Pfeile mit „Rückgängig“.'}; return null; }
+/* Auswertungen der Pfeile je Schritt (werden im Durchgang wiederverwendet) */
+const J={
+  s1:(arrs)=>{ if(!arrs.length) return {nocount:true, fb:'Setze zuerst einen Pfeil: Startpunkt markieren, dann das Ziel.'};
+    const Hs=['Hp','Ha1','Ha2'];
+    const a1=arrs.find(a=>srcAt(a)==='Ob'&&Hs.includes(a.t.id)), a2=arrs.find(a=>a.s.kind==='bond'&&Hs.some(h=>a.s.id===bkey('Oa',h))&&a.t.id==='Oa');
+    if(arrs.some(a=>srcAt(a)&&isH(srcAt(a)))) return {fb:'Das Proton hat keine Elektronen, die es abgeben könnte. '+H_START};
+    if(arrs.some(a=>a.s.kind==='bond'&&Hs.some(h=>a.s.id===bkey('Oa',h))&&Hs.includes(a.t.id))) return {fb:'Das Proton verlässt das Oxonium-Ion ohne Elektronen. Das bindende Elektronenpaar bleibt am Sauerstoffatom des Oxonium-Ions.'};
+    if(arrs.some(a=>srcAt(a)==='Ob'&&a.t.id==='Oa')) return {fb:'Das freie Elektronenpaar bildet eine Bindung zum Proton, nicht zum Sauerstoffatom des Oxonium-Ions. Das Ziel ist ein Wasserstoffatom.'};
+    if(arrs.some(a=>a.s.kind==='bond'&&a.s.id.split('|').includes('Ob'))) return {fb:'Die Bindungen des verbrückenden Sauerstoffatoms bleiben in diesem Schritt erhalten. Welches Elektronenpaar des Sauerstoffatoms ist noch nicht gebunden?'};
+    if(arrs.some(a=>['G.O','F.O'].includes(srcAt(a)))) return {fb:'Dieses freie Elektronenpaar gehört zu einem Ring-Sauerstoffatom. Welches Sauerstoffatom nimmt das Proton auf?'};
+    if(arrs.some(a=>srcAt(a)==='Oa')) return {fb:'Das Oxonium-Ion gibt ein Proton ab, es stellt kein Elektronenpaar für eine neue Bindung zur Verfügung. Welches Atom der Saccharose bindet das Proton?'};
+    if(a1&&a2){ if(a2.s.id!==bkey('Oa',a1.t.id)) return {fb:'Beide Pfeile müssen dasselbe Wasserstoffatom betreffen.'};
+      if(arrs.length>2) return {fb:'Zwei Pfeile genügen. Entferne den überzähligen Pfeil mit „Rückgängig“.'};
+      return {ok:true, fb:'Richtig. Ein freies Elektronenpaar des verbrückenden Sauerstoffatoms bildet die neue Bindung zum Proton. Das bindende Elektronenpaar der gespaltenen Bindung bleibt am Sauerstoffatom des Oxonium-Ions; zurück bleibt ein Wassermolekül.'+(a1.s.kind==='atom'?PRECISE:'')}; }
+    if(a1) return {fb:'Die neue Bindung ist richtig. Wohin wandert das Elektronenpaar der Bindung, die im Oxonium-Ion bricht?'};
+    if(a2) return {fb:'Die Spaltung der Bindung im Oxonium-Ion ist richtig. Welches Atom der Saccharose bindet das Proton?'};
+    return {fb:GEN}; },
+  s2:(arrs)=>{ const e=oneArrow(arrs); if(e) return e; const a=arrs[0];
+    if(isBond(a,'Ob','F.C2')){ if(a.t.id==='Ob') return {ok:true, fb:'Richtig. Das bindende Elektronenpaar bleibt vollständig beim Sauerstoffatom: Die Bindung wird heterolytisch gespalten.'};
+      if(a.t.id==='F.C2') return {fb:'Das Sauerstoffatom ist elektronegativer und trägt die positive Ladung – es behält das Elektronenpaar. Das Kohlenstoffatom verliert es.'};
+      return {fb:'Die Bindung ist richtig gewählt. Zu welchem der beiden Atome dieser Bindung wandert das Elektronenpaar?'}; }
+    if(isBond(a,'Ob','G.C1')) return {fb:'Das wäre die Spaltung am C1-Atom des Glucose-Bausteins. Bevorzugt bricht aber die Bindung zum C2-Atom des Fructose-Bausteins.'};
+    if(isBond(a,'Ob','Hp')) return {fb:'Das wäre die Umkehrung von Schritt 1. Gesucht ist die Spaltung der Bindung zum C2-Atom des Fructose-Bausteins.'};
+    if(a.s.kind==='lp') return {fb:'Hier bricht eine Bindung. Der Pfeil beginnt deshalb an der Bindung, nicht an einem freien Elektronenpaar.'};
+    if(a.s.kind==='atom') return {fb:'Pfeile beginnen an einem Elektronenpaar. Hier wandert das Elektronenpaar einer Bindung.'};
+    return {fb:GEN}; },
+  s3:(arrs)=>{ const e=oneArrow(arrs); if(e) return e; const a=arrs[0], s=srcAt(a);
+    if(['Ow','Oa'].includes(s)&&a.t.id==='F.C2'){ if(s!=='Ow') return {ok:true, fb:'Richtig: Ein Wassermolekül greift das C2-Atom an. In der Animation ist es das Wassermolekül direkt unter dem Carbokation. Ein freies Elektronenpaar des Sauerstoffatoms bildet die neue Bindung zum C2-Atom.'}; return {ok:true, fb:'Richtig. Ein freies Elektronenpaar des Sauerstoffatoms bildet die neue Bindung zum C2-Atom.'+(a.s.kind==='atom'?PRECISE:'')}; }
+    if(s==='F.C2') return {fb:'Dem Carbokation fehlt ein Elektronenpaar. Es kann keines abgeben.'};
+    if(['Ow','Oa'].includes(s)&&a.t.id==='F.O') return {fb:'Das Ring-Sauerstoffatom hat selbst freie Elektronenpaare. An welchem Atom fehlt eine Bindung?'};
+    if(['Ow','Oa'].includes(s)) return {fb:'Das Elektronenpaar ist richtig gewählt. Wo entsteht die neue Bindung?'};
+    if(s==='Ob'&&a.t.id==='F.C2') return {fb:'Das wäre die Rückreaktion: Die Hydroxygruppe des Glucose-Bausteins greift an, und Saccharose entsteht wieder. Zeichne den Angriff des Wassermoleküls.'};
+    if(s==='F.O'&&a.t.id==='F.C2') return {fb:'Damit hättest du eine mesomere Grenzformel gezeichnet: Das Ring-Sauerstoffatom stabilisiert das Carbokation. Gesucht ist aber der Angriff des Wassermoleküls.'};
+    if(s&&isH(s)) return {fb:H_START};
+    return {fb:GEN}; },
+  s4:(arrs)=>{ if(!arrs.length) return {nocount:true, fb:'Setze zuerst einen Pfeil: Startpunkt markieren, dann das Ziel.'};
+    const Hs=['Hw1','Hw2'];
+    const a1=arrs.find(a=>['Oa'].includes(srcAt(a))&&Hs.includes(a.t.id)), a2=arrs.find(a=>a.s.kind==='bond'&&Hs.some(h=>a.s.id===bkey('Ow',h))&&a.t.id==='Ow');
+    if(arrs.some(a=>srcAt(a)&&isH(srcAt(a)))) return {fb:H_START};
+    if(arrs.some(a=>a.s.kind==='bond'&&Hs.some(h=>a.s.id===bkey('Ow',h))&&Hs.includes(a.t.id))) return {fb:'Das Proton verlässt die Gruppe ohne Elektronen. Das bindende Elektronenpaar bleibt am Sauerstoffatom.'};
+    if(arrs.some(a=>isBond(a,'Ow','F.C2'))) return {fb:'Die Bindung zum C2-Atom bleibt erhalten – sonst wäre man wieder beim Carbokation.'};
+    if(arrs.some(a=>['Oa'].includes(srcAt(a))&&a.t.id==='Ow')) return {fb:'Das Wassermolekül bildet eine Bindung zum Proton, nicht zum Sauerstoffatom. Das Ziel ist ein Wasserstoffatom.'};
+    if(a1&&a2){ if(a2.s.id!==bkey('Ow',a1.t.id)) return {fb:'Beide Pfeile müssen dasselbe Wasserstoffatom betreffen.'};
+      if(arrs.length>2) return {fb:'Zwei Pfeile genügen. Entferne den überzähligen Pfeil mit „Rückgängig“.'};
+      return {ok:true, fb:'Richtig. Das Wassermolekül bildet mit einem freien Elektronenpaar eine Bindung zum Proton; das bindende Elektronenpaar der gespaltenen Bindung bleibt am Sauerstoffatom am C2-Atom.'}; }
+    if(a1) return {fb:'Die neue Bindung ist richtig. Wohin wandert das Elektronenpaar der Bindung, die dabei bricht?'};
+    if(a2) return {fb:'Die Spaltung der Bindung ist richtig. Welches Teilchen nimmt das Proton auf?'};
+    return {fb:GEN}; }
+};
+const INFO={
+  1:`<p>Ein freies Elektronenpaar des verbrückenden Sauerstoffatoms bindet ein Proton des Oxonium-Ions. Das bindende Elektronenpaar der gespaltenen Bindung bleibt am Sauerstoffatom des Oxonium-Ions; zurück bleibt ein Wassermolekül.</p>
+     <p>Das Sauerstoffatom hat danach drei Bindungen und nur noch ein freies Elektronenpaar: Es trägt eine positive Ladung.</p>
+     <p><b>Warum ist dieser Schritt nötig?</b> Ohne Protonierung müsste ein negativ geladenes Alkoholat-Ion abgespalten werden – eine schlechte Abgangsgruppe. Nach der Protonierung kann der Glucose-Baustein als neutrales Molekül abgespalten werden.</p>`,
+  2:`<p>Die Bindung zwischen dem verbrückenden Sauerstoffatom und dem C2-Atom des Fructose-Bausteins bricht. Das bindende Elektronenpaar bleibt vollständig beim Sauerstoffatom; es ist danach wieder neutral. α-D-Glucose wird abgespalten.</p>
+     <p>Dem C2-Atom fehlt jetzt eine Bindung. Es hat nur noch ein Elektronensextett und trägt eine positive Ladung: Es ist ein Carbokation.</p>`,
+  3:`<p>Das Carbokation reagiert als Elektrophil. Ein Wassermolekül greift es als Nucleophil an: Ein freies Elektronenpaar des Sauerstoffatoms bildet die neue Bindung zum C2-Atom.</p>
+     <p>Das Sauerstoffatom des Wassermoleküls hat danach drei Bindungen und nur noch ein freies Elektronenpaar: Jetzt trägt es die positive Ladung. Das C2-Atom hat wieder vier Bindungen und ist neutral.</p>`,
+  4:`<p>Ein Wassermolekül nimmt als Base ein Proton auf. Das bindende Elektronenpaar der gespaltenen Bindung bleibt beim Sauerstoffatom am C2-Atom, das dadurch wieder neutral wird. Es entstehen β-D-Fructose und ein Oxonium-Ion.</p>
+     <p><b>Bilanz:</b> Das Oxonium-Ion wird in Schritt 1 verbraucht und in Schritt 4 zurückgebildet. Es beschleunigt die Reaktion, ohne verbraucht zu werden: Es wirkt als Katalysator und taucht in der Reaktionsgleichung nicht auf.</p>
+`
+};
+const ST3={k:3}, ST2N={k:2}, LP=['Ob','Oa','Ow','G.O','F.O'];
+const CARDS=[
+/* ---------- Teil 0 ---------- */
+{ id:'0.1', sec:0, kind:'rings', title:'Bausteine finden',
+  intro:'Im Versuch wurde Haushaltszucker (Saccharose) in salzsaurer Lösung erhitzt; danach ließ sich Glucose nachweisen. Hier klärst du Schritt für Schritt, wie die Bindung zwischen den beiden Bausteinen gespalten wird.',
+  q:'Saccharose besteht aus einem Glucose- und einem Fructose-Baustein. Markiere nacheinander beide Bausteine.',
+  stage:{k:0,bare:true},
+  labels:{G:'Glucose-Baustein (Sechsring)',F:'Fructose-Baustein (Fünfring)'},
+  after:'Der Fructose-Baustein ist <b>gewendet</b> gezeichnet: um 180° um die Achse gedreht, die von vorne nach hinten durch den Ring verläuft. Dadurch sind oben und unten vertauscht, und das C2-Atom liegt neben dem C1-Atom des Glucose-Bausteins.' },
+{ id:'0.2', sec:0, kind:'tap', sel:['atom'], title:'Die Verbindung finden',
+  q:'Markiere das Atom, über das die beiden Bausteine verbunden sind.', stage:{k:0,bare:true}, sol:{kind:'atom',id:'Ob'},
+  judge:(h,F)=>{ const c=catOf(h.id,F);
+    if(c==='Ob') return {ok:true, fb:'Richtig. Dieses Sauerstoffatom verknüpft das C1-Atom des Glucose-Bausteins mit dem C2-Atom des Fructose-Bausteins. Diese Verknüpfung über das anomere Kohlenstoffatom heißt glycosidische Bindung.'};
+    if(c==='ringO') return {fb:'Dieses Sauerstoffatom gehört zum Ring eines einzelnen Bausteins. Gesucht ist ein Sauerstoffatom, das zu keinem Ring gehört und an beide Bausteine gebunden ist.'};
+    if(c==='hydroxy'||c==='ch2oh') return {fb:'Das ist eine Hydroxygruppe. Sie ist nur an einen Baustein gebunden.'};
+    return {fb:'Gesucht ist ein Sauerstoffatom, das an beide Bausteine gebunden ist.'}; },
+  tips:['Die Verbindung liegt zwischen den beiden Ringen.','Gesucht ist ein Sauerstoffatom, das an je ein Kohlenstoffatom beider Bausteine gebunden ist.'] },
+/* ---------- Schritt 1 ---------- */
+{ id:'1.1', sec:1, kind:'tap', sel:['atom'], title:'Vorhersage: Welches Atom wird protoniert?',
+  intro:'In salzsaurer Lösung liegen Oxonium-Ionen (H₃O⁺) vor. Sie geben leicht ein Proton (H⁺) ab – aber nur an ein Atom, das ein freies Elektronenpaar besitzt. Mit diesem Elektronenpaar bildet es die neue Bindung zum Proton. Die Spaltung beginnt damit, dass ein Atom an der Bindung zwischen den beiden Bausteinen ein Proton aufnimmt.',
+  q:'Markiere das Atom der Saccharose, das das Proton aufnimmt. Die freien Elektronenpaare der Sauerstoffatome in den Ringen, an der Verknüpfung und in den Teilchen der Lösung sind eingezeichnet.',
+  stage:{k:0}, show:{lps:LP}, sol:{kind:'atom',id:'Ob'},
+  judge:(h,F)=>{ const c=catOf(h.id,F);
+    if(c==='Ob') return {ok:true, fb:'Richtig. Das verbrückende Sauerstoffatom liegt direkt an der Bindung zwischen den Bausteinen und kann mit einem freien Elektronenpaar das Proton binden.'};
+    if(c==='ringO') return {fb:'Auch das Ring-Sauerstoffatom hat freie Elektronenpaare und kann protoniert werden. Es ist aber nicht an der Bindung zwischen den beiden Bausteinen beteiligt.'};
+    if(c==='hydroxy'||c==='ch2oh') return {fb:'Auch das Sauerstoffatom dieser Hydroxygruppe könnte ein Proton binden. Die Gruppe gehört aber nur zu einem Baustein – die Verbindung zwischen den Bausteinen bliebe erhalten.'};
+    if(c==='C') return {fb:'Dieses Kohlenstoffatom besitzt kein freies Elektronenpaar und kann deshalb kein Proton binden.'};
+    if(c==='H') return {fb:'Wasserstoffatome besitzen kein freies Elektronenpaar und können kein Proton binden.'};
+    if(c==='Oa') return {fb:'Das Oxonium-Ion gibt das Proton ab. Gesucht ist das Atom der Saccharose, das es aufnimmt.'};
+    if(c==='Ow'||c==='Ob2') return {fb:'Das ist ein Wassermolekül aus der Lösung. Gesucht ist das Atom der Saccharose, das das Proton aufnimmt.'};
+    if(/^H/.test(c)) return {fb:'Wasserstoffatome besitzen kein freies Elektronenpaar und können kein Proton binden.'};
+    return {fb:'Ein Proton wird von einem Atom mit freiem Elektronenpaar gebunden.'}; },
+  tips:['Welche Bindung soll gespalten werden? Schau dir die Atome an, die an dieser Bindung beteiligt sind.','Von den Atomen an dieser Bindung besitzt nur eines freie Elektronenpaare.'] },
+{ id:'1.2', sec:1, kind:'arrow', n:2, title:'Pfeile setzen',
+  q:'Zeichne die beiden Elektronenpaarpfeile für die Protonierung. Markiere für jeden Pfeil zuerst das Elektronenpaar, das wandert, dann das Ziel.',
+  stage:{k:0}, lps:LP, sol:AR.s1, judge:J.s1,
+  tips:['Ein Pfeil zeigt die neue Bindung zum Proton, der andere die Bindung im Oxonium-Ion, die dabei bricht.','Der erste Pfeil beginnt an einem freien Elektronenpaar des verbrückenden Sauerstoffatoms und endet an einem Wasserstoffatom des Oxonium-Ions.'] },
+{ id:'1.3', sec:1, kind:'choice', title:'Ladung bestimmen', chargeAt:'Ob',
+  q:'Welche Ladung trägt das verbrückende Sauerstoffatom nach der Protonierung?',
+  stage:{k:0}, show:{arrows:AR.s1,lps:LP},
+  opts:[{t:'positiv (+)',sign:'+',ok:true,fb:'Richtig. Das Sauerstoffatom hat jetzt drei Bindungen und nur noch ein freies Elektronenpaar. Es besitzt damit ein Elektron weniger als ein neutrales Sauerstoffatom.'},
+    {t:'negativ (−)',sign:'-',fb:'Das Sauerstoffatom hat ein Proton aufgenommen und dafür eines seiner freien Elektronenpaare eingesetzt. Hat es dadurch mehr oder weniger Elektronen als im neutralen Zustand?'},
+    {t:'neutral',sign:'0',fb:'Zähle Bindungen und freie Elektronenpaare: Ein neutrales Sauerstoffatom hat zwei Bindungen und zwei freie Elektronenpaare.'}] },
+{ id:'1.4', sec:1, kind:'info', title:'Schritt 1: Protonierung', stage:{k:1}, html:INFO[1] },
+/* ---------- Schritt 2 ---------- */
+{ id:'2.1', sec:2, kind:'tap', sel:['bond'], title:'Vorhersage: Welche Bindung bricht?',
+  q:'Das Sauerstoffatom mit positiver Ladung zieht die Elektronen seiner Bindungen stark an. Eine seiner Bindungen zu einem Kohlenstoffatom bricht. Markiere die Bindung, die deiner Meinung nach bricht.',
+  stage:{k:1}, sol:{kind:'bond',id:bkey('Ob','F.C2')},
+  judge:(h)=>{ const id=h.id;
+    if(id===bkey('Ob','F.C2')) return {ok:true, fb:'Richtig, diese Bindung bricht bevorzugt: Am C2-Atom des Fructose-Bausteins entsteht dabei ein besonders stabiles Carbokation.'};
+    if(id===bkey('Ob','G.C1')) return {ok:true, fb:'Gute Überlegung – auch so würden die Bausteine getrennt. Tatsächlich bricht aber bevorzugt die Bindung zum C2-Atom des Fructose-Bausteins, weil dort ein stabileres Carbokation entsteht. Mit dieser Bindung geht es weiter.'};
+    if(id===bkey('Ob','Hp')) return {fb:'Dann würde nur das Proton wieder abgegeben – das wäre die Umkehrung von Schritt 1. Für die Spaltung muss eine Bindung zu einem Kohlenstoffatom brechen.'};
+    return {fb:'Diese Bindung gehört nicht zum Sauerstoffatom mit positiver Ladung.'}; },
+  tips:['Gesucht ist eine Bindung des Sauerstoffatoms mit positiver Ladung.','Für die Spaltung muss eine Bindung zwischen diesem Sauerstoffatom und einem Kohlenstoffatom brechen.'] },
+{ id:'2.2', sec:2, kind:'arrow', n:1, title:'Pfeil setzen',
+  q:'Zeichne den Elektronenpaarpfeil für die Spaltung der Bindung zwischen dem verbrückenden Sauerstoffatom und dem C2-Atom des Fructose-Bausteins.',
+  stage:{k:1}, lps:LP, sol:AR.s2, judge:J.s2,
+  tips:['Bei einer Spaltung beginnt der Pfeil an der Bindung, die bricht.','Das Elektronenpaar wandert zu dem Atom, das elektronegativer ist und die positive Ladung trägt.'] },
+{ id:'2.3', sec:2, kind:'tap', sel:['atom'], preview:'+', title:'Wo sitzt danach die Ladung?',
+  q:'Nach der Spaltung trägt ein Atom eine positive Ladung. Markiere es.', stage:{k:1}, show:{arrows:AR.s2,lps:LP}, sol:{kind:'atom',id:'F.C2'},
+  judge:(h,F)=>{ const c=catOf(h.id,F);
+    if(h.id==='F.C2') return {ok:true, fb:'Richtig. Das C2-Atom hat nur noch drei Bindungspartner und ein Elektronensextett: Es ist ein Carbokation.'};
+    if(c==='Ob') return {fb:'Das Sauerstoffatom behält das Elektronenpaar und ist danach wieder neutral – als Hydroxygruppe des Glucose-Bausteins.'};
+    if(h.id==='F.O') return {fb:'Das Ring-Sauerstoffatom behält alle seine Bindungen. Wo fehlt nach der Spaltung eine Bindung?'};
+    if(h.id==='G.C1') return {fb:'Am C1-Atom des Glucose-Bausteins bleibt die Bindung zum Sauerstoffatom erhalten.'};
+    return {fb:'Wo fehlt nach der Spaltung eine Bindung?'}; },
+  tips:['Welches Atom verliert bei der Spaltung das bindende Elektronenpaar?'] },
+{ id:'2.4', sec:2, kind:'info', title:'Schritt 2: Heterolytische Spaltung', stage:{k:2}, html:INFO[2] },
+/* ---------- Schritt 3 ---------- */
+{ id:'3.1', sec:3, kind:'arrow', n:1, title:'Pfeil setzen',
+  q:'Dem Carbokation fehlt ein Elektronenpaar: Es ist ein Elektrophil. Das Wassermolekül aus der Lösung greift es als Nucleophil an. Zeichne den Elektronenpaarpfeil für diesen nucleophilen Angriff.', stage:ST2N, lps:LP, sol:AR.s3, judge:J.s3,
+  tips:['Das Nucleophil stellt das Elektronenpaar für die neue Bindung zur Verfügung.','Der Pfeil endet an dem Atom, an dem eine Bindung fehlt.'] },
+{ id:'3.2', sec:3, kind:'info', title:'Schritt 3: Nucleophiler Angriff', stage:{k:3}, html:INFO[3] },
+/* ---------- Schritt 4 ---------- */
+{ id:'4.1', sec:4, kind:'choice', title:'Vorhersage: Was passiert als Nächstes?',
+  q:'Am C2-Atom sitzt jetzt eine Hydroxygruppe mit einem zusätzlichen Proton (–OH₂⁺). Was passiert als Nächstes?', stage:ST3, show:{lps:LP},
+  opts:[{t:'Die Gruppe am C2-Atom gibt ein Proton an ein Wassermolekül aus der Lösung ab.',ok:true,fb:'Richtig. Das Wassermolekül reagiert als Base und nimmt das Proton auf.'},
+    {t:'Das Wassermolekül am C2-Atom löst sich wieder ab.',fb:'Das ist möglich – dann wäre man wieder beim Carbokation, und Schritt 3 wäre rückgängig gemacht. Wie entsteht ein neutrales Produkt?'},
+    {t:'Das Wassermolekül aus der Lösung greift das C2-Atom an.',fb:'Das C2-Atom hat bereits wieder vier Bindungen. Ein weiteres Teilchen kann dort keine Bindung eingehen.'}] },
+{ id:'4.2', sec:4, kind:'arrow', n:2, title:'Zwei Pfeile setzen',
+  q:'Zeichne beide Elektronenpaarpfeile der Deprotonierung.', stage:ST3, lps:LP, sol:AR.s4, judge:J.s4,
+  tips:['Ein Pfeil zeigt die neue Bindung zum Proton, der andere die Bindung, die bricht.','Als Base reagiert das freie Wassermolekül. Das abgegebene Proton hängt am Sauerstoffatom mit positiver Ladung.'] },
+{ id:'4.3', sec:4, kind:'info', title:'Schritt 4: Deprotonierung', stage:{k:4}, html:INFO[4] },
+/* ---------- Überblick ---------- */
+{ id:'Z.1', sec:5, kind:'order', title:'Schritte ordnen', stage:{k:0},
+  q:'Bringe die vier Schritte der sauren Hydrolyse von Saccharose in die richtige Reihenfolge. Markiere die Karten nacheinander.',
+  items:['Protonierung des verbrückenden Sauerstoffatoms','Heterolytische Spaltung der Bindung zum C2-Atom','Nucleophiler Angriff eines Wassermoleküls am Carbokation','Deprotonierung'],
+  tips:['Welcher Schritt erzeugt die positive Ladung, die die Spaltung erst möglich macht?'] },
+{ id:'D.1', sec:5, kind:'arrow', n:2, title:'Mechanismus durcharbeiten · Schritt 1 von 4',
+  q:'Zeichne die Elektronenpaarpfeile für den ersten Schritt.', stage:{k:0}, lps:LP, sol:AR.s1, judge:J.s1,
+  tips:['Zuerst wird ein Atom an der Verknüpfung protoniert. Dafür sind zwei Pfeile nötig.'] },
+{ id:'D.2', sec:5, kind:'arrow', n:1, title:'Mechanismus durcharbeiten · Schritt 2 von 4',
+  q:'Zeichne den Elektronenpaarpfeil für den nächsten Schritt.', stage:{k:1}, lps:LP, sol:AR.s2, judge:J.s2,
+  tips:['Jetzt bricht eine Bindung des Sauerstoffatoms mit positiver Ladung.'] },
+{ id:'D.3', sec:5, kind:'arrow', n:1, title:'Mechanismus durcharbeiten · Schritt 3 von 4',
+  q:'Zeichne den Elektronenpaarpfeil für den nächsten Schritt.', stage:ST2N, lps:LP, sol:AR.s3, judge:J.s3,
+  tips:['Das Carbokation ist ein Elektrophil.'] },
+{ id:'D.4', sec:5, kind:'arrow', n:2, title:'Mechanismus durcharbeiten · Schritt 4 von 4',
+  q:'Zeichne die Elektronenpaarpfeile für den letzten Schritt.', stage:ST3, lps:LP, sol:AR.s4, judge:J.s4,
+  tips:['Ein Wassermolekül reagiert als Base.'] },
+{ id:'G', sec:5, kind:'player', title:'Der gesamte Mechanismus', stage:{k:0}, m:'suc', dir:'h',
+  q:'Gehe den Mechanismus Schritt für Schritt durch oder spiele ihn vollständig ab.' },
+/* ---------- Zeichnen ---------- */
+{ id:'A.1', sec:6, kind:'draw', title:'Zeichenauftrag', stage:{k:0},
+  q:'Der Aufschrieb enthält alle Strukturformeln, freien Elektronenpaare und Ladungen der sauren Hydrolyse von Saccharose. Zeichne die Elektronenpaarpfeile für alle vier Schritte ein. Überprüfe danach mit der Musterlösung.',
+  checks:['Jeder Pfeil beginnt an einem freien Elektronenpaar oder an einer Bindung.','Jeder Pfeil endet dort, wo eine neue Bindung oder ein freies Elektronenpaar entsteht.','Bei jeder Protonenübertragung zeigt ein Pfeil die neue Bindung und ein Pfeil die gespaltene Bindung.'] },
+/* ---------- Üben ---------- */
+{ id:'Ü', sec:7, kind:'practice', title:'Übungsaufgaben', stage:{k:0} }
+];
+/* Übungsaufgaben */
+const TASKS=[
+  {m:'mal',dir:'h',title:'Hydrolyse von Maltose',text:'Formuliere den Mechanismus der säurekatalysierten Hydrolyse von Maltose. Maltose (Malzzucker) besteht aus zwei Glucose-Bausteinen, die α-1,4-glycosidisch verknüpft sind. Prüfe anschließend deine Lösung.'},
+  {m:'cel',dir:'h',title:'Hydrolyse von Cellobiose',text:'Formuliere den Mechanismus der säurekatalysierten Hydrolyse von Cellobiose. Cellobiose besteht aus zwei Glucose-Bausteinen, die β-1,4-glycosidisch verknüpft sind; der rechte Baustein ist gewendet gezeichnet. Prüfe anschließend deine Lösung.'},
+  {m:'lac',dir:'h',title:'Hydrolyse von Lactose',text:'Formuliere den Mechanismus der säurekatalysierten Hydrolyse von Lactose. Lactose (Milchzucker) besteht aus einem Galactose- und einem Glucose-Baustein, die β-1,4-glycosidisch verknüpft sind. Prüfe anschließend deine Lösung.'},
+  {m:'suc',dir:'f',title:'Bildung von Saccharose',text:'Formuliere den Mechanismus der säurekatalysierten Bildung (Kondensation) von Saccharose aus α-D-Glucose und β-D-Fructose. Prüfe anschließend deine Lösung.'},
+  {m:'mal',dir:'f',title:'Bildung von Maltose',text:'Formuliere den Mechanismus der säurekatalysierten Bildung (Kondensation) von Maltose aus α-D-Glucose und β-D-Glucose. Prüfe anschließend deine Lösung.'}
+];
+/* Erklärung je Schritt für den Abspieler */
+function stepText(m,dir,i){ const c=MC[m], n=c.names, Cn=c.Cn;
+  if(dir==='h') return [
+    `<b>Ausgangsstoffe:</b> ${n.D} in salzsaurer Lösung. Die Pfeile zeigen jeweils den nächsten Schritt.`,
+    `<b>1 Protonierung:</b> Ein freies Elektronenpaar des verbrückenden Sauerstoffatoms bindet ein Proton des Oxonium-Ions. Das Sauerstoffatom trägt danach eine positive Ladung.`,
+    `<b>2 Heterolytische Spaltung:</b> Die Bindung zum ${Cn}-Atom des ${n.Cg} bricht; das bindende Elektronenpaar bleibt beim Sauerstoffatom. Der ${n.Lu} wird abgespalten, am ${Cn}-Atom entsteht ein Carbokation.`,
+    `<b>3 Nucleophiler Angriff:</b> Ein Wassermolekül greift das Carbokation mit einem freien Elektronenpaar an. Jetzt trägt sein Sauerstoffatom die positive Ladung.`,
+    `<b>4 Deprotonierung:</b> Ein Wassermolekül nimmt als Base ein Proton auf. Es entstehen ${n.C}, ${n.L} und wieder ein Oxonium-Ion (Katalysator).`][i];
+  return [
+    `<b>Ausgangsstoffe:</b> ${n.C} und ${n.L} in salzsaurer Lösung. Die Pfeile zeigen jeweils den nächsten Schritt.`,
+    `<b>1 Protonierung:</b> Die Hydroxygruppe am ${Cn}-Atom des ${n.Cg} bindet mit einem freien Elektronenpaar ein Proton des Oxonium-Ions.`,
+    `<b>2 Abspaltung von Wasser:</b> Die Bindung zum ${Cn}-Atom bricht heterolytisch, ein Wassermolekül wird abgespalten. Am ${Cn}-Atom entsteht ein Carbokation.`,
+    `<b>3 Nucleophiler Angriff:</b> Das Sauerstoffatom der Hydroxygruppe des ${n.Lg} greift das Carbokation an. Es trägt danach die positive Ladung.`,
+    `<b>4 Deprotonierung:</b> Ein Wassermolekül nimmt das Proton auf. Es entstehen ${n.D} und wieder ein Oxonium-Ion (Katalysator).`][i];
+}
 
+/* ================= Kartensteuerung ================= */
+const KEY='mech-saccharose-v2';
+const P=Object.assign({cur:0,max:0,checks:{},task:null},store.get(KEY,{}));
+const save=()=>store.set(KEY,P);
+let STAGE, C=null;
+const idxOf=id=>CARDS.findIndex(c=>c.id===id);
+function shuffle(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function progress(){
+  const curSec=CARDS[P.cur].sec, maxSec=CARDS[Math.min(P.max,CARDS.length-1)].sec;
+  $('#prog').innerHTML=SECS.map((s,i)=>{ const cls=i===curSec?'cur':(i<maxSec?'done':(i===maxSec?'reach':''));
+    return `<button type="button" class="chip ${cls}" data-s="${i}" ${(i>maxSec||i===curSec)?'disabled':''}><span>${s}</span></button>`; }).join('');
+  $$('#prog .chip').forEach(b=>b.onclick=()=>{ P.cur=CARDS.findIndex(c=>c.sec===+b.dataset.s); save(); renderCard(P.cur); });
+}
+function playAnim(c){ return STAGE.play(c.stage,c.anim.to,{overlay:{arrows:c.anim.arrows,lps:c.anim.lps,charges:c.chargeAt?[{at:c.chargeAt,sign:'+',col:PAL.react}]:[]}}); }
+
+function renderCard(i){
+  const card=CARDS[i]; const el=$('#card'); STAGE.stop();
+  C={card, wrong:0, cnt:0, tip:0, last:performance.now(), done:false, sel:null, arrows:[], pend:null, opt:null};
+  const tl={rings:'Markieren',tap:'Markieren',arrow:'Pfeil setzen',choice:card.tiles?'Teilchen wählen':'Auswählen',order:'Ordnen',info:'Erklärung',player:'Animation',draw:'Zeichnen',practice:'Üben'}[card.kind];
+  el.innerHTML=`${card.intro?`<p class="intro">${card.intro}</p>`:''}
+    <div class="chead"><span class="cno">${/^\d/.test(card.id)?'Karte '+card.id:SECS[card.sec]}</span><span class="ctype">${tl}</span></div>
+    <h2>${esc(card.title)}</h2>${card.q?`<p class="q">${card.q}</p>`:''}
+    <div class="cbody"></div><div class="fb" aria-live="polite"></div><div class="tipbox"></div>
+    <div class="cact"><button class="btn primary" type="button" data-check>Überprüfen</button><button class="btn" type="button" data-undo hidden>Rückgängig</button>
+      <button class="btn" type="button" data-tip hidden>Tipp</button><button class="btn" type="button" data-reveal hidden>${card.kind==='arrow'?'Pfeile zeigen':'Lösung zeigen'}</button>
+      <button class="btn primary" type="button" data-next hidden>Weiter ▶</button></div>`;
+  linkify(el);
+  const body=$('.cbody',el), fbEl=$('.fb',el), bCheck=$('[data-check]',el), bUndo=$('[data-undo]',el), bTip=$('[data-tip]',el), bRev=$('[data-reveal]',el), bNext=$('[data-next]',el);
+  const show=card.show||{};
+  const ov=()=>{ const o={arrows:red(show.arrows||[]), lps:show.lps||lpsOf(card.stage.m)};
+    if(card.kind==='tap'&&C.sel){ o.sel=[{...C.sel,c:C.done?PAL.react:PAL.down}]; if(card.preview&&C.sel.kind==='atom') o.charges=[{at:C.sel.id,sign:card.preview,col:C.done?PAL.react:PAL.down,dashed:!C.done}]; }
+    if(card.kind==='arrow'){ o.lps=card.lps; o.arrows=C.arrows.map(a=>({...a,col:C.done?PAL.react:PAL.down})); if(C.pend) o.sel=[{...C.pend}]; }
+    if(card.kind==='choice'&&card.chargeAt&&C.opt){ o.charges=[{at:card.chargeAt,sign:C.opt.sign,col:C.done?PAL.react:PAL.down,dashed:!C.done}]; }
+    if(card.kind==='rings'){ o.sel=(C.rings||[]).map(r=>({kind:'ring',id:r})); o.labels=(C.rings||[]).map(r=>{ const c=STAGE.frame().rc[r]; return {x:c.x,y:c.y+c.s*1.62,t:card.labels[r]}; }); }
+    return o; };
+  C.restore=()=>STAGE.set(card.stage,ov());
+  const redraw=()=>STAGE.overlay(ov());
+  STAGE.set(card.stage,ov());
+  STAGE.setReplay(null);
+  const setFb=(t,cls)=>{ fbEl.className='fb '+cls; fbEl.innerHTML=t; linkify(fbEl); };
+  const help=()=>{ const tips=card.tips||[]; bTip.hidden=C.done||C.wrong<2||C.tip>=tips.length; bRev.hidden=C.done||C.cnt<3||!card.sol&&card.kind!=='choice'&&card.kind!=='order'; };
+  const lock=()=>{ $$('button.opt',body).forEach(b=>b.disabled=true); };
+  const solved=()=>{ C.done=true; bCheck.hidden=true; bUndo.hidden=true; bTip.hidden=true; bRev.hidden=true; bNext.hidden=false;
+    STAGE.stop(); redraw(); lock(); bNext.focus({preventScroll:true}); };
+  /* Fehlversuche, die schneller als 5 s nach der letzten Prüfung kommen, zählen für die Lösung nicht mit */
+  const verdict=r=>{ if(r.nocount){ setFb(r.fb,'info'); return; }
+    const now=performance.now();
+    if(r.ok){ setFb(r.fb,'ok'); solved(); return; }
+    C.wrong++; if(now-C.last>=5000) C.cnt++; C.last=now;
+    setFb(r.fb,'no'); help(); };
+  bTip.onclick=()=>{ const t=card.tips[C.tip++]; $('.tipbox',el).insertAdjacentHTML('beforeend',`<p class="tip"><b>Tipp ${C.tip}:</b> ${t}</p>`); linkify($('.tipbox',el)); help(); };
+  bNext.onclick=()=>advance(i);
+
+  if(card.kind==='rings'){ C.rings=[]; bCheck.hidden=true;
+    STAGE.listen(['ring'],h=>{ if(!h||C.rings.includes(h.id)) return; C.rings.push(h.id); redraw();
+      if(C.rings.length===2){ body.innerHTML=`<div class="afterbox"><p>${card.after}</p><div class="wfig">${wendenFig()}</div></div>`; linkify(body);
+        C.done=true; bNext.hidden=false; STAGE.stop(); } },{hint:'Markiere einen Ring.'}); }
+  if(card.kind==='tap'){
+    const what=card.sel.includes('bond')?'eine Bindung':'ein Atom';
+    STAGE.listen(card.sel,h=>{ if(C.done||!h) return; C.sel=h; redraw(); setFb('',''); },{hint:`Markiere ${what}.`});
+    bCheck.onclick=()=>{ if(!C.sel){ setFb(`Markiere zuerst ${what} in der Formel.`,'info'); return; } verdict(card.judge(C.sel,STAGE.frame())); };
+    bRev.onclick=()=>{ C.sel=card.sol; const r=card.judge(card.sol,STAGE.frame()); setFb('<b>Lösung:</b> '+r.fb,'ok'); solved(); };
+  }
+  if(card.kind==='arrow'){ bUndo.hidden=false;
+    const cnt=document.createElement('p'); cnt.className='small acnt'; body.appendChild(cnt);
+    const upd=()=>{ cnt.textContent=card.n>1?`${C.arrows.length} von ${card.n} Pfeilen gesetzt.`+(C.pend?' Jetzt das Ziel markieren.':''):(C.pend?'Jetzt das Ziel markieren.':(C.arrows.length?'Pfeil gesetzt.':'Startpunkt markieren: freies Elektronenpaar oder Bindung.')); bUndo.disabled=!C.arrows.length&&!C.pend; };
+    const listen=()=>STAGE.listen(C.pend?['atom','lp']:['lp','atom','bond'],pick,{lpIds:card.lps,hint:C.pend?'Ziel markieren':'Startpunkt markieren'});
+    const pick=h=>{ if(C.done) return;
+      if(!C.pend){ if(!h) return; if(C.arrows.length>=card.n+1){ setFb('Entferne zuerst einen Pfeil mit „Rückgängig“.','info'); return; } C.pend=h; }
+      else { if(!h||h.id===C.pend.id){ C.pend=null; }
+        else { const tId=h.kind==='lp'?h.at:h.id, sAt=C.pend.kind==='lp'?C.pend.at:C.pend.id;
+          if(tId===sAt) C.pend=null; else { C.arrows.push({s:{kind:C.pend.kind,id:C.pend.id},t:{kind:'atom',id:tId}}); C.pend=null; } } }
+      setFb('',''); redraw(); upd(); listen(); };
+    listen(); upd();
+    bUndo.onclick=()=>{ if(C.pend) C.pend=null; else C.arrows.pop(); redraw(); upd(); listen(); setFb('',''); };
+    bCheck.onclick=()=>verdict(card.judge(C.arrows,STAGE.frame()));
+    bRev.onclick=()=>{ C.arrows=red(card.sol); C.pend=null; const r=card.judge(C.arrows,STAGE.frame()); setFb('<b>Lösung:</b> '+r.fb,'ok'); solved(); upd(); };
+  }
+  if(card.kind==='choice'){
+    const opts=shuffle(card.opts);
+    body.innerHTML=`<div class="opts ${card.tiles?'tiles':''}" role="radiogroup">${opts.map((o,k)=>`<button type="button" class="opt" role="radio" aria-checked="false" data-k="${k}">${o.t}</button>`).join('')}</div>`;
+    $$('.opt',body).forEach(b=>b.onclick=()=>{ if(C.done) return; C.opt=opts[+b.dataset.k]; $$('.opt',body).forEach(x=>x.setAttribute('aria-checked',x===b)); setFb('',''); redraw(); });
+    bCheck.onclick=()=>{ if(!C.opt){ setFb('Wähle zuerst eine Antwort aus.','info'); return; } const o=C.opt, b=$(`.opt[data-k="${opts.indexOf(o)}"]`,body);
+      if(o.ok){ b.classList.add('right'); verdict({ok:true,fb:o.fb}); } else { b.classList.add('wrong'); b.disabled=true; b.setAttribute('aria-checked','false'); C.opt=null; verdict({fb:o.fb}); redraw(); } };
+    bRev.onclick=()=>{ const o=opts.find(x=>x.ok); C.opt=o; const b=$(`.opt[data-k="${opts.indexOf(o)}"]`,body); b.classList.add('right'); b.setAttribute('aria-checked','true'); setFb('<b>Lösung:</b> '+o.fb,'ok'); solved(); };
+  }
+  if(card.kind==='order'){
+    let pool; do{ pool=shuffle(card.items.map((t,k)=>k)); }while(pool.every((v,k)=>v===k));
+    const seq=[];
+    const draw=()=>{ body.innerHTML=`<ol class="slots">${card.items.map((_,k)=>`<li>${seq[k]!=null?`<button type="button" class="opt placed" data-r="${k}">${card.items[seq[k]]}</button>`:'<span class="empty">…</span>'}</li>`).join('')}</ol>
+        <div class="ord pool">${pool.filter(v=>!seq.includes(v)).map(v=>`<button type="button" class="opt" data-v="${v}">${card.items[v]}</button>`).join('')}</div>`;
+      $$('[data-v]',body).forEach(b=>b.onclick=()=>{ if(C.done) return; seq.push(+b.dataset.v); setFb('',''); draw(); });
+      $$('[data-r]',body).forEach(b=>b.onclick=()=>{ if(C.done) return; seq.splice(+b.dataset.r,1); setFb('',''); draw(); });
+      if(C.done) lock(); };
+    draw();
+    bCheck.onclick=()=>{ if(seq.length<card.items.length){ setFb('Ordne zuerst alle vier Schritte.','info'); return; }
+      const n=seq.filter((v,k)=>v===k).length; verdict(n===seq.length?{ok:true,fb:'Richtig: Protonierung, heterolytische Spaltung, nucleophiler Angriff, Deprotonierung.'}:{fb:`${n} von 4 Schritten stehen an der richtigen Stelle.`}); };
+    bRev.onclick=()=>{ seq.length=0; card.items.forEach((_,k)=>seq.push(k)); C.done=true; draw(); setFb('<b>Lösung:</b> Protonierung, heterolytische Spaltung, nucleophiler Angriff, Deprotonierung.','ok'); solved(); };
+  }
+  if(card.kind==='info'){ bCheck.hidden=true; bNext.hidden=false; body.innerHTML=`<div class="infotext">${card.html}</div>`; linkify(body); }
+  if(card.kind==='player'){ bCheck.hidden=true; bNext.hidden=false; Player(body,card.m,card.dir); }
+  if(card.kind==='draw'){ bCheck.textContent='Überprüfen'; bNext.textContent='Zu den Übungsaufgaben ▶';
+    body.appendChild(imgBox('Aufschrieb (Vorlage)',()=>mechSheet('suc','h',false),'Aufschrieb_Hydrolyse_Saccharose.png'));
+    body.insertAdjacentHTML('beforeend',`<div class="checkl"><b>Selbst prüfen</b><ul class="check">${card.checks.map((c,k)=>`<li><label><input type="checkbox" data-ck="${k}" ${P.checks[k]?'checked':''}> <span>${c}</span></label></li>`).join('')}</ul></div><div class="sol" hidden></div>`);
+    $$('[data-ck]',body).forEach(c=>c.onchange=()=>{ P.checks[c.dataset.ck]=c.checked; save(); });
+    bCheck.onclick=()=>{ const s=$('.sol',body); s.innerHTML='<p><b>Musterlösung:</b> Vergleiche deine Pfeile mit der Lösung.</p>'; s.appendChild(imgBox('Musterlösung',()=>mechSheet('suc','h',true),'Musterloesung_Hydrolyse_Saccharose.png')); s.hidden=false; bCheck.hidden=true; bNext.hidden=false; s.scrollIntoView({behavior:'smooth',block:'start'}); }; }
+  if(card.kind==='practice'){ bCheck.hidden=true; practice(body); }
+  help(); progress();
+  if(window.innerWidth<980) window.scrollTo({top:0});
+}
+async function advance(i){
+  const card=CARDS[i]; const b=$('#card [data-next]'); if(b) b.disabled=true;
+  P.cur=Math.min(i+1,CARDS.length-1); P.max=Math.max(P.max,P.cur); save(); renderCard(P.cur);
+}
+/* ---------- Abspieler: gesamter Mechanismus Schritt für Schritt ---------- */
+function Player(host,m,dir){
+  const seq=dir==='h'?[0,1,2,3,4]:[4,3,2,1,0];
+  const cfg=i=>({m,k:seq[i]});
+  const ovOf=i=>({arrows:i<4?resolveArrows(m,mechArrows(i+1,dir)):[], lps:lpsOf(m)});
+  const names=[0,1,2,3,4].map(i=>stepText(m,dir,i).match(/<b>(.*?):?<\/b>/)[1].replace(/:$/,''));
+  host.innerHTML=`<ol class="steps">${names.map((n,i)=>`<li><button type="button" class="stepbtn" data-i="${i}">${n}</button></li>`).join('')}</ol>
+    <div class="steptext" aria-live="polite"></div>
+    <div class="row pctl"><button class="btn" type="button" data-prev>◀ Zurück</button><button class="btn primary" type="button" data-fwd>Nächster Schritt ▶</button><button class="btn" type="button" data-all>Alles abspielen</button></div>`;
+  let i=0, busy=false, stop=false;
+  const ui=()=>{ $$('.stepbtn',host).forEach((b,k)=>{ b.classList.toggle('cur',k===i); b.classList.toggle('done',k<i); });
+    $('.steptext',host).innerHTML=stepText(m,dir,i); linkify($('.steptext',host));
+    $('[data-prev]',host).disabled=busy||i===0; $('[data-fwd]',host).disabled=busy||i===4; $('[data-all]',host).textContent=busy?'Anhalten':'Alles abspielen'; };
+  const jump=k=>{ i=k; STAGE.set(cfg(i),ovOf(i)); ui(); };
+  const fwd=async()=>{ if(i>=4) return; busy=true; ui(); await STAGE.play(cfg(i),cfg(i+1),{overlay:ovOf(i),end:ovOf(i+1),hold:600}); i++; busy=false; ui(); };
+  $('[data-fwd]',host).onclick=fwd;
+  $('[data-prev]',host).onclick=()=>jump(i-1);
+  $$('.stepbtn',host).forEach(b=>b.onclick=()=>{ if(!busy) jump(+b.dataset.i); });
+  $('[data-all]',host).onclick=async()=>{ if(busy){ stop=true; return; } stop=false; if(i===4) jump(0); await sleep(500);
+    while(i<4&&!stop){ await fwd(); if(i<4) await sleep(1500); } stop=false; ui(); };
+  jump(0);
+}
+/* ---------- Bilder: Vorlage und Musterlösung ---------- */
+function wrapText(t,n=84){ const out=[]; let line=''; t.split(/\s+/).forEach(w=>{ if((line+' '+w).trim().length>n){ out.push(line.trim()); line=w; } else line+=' '+w; }); if(line.trim()) out.push(line.trim()); return out; }
+const stripTags=h=>h.replace(/<[^>]+>/g,'');
+function mechSheet(m,dir,sol){
+  const seq=dir==='h'?[0,1,2,3,4]:[4,3,2,1,0], pal=sol?PRINTC:PRINT, n=MC[m].names, parts=[];
+  seq.forEach((k,i)=>{ const ov={arrows:sol&&i<4?resolveArrows(m,mechArrows(i+1,dir)):[], lps:lpsOf(m)};
+    const r=mechSVG(m,k,{},pal,ov);
+    if(i<4){ const st=stepText(m,dir,i+1), head=stripTags(st.match(/<b>(.*?)<\/b>/)[1]).replace(/:$/,'').replace(/^(\d) /,'Schritt $1 – ');
+      parts.push({label:head, text:wrapText(stripTags(st.replace(/<b>.*?<\/b>/,'')).trim())}); }
+    else parts.push({label:'Produkte', text:wrapText(dir==='h'?`Es entstehen ${n.L}, ${n.C} und ein Oxonium-Ion. Das Oxonium-Ion wird zurückgebildet: Es wirkt als Katalysator.`:`Es entstehen ${n.D} und ein Oxonium-Ion. Das Oxonium-Ion wird zurückgebildet: Es wirkt als Katalysator.`)});
+    parts.push({svg:r.svg,vb:r.vb,w:640,gap:16}); });
+  const title=(dir==='h'?'Saure Hydrolyse von ':'Säurekatalysierte Bildung von ')+n.D+(sol?' – Musterlösung':'');
+  return sheet(title,parts,700);
+}
+function imgBox(label,make,fname){
+  const box=document.createElement('div'); box.className='vorlagebox';
+  box.innerHTML=`<div class="vorlage" role="button" tabindex="0" title="Vergrößern"><img alt="${esc(label)}"></div><div class="row"><button class="btn small" type="button" data-big>⤢ Vergrößern</button><button class="btn small" type="button" data-copy>Bild kopieren</button><a class="btn small" download="${fname}" data-dl>Bild speichern</a><span class="small fbcopy"></span></div>`;
+  let framed=false; try{ framed=window.top!==window.self; }catch(e){ framed=true; } if(framed) $('[data-dl]',box).hidden=true;
+  const v=make(); let blob=null, url=null;
+  svgToPng(v.svg,v.w,v.h,2).then(r=>{ blob=r.blob; url=r.url; $('img',box).src=url; $('[data-dl]',box).href=url; }).catch(()=>{ $('.vorlage',box).innerHTML=v.svg; });
+  const big=()=>lightbox(url||'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(v.svg),label);
+  $('[data-big]',box).onclick=big; $('.vorlage',box).onclick=big;
+  $('[data-copy]',box).onclick=()=>{ const fb=$('.fbcopy',box), no=()=>fb.textContent='Kopieren ist hier nicht möglich. Bild gedrückt halten.';
+    try{ if(!blob||!window.ClipboardItem) throw 0; navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(()=>fb.textContent='Bild kopiert.').catch(no); }catch(e){ no(); } };
+  return box; }
+function lightbox(src,label){ const lb=$('#lb'); $('img',lb).src=src; $('img',lb).alt=label; $('.lbt',lb).textContent=label; lb.hidden=false; $('button',lb).focus(); }
+/* ---------- Übungsaufgaben ---------- */
+function practice(host){
+  const draw=()=>{ const t=TASKS[P.task];
+    host.innerHTML=`<p class="small">Bearbeite die Aufgabe im Heft: Strukturformeln, freie Elektronenpaare, Ladungen und Elektronenpaarpfeile.</p>
+      <div class="row"><button class="btn primary" type="button" data-new>${P.task==null?'Aufgabe stellen':'Neue Aufgabe'}</button></div>
+      ${t?`<div class="task"><h3>${t.title}</h3><p>${t.text}</p><p class="small">Die Ausgangsstoffe siehst du in der Formelansicht.</p>
+        <div class="row"><button class="btn" type="button" data-sol>Lösung überprüfen</button></div><div class="tout"></div></div>`:''}`;
+    linkify(host);
+    $('[data-new]',host).onclick=()=>{ let n; do{ n=Math.floor(Math.random()*TASKS.length); }while(TASKS.length>1&&n===P.task); P.task=n; save(); draw(); };
+    if(!t){ STAGE.set({k:0}); return; }
+    const out=$('.tout',host); STAGE.set({m:t.m,k:t.dir==='h'?0:4},{lps:lpsOf(t.m)});
+    $('[data-sol]',host).onclick=e=>{ e.currentTarget.hidden=true; const d=document.createElement('div'); out.appendChild(d); Player(d,t.m,t.dir);
+      out.appendChild(imgBox('Musterlösung',()=>mechSheet(t.m,t.dir,true),'Musterloesung.png')); if(window.innerWidth<980) $('#stage').scrollIntoView({behavior:'smooth'}); };
+  };
+  draw();
+}
+/* Wenden des Fructose-Bausteins: üblich gezeichnet und gewendet */
+function wendenFig(){
+  const F=newFrame('20 90 720 300'); addRing(F,'A',SUG.fruB,pose(170,215),{tint:'B'}); addRing(F,'B',SUG.fruB,pose(560,215,Rz(Math.PI)),{tint:'B'});
+  F.hi=['A.C2','B.C2','A.O','B.O'];
+  F.caps.push({x:170,y:375,t:'β-D-Fructose, üblich gezeichnet',size:16},{x:560,y:375,t:'gewendet (wie in Saccharose)',size:16});
+  const a=`<path d="M318,215 Q365,180 412,215" fill="none" stroke="${PAL.react}" stroke-width="3" marker-end="url(#wfa)"/><text x="365" y="168" text-anchor="middle" font-size="15" font-weight="700" fill="${PAL.react}">um 180° gewendet</text><defs><marker id="wfa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${PAL.react}"/></marker></defs>`;
+  return `<svg viewBox="${F.vb}" role="img" aria-label="Fructose-Baustein üblich gezeichnet und gewendet" font-family="var(--font)">${renderFrame(F,PAL,{mid:'wf',ud:false,num:true})}${a}</svg>`; }
+
+/* ================= Start ================= */
+readPal(); SET.ud=false; SET.num=true;
+STAGE=Stage($('#stage'));
+buildGlossar();
+renderCard(Math.min(P.cur,CARDS.length-1));
+// Glossar als eigene Seite
+let backY=0, glossOpen=false;
+function openGloss(id){ if(!glossOpen){ backY=window.scrollY; } glossOpen=true; $('#app').hidden=true; $('#prog').hidden=true; $('#gloss').hidden=false; $('#gbtn').setAttribute('aria-pressed','true');
+  const tg=id&&document.getElementById(id); if(tg){ tg.scrollIntoView({block:'start'}); tg.classList.remove('flash'); void tg.offsetWidth; tg.classList.add('flash'); } else window.scrollTo(0,0); }
+function closeGloss(){ glossOpen=false; $('#gloss').hidden=true; $('#app').hidden=false; $('#prog').hidden=false; $('#gbtn').setAttribute('aria-pressed','false'); STAGE.redraw(); window.scrollTo(0,backY); }
+document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closest('a.gl, a.gi'); if(!a) return; e.preventDefault(); openGloss(a.getAttribute('href').slice(1)); });
+$('#gbtn').onclick=()=>glossOpen?closeGloss():openGloss(null);
+$('#gback').onclick=closeGloss;
+$('#lb button').onclick=()=>{ $('#lb').hidden=true; };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').hidden=true; });
+// Farbschema
+function refreshAll(){ readPal(); STAGE.redraw(); buildGlossar(); }
+const mq=window.matchMedia('(prefers-color-scheme: dark)'); mq.addEventListener&&mq.addEventListener('change',refreshAll);
+new MutationObserver(refreshAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 </script>
 
 </body>

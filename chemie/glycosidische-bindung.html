@@ -300,10 +300,12 @@ function mix(A,B,f){
 /* Zeichnen als SVG-Markup */
 const LR={'':0,'C':9,'O':11,'H':9,'OH':11,'CH2OH':11,'CH2':11,'H2O':22,'H3O+':24};
 const f2=n=>Math.round(n*10)/10;
+/* Haworth: Ring-Kohlenstoffatome werden nicht beschriftet */
+const vis=a=>!!a.lab && !(a.lab==='C' && a.ring && !a.sub);
 function labelSVG(a,pal,o,rc){
   const col = a.cls==='react' ? pal.react : (o.ud && a.tag==='u' ? pal.up : (o.ud && a.tag==='d' ? pal.down : pal.ink));
   const wt = (a.cls==='react' || (o.ud && a.tag)) ? 700 : 400;
-  const op = a.op??1; if(op<0.02 || !a.lab) return '';
+  const op = a.op??1; if(op<0.02 || !vis(a)) return '';
   const left = !!rc && (a.inner&&a.lab==='OH' ? a.x > rc.x+2 : a.x < rc.x - ((a.lab==='OH')?0.25:0.72)*rc.s);
   let t='', anchor='middle', x=a.x;
   if(a.lab==='OH'){ t=left?'HO':'OH'; anchor=left?'end':'start'; x=left?a.x+8:a.x-8; }
@@ -367,10 +369,10 @@ function renderFrame(F,pal,o={}){
   F.bonds.forEach(b=>{ const A=F.atoms[b.a], B=F.atoms[b.b]; if(!A||!B) return;
     const op=Math.min(b.op??1, A.op??1, B.op??1); if(op<0.02) return;
     let wA=2.3,wB=2.3; if(b.ring){ wA=wz(A.z); wB=wz(B.z); }
-    const pts=bondPoly(A,B,A.lab?(LR[A.lab]??11):0,B.lab?(LR[B.lab]??11):0,wA,wB);
+    const pts=bondPoly(A,B,vis(A)?(LR[A.lab]??11):0,vis(B)?(LR[B.lab]??11):0,wA,wB);
     const col=b.cls==='react'?pal.react:pal.ink;
     if(pts) s+=`<polygon points="${pts}" fill="${col}" opacity="${op.toFixed(3)}"/>`;
-    if(b.ring){ [A,B].forEach(X=>{ if(!X.lab){ const w=wz(X.z); if(w>2.6) s+=`<circle cx="${f2(X.x)}" cy="${f2(X.y)}" r="${f2(w/2)}" fill="${col}" opacity="${op.toFixed(3)}"/>`; } }); }
+    if(b.ring){ [A,B].forEach(X=>{ if(!vis(X)){ const w=wz(X.z); if(w>2.6) s+=`<circle cx="${f2(X.x)}" cy="${f2(X.y)}" r="${f2(w/2)}" fill="${col}" opacity="${op.toFixed(3)}"/>`; } }); }
   });
   // Atome/Beschriftungen
   for(const id in F.atoms){ const a=F.atoms[id]; s+=labelSVG(a,pal,oo, a.sub? F.rc[a.ring] : null); }
@@ -980,7 +982,7 @@ const GL=[
  ['pfeil','Elektronenpaarpfeil','Elektronenpaarpfeil(?:e|en)?|Elektronenpaarverschiebung(?:en)?','Gebogener Pfeil in einem Reaktionsmechanismus. Er zeigt, wohin ein Elektronenpaar wandert. Er beginnt immer an einem freien Elektronenpaar oder an einer Bindung und endet dort, wo eine neue Bindung oder ein neues freies Elektronenpaar entsteht.','Ein Pfeil beginnt nie an einem Proton oder an einem positiv geladenen Atom.','pfeil'],
  ['elektrophil','Elektrophil','Elektrophil(?:e|en)?|elektrophile[nmrs]?','Teilchen mit Elektronenmangel („elektronenliebend“), das ein Elektronenpaar aufnimmt und damit eine neue Bindung bildet, z. B. ein Carbokation oder ein Proton.','Hier: Das Carbokation am C2-Atom der Fructose.','nucel'],
  ['glyc','Glycosidische Bindung','glycosidische[nmrs]? Bindung(?:en)?','Bindung zwischen dem anomeren Kohlenstoffatom eines Zuckerbausteins und einem Atom eines weiteren Moleküls, meist einem Sauerstoffatom. Sie entsteht durch Kondensation und wird durch Hydrolyse gespalten.','In Saccharose verbindet ein Sauerstoffatom das C1-Atom der Glucose mit dem C2-Atom der Fructose.','glyc'],
- ['haworth','Haworth-Projektion','Haworth-Projektion(?:en)?','Darstellung der Ringform eines Zuckers: Der Ring liegt waagrecht und wird perspektivisch von schräg oben gesehen; die dick gezeichnete Kante zeigt zum Betrachter, das Ring-Sauerstoffatom liegt hinten. Die Substituenten stehen senkrecht oberhalb oder unterhalb der Ringebene.','Die Abbildung zeigt β-D-Glucose.','haworth'],
+ ['haworth','Haworth-Projektion','Haworth-Projektion(?:en)?','Darstellung der Ringform eines Zuckers: Der Ring liegt waagrecht und wird perspektivisch von schräg oben gesehen; die dick gezeichnete Kante zeigt zum Betrachter, das Ring-Sauerstoffatom liegt hinten. Die Substituenten stehen senkrecht oberhalb oder unterhalb der Ringebene. Die Kohlenstoffatome des Rings werden nicht ausgeschrieben, sie sitzen an den Ecken.','Die Abbildung zeigt β-D-Glucose.','haworth'],
  ['hetero','Heterolytische Spaltung','heterolytisch(?:e[nmrs]?)?(?: Spaltung| gespalten)?','Spaltung einer Atombindung, bei der das bindende Elektronenpaar vollständig bei einem der beiden Atome bleibt, meist beim elektronegativeren. Es entstehen Ionen. Bei der homolytischen Spaltung erhält dagegen jedes Atom ein Elektron, und es entstehen Radikale.','Hier: Das Elektronenpaar der Bindung zwischen dem verbrückenden Sauerstoffatom und dem C2-Atom bleibt beim Sauerstoffatom, am C2-Atom entsteht ein Carbokation.','hetero'],
  ['hydro','Hydrolyse und Kondensation','Hydrolyse|hydrolysiert|Kondensation','Hydrolyse: Spaltung einer Bindung unter Aufnahme eines Wassermoleküls. Kondensation: Verknüpfung zweier Moleküle unter Abspaltung eines Wassermoleküls. Beide Reaktionen sind Umkehrungen voneinander.','Saccharose + Wasser → Glucose + Fructose ist eine Hydrolyse.','hydro'],
  ['iEff','+I-Effekt (induktiver Effekt)','\\+I-Effekt','Alkylreste schieben Elektronendichte über die Bindungen zu einem benachbarten Atom. Dadurch wird eine positive Ladung an einem Kohlenstoffatom teilweise ausgeglichen, das Carbokation wird stabilisiert.','Je mehr Alkylreste am positiv geladenen Kohlenstoffatom sitzen, desto stärker ist die Stabilisierung.','iEff'],
@@ -1224,6 +1226,7 @@ function stepText(m,dir,i){ const c=MC[m], n=c.names, Cn=c.Cn;
 const KEY='mech-saccharose-v2';
 const P=Object.assign({cur:0,max:0,checks:{},task:null},store.get(KEY,{}));
 const save=()=>store.set(KEY,P);
+P.cur=Math.max(0,Math.min(+P.cur||0,CARDS.length-1)); P.max=Math.max(P.cur,Math.min(+P.max||0,CARDS.length-1));
 let STAGE, C=null;
 const idxOf=id=>CARDS.findIndex(c=>c.id===id);
 function shuffle(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
@@ -1402,7 +1405,7 @@ function practice(host){
 }
 /* Wenden des Fructose-Bausteins: üblich gezeichnet und gewendet */
 function wendenFig(){
-  const F=newFrame('20 90 720 300'); addRing(F,'A',SUG.fruB,pose(170,215),{tint:'B'}); addRing(F,'B',SUG.fruB,pose(560,215,Rz(Math.PI)),{tint:'B'});
+  const F=newFrame('-10 90 760 300'); addRing(F,'A',SUG.fruB,pose(170,215),{tint:'B'}); addRing(F,'B',SUG.fruB,pose(560,215,Rz(Math.PI)),{tint:'B'});
   F.hi=['A.C2','B.C2','A.O','B.O'];
   F.caps.push({x:170,y:375,t:'β-D-Fructose, üblich gezeichnet',size:16},{x:560,y:375,t:'gewendet (wie in Saccharose)',size:16});
   const a=`<path d="M318,215 Q365,180 412,215" fill="none" stroke="${PAL.react}" stroke-width="3" marker-end="url(#wfa)"/><text x="365" y="168" text-anchor="middle" font-size="15" font-weight="700" fill="${PAL.react}">um 180° gewendet</text><defs><marker id="wfa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${PAL.react}"/></marker></defs>`;

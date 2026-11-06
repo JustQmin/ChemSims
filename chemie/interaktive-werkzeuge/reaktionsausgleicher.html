@@ -445,6 +445,7 @@
       padding: 0;
       margin: 2px 0;
       -moz-appearance: textfield;
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
     }
     .coeff-input::-webkit-outer-spin-button,
     .coeff-input::-webkit-inner-spin-button {
@@ -455,33 +456,76 @@
       outline: none;
       border-color: var(--focus);
     }
+    .coeff-input::placeholder {
+      color: var(--muted);
+      opacity: 0.5;
+      font-weight: 700;
+    }
+    .coeff-input.error-coeff {
+      border-color: var(--alert) !important;
+      background: var(--alert-bg) !important;
+      color: var(--alert) !important;
+      box-shadow: 0 0 0 2px var(--alert-bg);
+    }
+    .coeff-input.error-coeff::placeholder {
+      color: var(--alert);
+      opacity: 0.65;
+    }
+    .coeff-input.correct-coeff {
+      border-color: var(--ok) !important;
+      background: var(--ok-bg) !important;
+      color: var(--ok) !important;
+    }
 
     .formula {
       font-family: var(--f-display);
       font-size: 1.6rem;
       font-weight: 600;
       letter-spacing: 0.02em;
-      display: inline-flex;
-      align-items: baseline;
+      display: inline-block;
+      line-height: 1.2;
+      vertical-align: middle;
     }
-    sub {
+    .formula sub, .formula sup, .review-eq sub, .review-eq sup, sub, sup {
       font-size: 0.65em;
-      line-height: 0;
-      vertical-align: -0.25em;
+      line-height: 1;
       font-weight: 700;
+      position: relative;
+      display: inline-block;
     }
-    sup {
-      font-size: 0.65em;
-      line-height: 0;
-      vertical-align: 0.45em;
-      font-weight: 700;
+    .formula sub, .review-eq sub, sub {
+      vertical-align: baseline;
+      bottom: -0.28em;
+    }
+    .formula sup, .review-eq sup, sup {
+      vertical-align: baseline;
+      top: -0.55em;
       color: var(--brand);
     }
     .chem-phase {
       font-size: 0.72rem;
       color: var(--muted);
       font-weight: 700;
-      margin-left: 2px;
+      margin-left: 3px;
+      display: inline-block;
+    }
+    .eq-coeff {
+      font-family: var(--f-display);
+      font-size: 1em;
+      font-weight: 700;
+      color: inherit;
+    }
+    .eq-coeff.error-coeff {
+      color: var(--alert);
+      background: var(--alert-bg);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border-bottom: 2px solid var(--alert);
+      display: inline-block;
+      line-height: 1;
+    }
+    .eq-coeff.correct-coeff {
+      color: var(--ok);
     }
 
     /* Actions Bar */
@@ -702,6 +746,14 @@
       gap: 6px;
       font-size: 1.05rem;
       color: var(--brand);
+    }
+    .completed-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-weight: 700;
     }
 
     /* Review Screen (Challenge End) */
@@ -1018,16 +1070,12 @@
     <div class="task-indicator">
       Aufgabe <span id="chTaskIndex">1</span> von 10
     </div>
-    <div class="score-wrap">
+    <div class="completed-wrap">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-        <path d="M4 22h16"></path>
-        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
       </svg>
-      Punkte: <span id="chScore">0</span> / 10
+      Erledigt: <span id="chCompleted">0</span> / 10
     </div>
   </div>
 
@@ -1106,7 +1154,7 @@
       </div>
       <div style="display:flex; gap:10px;">
         <button id="btnCheck" class="btn primary" type="button">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="btnCheckIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           <span id="btnCheckText">Prüfen</span>
@@ -1287,6 +1335,70 @@ function parseFormulaAndCharge(raw) {
   return { counts, charge, phase, base: s };
 }
 
+const SUB_DIGITS_MAP = {
+  '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄',
+  '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉'
+};
+
+const TO_NORMAL_DIGITS = {
+  '₀':'0', '₁':'1', '₂':'2', '₃':'3', '₄':'4',
+  '₅':'5', '₆':'6', '₇':'7', '₈':'8', '₉':'9',
+  '⁰':'0', '¹':'1', '²':'2', '³':'3', '⁴':'4',
+  '⁵':'5', '⁶':'6', '⁷':'7', '⁸':'8', '⁹':'9',
+  '⁺':'+', '⁻':'-'
+};
+
+// Automatische Formatierung der Schülereingabe: Ziffern stets als Subscript, Ladungen hochgestellt
+function convertInputToChemicalUnicode(str) {
+  // Ziffern 0-9 direkt als Subscript
+  let s = str.replace(/[0-9]/g, d => SUB_DIGITS_MAP[d] || d);
+
+  // Ladungen: Subscript-Ziffer gefolgt von + oder - wird zu Hochstellung (z. B. ₂⁺ -> ²⁺)
+  const supNums = { '₀':'⁰', '₁':'¹', '₂':'²', '₃':'³', '₄':'⁴', '₅':'⁵', '₆':'⁶', '₇':'⁷', '₈':'⁸', '₉':'⁹' };
+  s = s.replace(/([₀-₉])\s*([\+\-\u2212])/g, (_, d, sign) => {
+    const sChar = (sign === '+' || sign === '\u207A') ? '⁺' : '⁻';
+    return (supNums[d] || d) + sChar;
+  });
+  // Element/Klammer gefolgt von + oder - (z. B. H+ -> H⁺, Cl- -> Cl⁻)
+  s = s.replace(/([A-Za-z\)])\s*([\+\-\u2212])/g, (_, letter, sign) => {
+    const sChar = (sign === '+' || sign === '\u207A') ? '⁺' : '⁻';
+    return letter + sChar;
+  });
+
+  return s;
+}
+
+// Wandelt Summenformel wie Fe2O3 in Unicode-Subscript (Fe₂O₃) oder Ba2+(aq) in Ba²⁺ um
+function formatFormulaToUnicode(raw) {
+  let s = raw.trim().replace(/\((aq|s|l|g)\)$/i, "");
+  let chargeStr = "";
+  const chargeMatch = s.match(/(\d*)([\+\-])$/) || s.match(/([\+\-])(\d*)$/);
+  if (chargeMatch) {
+    const sign = (chargeMatch[1] === "+" || chargeMatch[2] === "+") ? "⁺" : "⁻";
+    const num = (chargeMatch[1].replace(/[\+\-]/, "") || chargeMatch[2].replace(/[\+\-]/, ""));
+    const supNums = { '1':'¹', '2':'²', '3':'³', '4':'⁴', '5':'⁵', '6':'⁶', '7':'⁷', '8':'⁸', '9':'⁹' };
+    const supNum = num ? (supNums[num] || num) : "";
+    chargeStr = supNum + sign;
+    s = s.slice(0, -chargeMatch[0].length).trim();
+  }
+  s = s.replace(/[0-9]/g, d => SUB_DIGITS_MAP[d] || d);
+  return s + chargeStr;
+}
+
+function attachFormulaInputFormatter(inp) {
+  inp.addEventListener("input", () => {
+    const start = inp.selectionStart;
+    const end = inp.selectionEnd;
+    const orig = inp.value;
+    const converted = convertInputToChemicalUnicode(orig);
+    if (orig !== converted) {
+      inp.value = converted;
+      const diff = converted.length - orig.length;
+      inp.setSelectionRange(start + diff, end + diff);
+    }
+  });
+}
+
 // Saubere HTML-Formatierung chemischer Formeln
 function formatChemicalFormulaHTML(raw) {
   let s = raw.trim();
@@ -1296,6 +1408,11 @@ function formatChemicalFormulaHTML(raw) {
     phase = phaseMatch[1].toLowerCase();
     s = s.slice(0, -phaseMatch[0].length).trim();
   }
+
+  // Bereits vorhandene Unicode-Zeichen normalisieren
+  s = s.replace(/[\u2080-\u2089]/g, ch => TO_NORMAL_DIGITS[ch] || ch);
+  s = s.replace(/[\u2070-\u2079\u00B9\u00B2\u00B3]/g, ch => TO_NORMAL_DIGITS[ch] || ch);
+  s = s.replace(/[\u207A\+]/g, "+").replace(/[\u207B\-\u2212\u2013\u2014]/g, "-");
 
   let chargeStr = "";
   const chargeMatch = s.match(/(\d*)([\+\-])$/) || s.match(/([\+\-])(\d*)$/);
@@ -1317,17 +1434,37 @@ function formatChemicalFormulaHTML(raw) {
   return res;
 }
 
-// Eingabe-Normalisierung für Formeleingabe (Groß-/Kleinschreibung tolerant)
-function normalizeFormulaInput(str) {
+// Eingabe-Normalisierung für Formeleingabe (Groß-/Kleinschreibung wird exakt gefordert!)
+function normalizeFormulaInput(str, preserveCase = true) {
   let s = str.trim().replace(/\s+/g, "");
+  // Optionale Aggregatzustände wie (aq), (s), (l), (g) ignorieren
   s = s.replace(/\((aq|s|l|g)\)$/i, "");
-  return s.toLowerCase();
+  // Tief- und hochgestellte Zeichen normalisieren
+  s = s.replace(/[\u2080-\u2089\u2070-\u2079\u00B9\u00B2\u00B3\u207A\u207B]/g, ch => TO_NORMAL_DIGITS[ch] || ch);
+  // Typografische Minuszeichen angleichen
+  s = s.replace(/[\u2212\u2013\u2014]/g, "-");
+  // Ladungsformat harmonisieren: ^2+ -> 2+, +2 -> 2+, -2 -> 2-
+  s = s.replace(/\^/g, "");
+  s = s.replace(/([\+\-])(\d+)/g, "$2$1");
+  return preserveCase ? s : s.toLowerCase();
 }
 
 function compareFormulaInput(userInput, expectedFormula) {
-  const normIn = normalizeFormulaInput(userInput);
-  const normExp = normalizeFormulaInput(expectedFormula);
-  return normIn === normExp;
+  const normInExact = normalizeFormulaInput(userInput, true);
+  const normExpExact = normalizeFormulaInput(expectedFormula, true);
+
+  if (normInExact === normExpExact) {
+    return { ok: true, caseError: false };
+  }
+
+  // Prüfen, ob der Fehler lediglich an falscher Groß-/Kleinschreibung lag
+  const normInLower = normalizeFormulaInput(userInput, false);
+  const normExpLower = normalizeFormulaInput(expectedFormula, false);
+  if (normInLower === normExpLower) {
+    return { ok: false, caseError: true };
+  }
+
+  return { ok: false, caseError: false };
 }
 
 
@@ -1864,7 +2001,7 @@ const challengeBar = document.getElementById("challengeBar");
 const timerContainer = document.getElementById("timerContainer");
 const timerText = document.getElementById("timerText");
 const chTaskIndex = document.getElementById("chTaskIndex");
-const chScore = document.getElementById("chScore");
+const chCompleted = document.getElementById("chCompleted");
 
 const gameCard = document.getElementById("gameCard");
 const taskReactionName = document.getElementById("taskReactionName");
@@ -1891,6 +2028,7 @@ const explanationDetailText = document.getElementById("explanationDetailText");
 
 const btnReset = document.getElementById("btnReset");
 const btnCheck = document.getElementById("btnCheck");
+const btnCheckIcon = document.getElementById("btnCheckIcon");
 const btnCheckText = document.getElementById("btnCheckText");
 const btnNext = document.getElementById("btnNext");
 
@@ -2058,6 +2196,7 @@ function loadNewTask() {
     setupWordEquationUI();
   } else {
     wordEqBox.style.display = "none";
+    btnCheckIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
     btnCheckText.textContent = "Prüfen";
     renderBalancingEquation(state.currentTask);
   }
@@ -2069,6 +2208,7 @@ function setupWordEquationUI() {
   const pNames = state.currentTask.products.map(p => p.name).join(" + ");
   wordEqText.textContent = `${rNames} ➔ ${pNames}`;
   wordEqInstruction.textContent = "Schritt 1: Trage für jeden Stoff die korrekte chemische Summenformel ein.";
+  btnCheckIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
   btnCheckText.textContent = "Formeln prüfen";
 
   renderFormulaInputs(state.currentTask);
@@ -2124,6 +2264,7 @@ function renderFormulaInputs(task) {
   equationContainer.appendChild(rightSide);
 
   equationContainer.querySelectorAll(".formula-input").forEach(inp => {
+    attachFormulaInputFormatter(inp);
     inp.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -2187,7 +2328,7 @@ function createTermElement(item, id) {
   input.inputMode = "numeric";
   input.pattern = "[0-9]*";
   input.className = "coeff-input";
-  input.value = "1";
+  input.value = "";
   input.placeholder = "1";
   input.dataset.termId = id;
 
@@ -2198,22 +2339,28 @@ function createTermElement(item, id) {
   btnDown.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
 
   btnUp.addEventListener("click", () => {
-    let val = parseInt(input.value.trim(), 10);
+    const raw = input.value.trim();
+    let val = raw === "" ? 1 : parseInt(raw, 10);
     if (isNaN(val) || val < 1) val = 1;
     input.value = String(val + 1);
+    input.classList.remove("error-coeff", "correct-coeff");
   });
 
   btnDown.addEventListener("click", () => {
-    let val = parseInt(input.value.trim(), 10);
-    if (isNaN(val) || val <= 1) {
-      input.value = "1";
+    const raw = input.value.trim();
+    if (raw === "") return;
+    let val = parseInt(raw, 10);
+    if (isNaN(val) || val <= 2) {
+      input.value = "";
     } else {
       input.value = String(val - 1);
     }
+    input.classList.remove("error-coeff", "correct-coeff");
   });
 
   input.addEventListener("input", () => {
     input.value = input.value.replace(/[^0-9]/g, "");
+    input.classList.remove("error-coeff", "correct-coeff");
   });
 
   input.addEventListener("keydown", (e) => {
@@ -2246,7 +2393,10 @@ function handleReset() {
   if (state.mode === "wordEq" && state.wordEqPhase === 1) {
     equationContainer.querySelectorAll(".formula-input").forEach(i => i.value = "");
   } else {
-    equationContainer.querySelectorAll(".coeff-input").forEach(i => i.value = "1");
+    equationContainer.querySelectorAll(".coeff-input").forEach(i => {
+      i.value = "";
+      i.classList.remove("error-coeff", "correct-coeff");
+    });
   }
 }
 
@@ -2274,6 +2424,8 @@ function setCoefficientsInUI(reactants, products, disabled = false) {
     if (input) {
       input.value = String(c);
       input.disabled = disabled;
+      input.classList.remove("error-coeff");
+      if (disabled) input.classList.add("correct-coeff");
     }
   });
   products.forEach((c, idx) => {
@@ -2281,6 +2433,8 @@ function setCoefficientsInUI(reactants, products, disabled = false) {
     if (input) {
       input.value = String(c);
       input.disabled = disabled;
+      input.classList.remove("error-coeff");
+      if (disabled) input.classList.add("correct-coeff");
     }
   });
   equationContainer.querySelectorAll(".step-btn").forEach(btn => btn.disabled = disabled);
@@ -2419,33 +2573,41 @@ function handleCheck() {
 
 function handleWordEqFormulaCheck() {
   let allCorrect = true;
+  let hasCaseError = false;
   feedbackBox.style.display = "flex";
 
   state.currentTask.reactants.forEach((r, idx) => {
     const inp = document.getElementById(`inp_r_${idx}`);
     const box = document.getElementById(`f_box_r_${idx}`);
-    const isOk = compareFormulaInput(inp.value, r.f);
-    if (!isOk) allCorrect = false;
-    box.className = `chem-input-term ${isOk ? "valid" : "invalid"}`;
+    const res = compareFormulaInput(inp.value, r.f);
+    if (!res.ok) {
+      allCorrect = false;
+      if (res.caseError) hasCaseError = true;
+    }
+    box.className = `chem-input-term ${res.ok ? "valid" : "invalid"}`;
   });
 
   state.currentTask.products.forEach((p, idx) => {
     const inp = document.getElementById(`inp_p_${idx}`);
     const box = document.getElementById(`f_box_p_${idx}`);
-    const isOk = compareFormulaInput(inp.value, p.f);
-    if (!isOk) allCorrect = false;
-    box.className = `chem-input-term ${isOk ? "valid" : "invalid"}`;
+    const res = compareFormulaInput(inp.value, p.f);
+    if (!res.ok) {
+      allCorrect = false;
+      if (res.caseError) hasCaseError = true;
+    }
+    box.className = `chem-input-term ${res.ok ? "valid" : "invalid"}`;
   });
 
   if (allCorrect) {
     playSound("correct");
     feedbackBox.className = "feedback-box ok";
     feedbackTitle.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" color="var(--ok)"><polyline points="20 6 9 17 4 12"></polyline></svg> Formeln korrekt aufgestellt!`;
-    feedbackText.textContent = "Super! Die Summenformeln stimmen. Gleiche nun in Schritt 2 die Stöchiometriezahlen aus.";
+    feedbackText.textContent = "Super! Die Summenformeln stimmen exakt. Gleiche nun in Schritt 2 die Stöchiometriezahlen aus.";
     collapsibleSection.style.display = "none";
 
     state.wordEqPhase = 2;
     wordEqInstruction.textContent = "Schritt 2: Gleiche nun die Stöchiometriezahlen (Faktoren vor den Stoffen) aus.";
+    btnCheckIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
     btnCheckText.textContent = "Ausgleichung prüfen";
     renderBalancingEquation(state.currentTask);
 
@@ -2456,23 +2618,28 @@ function handleWordEqFormulaCheck() {
 
     if (state.wordEqFormulaAttempt === 1) {
       feedbackTitle.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" color="var(--alert)"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Formel noch nicht korrekt – 1 Korrekturversuch`;
-      feedbackText.textContent = "Achte auf die Elementsymbole und Indexzahlen (z. B. elementare Gase wie O₂ oder H₂, Ladungen bei Ionen). Probiere es noch einmal!";
+      if (hasCaseError) {
+        feedbackText.textContent = "Achte genau auf die chemische Groß- und Kleinschreibung! Elementsymbole beginnen immer mit einem Großbuchstaben (z. B. 'Ba' statt 'ba', 'O₂' statt 'o₂', 'Cl' statt 'CL' oder 'cl').";
+      } else {
+        feedbackText.textContent = "Achte auf Elementsymbole, exakte Groß-/Kleinschreibung und Indexzahlen (z. B. elementare Gase wie O₂ oder H₂, Ladungen bei Ionen). Probiere es noch einmal!";
+      }
     } else {
       feedbackTitle.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" color="var(--alert)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Richtige Formeln aufgedeckt`;
       feedbackText.textContent = "Hier sind die korrekten Summenformeln. Nun kannst du die Stöchiometriezahlen ausgleichen:";
 
       state.currentTask.reactants.forEach((r, idx) => {
         const inp = document.getElementById(`inp_r_${idx}`);
-        inp.value = r.f;
+        inp.value = formatFormulaToUnicode(r.f);
       });
       state.currentTask.products.forEach((p, idx) => {
         const inp = document.getElementById(`inp_p_${idx}`);
-        inp.value = p.f;
+        inp.value = formatFormulaToUnicode(p.f);
       });
 
       setTimeout(() => {
         state.wordEqPhase = 2;
         wordEqInstruction.textContent = "Schritt 2: Gleiche nun die Stöchiometriezahlen aus.";
+        btnCheckIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
         btnCheckText.textContent = "Ausgleichung prüfen";
         renderBalancingEquation(state.currentTask);
       }, 1400);
@@ -2507,9 +2674,57 @@ function handlePracticeCheck(evalResult, userCoeffs) {
     feedbackText.textContent = "Die Bilanz stimmt, aber in der Chemie wird das kleinste ganzzahlige Verhältnis gesucht. Teile alle Zahlen durch ihren gemeinsamen Teiler!";
     collapsibleSection.style.display = "none";
 
+    state.currentTask.reactants.forEach((r, idx) => {
+      const inp = equationContainer.querySelector(`[data-term-id="r_${idx}"]`);
+      if (inp) {
+        if (userCoeffs.reactants[idx] !== r.c) {
+          inp.classList.add("error-coeff");
+          inp.classList.remove("correct-coeff");
+        } else {
+          inp.classList.remove("error-coeff");
+        }
+      }
+    });
+    state.currentTask.products.forEach((p, idx) => {
+      const inp = equationContainer.querySelector(`[data-term-id="p_${idx}"]`);
+      if (inp) {
+        if (userCoeffs.products[idx] !== p.c) {
+          inp.classList.add("error-coeff");
+          inp.classList.remove("correct-coeff");
+        } else {
+          inp.classList.remove("error-coeff");
+        }
+      }
+    });
+
   } else {
     playSound("error");
     state.practiceAttempt++;
+
+    state.currentTask.reactants.forEach((r, idx) => {
+      const inp = equationContainer.querySelector(`[data-term-id="r_${idx}"]`);
+      if (inp) {
+        if (userCoeffs.reactants[idx] !== r.c) {
+          inp.classList.add("error-coeff");
+          inp.classList.remove("correct-coeff");
+        } else {
+          inp.classList.remove("error-coeff");
+          inp.classList.add("correct-coeff");
+        }
+      }
+    });
+    state.currentTask.products.forEach((p, idx) => {
+      const inp = equationContainer.querySelector(`[data-term-id="p_${idx}"]`);
+      if (inp) {
+        if (userCoeffs.products[idx] !== p.c) {
+          inp.classList.add("error-coeff");
+          inp.classList.remove("correct-coeff");
+        } else {
+          inp.classList.remove("error-coeff");
+          inp.classList.add("correct-coeff");
+        }
+      }
+    });
 
     const mismatchElems = evalResult.elementDetails
       .filter(d => !d.match)
@@ -2523,7 +2738,7 @@ function handlePracticeCheck(evalResult, userCoeffs) {
     if (state.practiceAttempt === 1) {
       feedbackBox.className = "feedback-box alert";
       feedbackTitle.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" color="var(--alert)"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Noch nicht ausgeglichen – 1 Korrekturversuch`;
-      feedbackText.textContent = `${errorDetail}Prüfe die Atombilanz und passe die Stöchiometriezahlen an!`;
+      feedbackText.textContent = `${errorDetail}Prüfe die rot markierten Koeffizienten und passe die Zahlen an!`;
       collapsibleSection.style.display = "none";
       btnCheckText.textContent = "Korrektur prüfen";
 
@@ -2609,14 +2824,15 @@ function updateTimerDisplay() {
 function loadChallengeTask(index) {
   state.currentTask = state.challenge.tasks[index];
   chTaskIndex.textContent = String(index + 1);
-  chScore.textContent = String(state.challenge.score);
+  chCompleted.textContent = String(index);
 
   taskReactionName.textContent = state.currentTask.name;
 
   atomBalanceCard.style.display = "none";
   feedbackBox.style.display = "none";
   btnCheck.style.display = "inline-flex";
-  btnCheckText.textContent = "Prüfen & Weiter";
+  btnCheckIcon.innerHTML = '<path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>';
+  btnCheckText.textContent = "Nächste Aufgabe";
   btnNext.style.display = "none";
   btnReset.disabled = false;
 
@@ -2631,7 +2847,6 @@ function handleChallengeCheck(evalResult, userCoeffs) {
   } else {
     playSound("error");
   }
-  chScore.textContent = String(state.challenge.score);
 
   state.challenge.answers.push({
     task: state.currentTask,
@@ -2751,10 +2966,50 @@ function handleClearLeaderboard() {
   }
 }
 
-function formatEquationString(task, coeffs) {
-  const rStr = task.reactants.map((r, i) => `${coeffs.reactants[i] > 1 ? coeffs.reactants[i] + " " : ""}${r.f}`).join(" + ");
-  const pStr = task.products.map((p, i) => `${coeffs.products[i] > 1 ? coeffs.products[i] + " " : ""}${p.f}`).join(" + ");
-  return formatChemicalFormulaHTML(`${rStr} → ${pStr}`);
+function formatEquationString(task, coeffs, targetCoeffs = null) {
+  const rStr = task.reactants.map((r, i) => {
+    const c = coeffs.reactants[i];
+    let cClass = "eq-coeff";
+    let isWrong = false;
+    if (targetCoeffs) {
+      if (c !== targetCoeffs.reactants[i]) {
+        isWrong = true;
+        cClass += " error-coeff";
+      } else if (c > 1) {
+        cClass += " correct-coeff";
+      }
+    }
+    let cStr = "";
+    if (isWrong) {
+      cStr = `<span class="${cClass}">${c}</span>&nbsp;`;
+    } else if (c > 1) {
+      cStr = `<span class="${cClass}">${c}</span>&nbsp;`;
+    }
+    return `${cStr}${formatChemicalFormulaHTML(r.f)}`;
+  }).join(" + ");
+
+  const pStr = task.products.map((p, i) => {
+    const c = coeffs.products[i];
+    let cClass = "eq-coeff";
+    let isWrong = false;
+    if (targetCoeffs) {
+      if (c !== targetCoeffs.products[i]) {
+        isWrong = true;
+        cClass += " error-coeff";
+      } else if (c > 1) {
+        cClass += " correct-coeff";
+      }
+    }
+    let cStr = "";
+    if (isWrong) {
+      cStr = `<span class="${cClass}">${c}</span>&nbsp;`;
+    } else if (c > 1) {
+      cStr = `<span class="${cClass}">${c}</span>&nbsp;`;
+    }
+    return `${cStr}${formatChemicalFormulaHTML(p.f)}`;
+  }).join(" + ");
+
+  return `${rStr} &rarr; ${pStr}`;
 }
 
 function renderReviewList() {
@@ -2779,7 +3034,7 @@ function renderReviewList() {
           Falsch (0)
          </span>`;
 
-    const userEqHTML = formatEquationString(entry.task, entry.userCoeffs);
+    const userEqHTML = formatEquationString(entry.task, entry.userCoeffs, correctCoeffs);
     const correctEqHTML = formatEquationString(entry.task, correctCoeffs);
 
     card.innerHTML = `

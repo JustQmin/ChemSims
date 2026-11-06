@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haworth-Rotation</title>
+<style>
+  :root{
+    --ink:#1b1b1b; --muted:#6b7280; --line:#e3e5e8; --panel:#f4f5f7;
+    --accent:#0072B2; --accent-soft:#e6f1f8;
+    --font:"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:var(--font);color:var(--ink);background:#fff}
+  #app{display:flex;height:100vh;overflow:hidden}
+  aside{width:300px;flex:0 0 300px;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:16px 14px;gap:12px;background:#fbfbfc;transition:margin-left .25s}
+  body.collapsed aside{margin-left:-300px}
+  aside h1{font-size:18px;margin:0 0 2px;font-weight:600}
+  #search{width:100%;font:inherit;font-size:15px;padding:9px 11px;border:1px solid #cfd3d8;border-radius:8px;outline:none;background:#fff}
+  #search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .sw{position:relative}
+  #search{padding-right:30px}
+  .sw::after{content:"▾";position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:13px}
+  #list{display:none;position:absolute;top:calc(100% + 6px);left:0;width:360px;max-height:min(70vh,600px);overflow:auto;border:1px solid #d5d9de;border-radius:10px;background:#fff;box-shadow:0 12px 32px rgba(0,0,0,.16);z-index:50}
+  body.listopen #list{display:block}
+  aside .fill{flex:1}
+  .grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:9px 11px 3px}
+  .item{padding:6px 11px;cursor:pointer;font-size:15px;display:flex;justify-content:space-between;gap:8px}
+  .item small{color:var(--muted);font-size:12px;white-space:nowrap}
+  .item:hover{background:#f1f3f5}
+  .item.act{background:var(--accent-soft)}
+  .item.sel{font-weight:600;color:var(--accent)}
+  .none{padding:10px 11px;color:var(--muted);font-size:14px}
+  .row{display:flex;gap:8px;align-items:center}
+  .seg{display:flex;border:1px solid #cfd3d8;border-radius:8px;overflow:hidden;flex:1}
+  .seg button{flex:1;font:inherit;font-size:14px;padding:7px 4px;border:0;background:#fff;cursor:pointer;border-left:1px solid #cfd3d8}
+  .seg button:first-child{border-left:0}
+  .seg button.on{background:var(--accent);color:#fff}
+  .seg button:disabled{color:#c4c8cd;cursor:default;background:#fafafa}
+  .chk{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;user-select:none}
+  .chk input{width:16px;height:16px;accent-color:var(--accent)}
+  .btn{font:inherit;font-size:14px;padding:7px 11px;border:1px solid #cfd3d8;border-radius:8px;background:#fff;cursor:pointer}
+  .btn:hover{background:#f1f3f5}
+  .hint{font-size:12px;color:var(--muted);margin:0}
+  main{flex:1;display:flex;flex-direction:column;min-width:0}
+  #top{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line)}
+  #top .sp{flex:1}
+  #top label{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  #tempo{accent-color:var(--accent);width:130px}
+  #stageWrap{flex:1;min-height:0;position:relative}
+  #stage{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none}
+  #ctrl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:stretch;padding:12px 16px 16px;border-top:1px solid var(--line)}
+  .op{display:flex;align-items:center;gap:8px;font:inherit;padding:6px 14px 6px 6px;border:1px solid #cfd3d8;border-radius:12px;background:#fff;cursor:pointer;text-align:left}
+  .op:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .op svg{flex:0 0 auto}
+  .op b{display:block;font-size:16px;font-weight:600}
+  .op span{display:block;font-size:12.5px;color:var(--muted)}
+  .op kbd,.btn kbd{font:11px var(--font);border:1px solid #cfd3d8;border-bottom-width:2px;border-radius:4px;padding:0 5px;margin-left:6px;color:var(--muted);background:#fafafa}
+  .stack{display:flex;flex-direction:column;gap:6px}
+  .stack .btn{display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .op{min-width:0}
+  .sep{width:1px;background:var(--line);margin:0 4px}
+  .busy .op{opacity:.55;cursor:default}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside>
+    <h1>Haworth-Rotation</h1>
+    <div class="sw"><input id="search" type="text" placeholder="Zucker suchen …" autocomplete="off" spellcheck="false">
+    <div id="list"></div></div>
+    <div class="row"><div class="seg" id="segAn"><button data-v="a">α</button><button data-v="b">β</button></div>
+      <div class="seg" id="segSer"><button data-v="D">D</button><button data-v="L">L</button></div></div>
+    <div class="seg" id="segRing" style="flex:0 0 auto"><button data-v="p">Pyranose</button><button data-v="f">Furanose</button></div>
+    <label class="chk"><input type="checkbox" id="chkNum"> C-Nummern <kbd style="font-size:11px;color:#6b7280;border:1px solid #cfd3d8;border-radius:4px;padding:0 5px">N</kbd></label>
+    <label class="chk"><input type="checkbox" id="chkAnom"> Anomeres C markieren <kbd style="font-size:11px;color:#6b7280;border:1px solid #cfd3d8;border-radius:4px;padding:0 5px">A</kbd></label>
+    <button class="btn" id="clearHL">Markierungen löschen</button>
+    <p class="hint">Klick auf Ringatom oder Gruppe: farbig markieren (mehrfach klicken wechselt die Farbe).</p>
+    <div class="fill"></div>
+  </aside>
+  <main>
+    <div id="top">
+      <button class="btn" id="tglSide" title="Seitenleiste ein/aus (S)">☰</button>
+      <div class="sp"></div>
+      <label>Tempo <input type="range" id="tempo" min="0.35" max="2.5" step="0.05" value="1"></label>
+      <button class="btn" id="fs" title="Vollbild (F)">Vollbild</button>
+    </div>
+    <div id="stageWrap"><svg id="stage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div id="ctrl">
+      <button class="op" data-op="K"></button>
+      <button class="op" data-op="W"></button>
+      <button class="op" data-op="L"></button>
+      <button class="op" data-op="R"></button>
+      <div class="sep"></div>
+      <div class="stack"><button class="btn" id="undo">Rückgängig<kbd>⌫</kbd></button>
+      <button class="btn" id="reset">Zurücksetzen<kbd>0</kbd></button></div>
+    </div>
+  </main>
+</div>
+<script>
+"use strict";
+/* ================= Mathe ================= */
+const FONT = '"Segoe UI","Helvetica Neue",Arial,sans-serif';
+const EL = 33*Math.PI/180, cE = Math.cos(EL), sE = Math.sin(EL);
+const proj = v => ({x:v[0], y:v[1]*cE - v[2]*sE, d:v[1]*sE + v[2]*cE});
+function projYaw(v, yaw){ const c=Math.cos(yaw), s=Math.sin(yaw); return proj([v[0]*c+v[2]*s, v[1], -v[0]*s+v[2]*c]); }
+const qId = [1,0,0,0];
+const qAA = (a,t) => { const s=Math.sin(t/2); return [Math.cos(t/2), a[0]*s, a[1]*s, a[2]*s]; };
+const qMul = (a,b) => [
+  a[0]*b[0]-a[1]*b[1]-a[2]*b[2]-a[3]*b[3],
+  a[0]*b[1]+a[1]*b[0]+a[2]*b[3]-a[3]*b[2],
+  a[0]*b[2]-a[1]*b[3]+a[2]*b[0]+a[3]*b[1],
+  a[0]*b[3]+a[1]*b[2]-a[2]*b[1]+a[3]*b[0]];
+function qRot(q,v){
+  const [w,x,y,z]=q;
+  const tx=2*(y*v[2]-z*v[1]), ty=2*(z*v[0]-x*v[2]), tz=2*(x*v[1]-y*v[0]);
+  return [v[0]+w*tx+(y*tz-z*ty), v[1]+w*ty+(z*tx-x*tz), v[2]+w*tz+(x*ty-y*tx)];
+}
+const qNorm = q => { const l=Math.hypot(...q); return q.map(c=>c/l); };
+function qSlerp(a,b,t){
+  let d=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3];
+  if(d<0){ b=b.map(c=>-c); d=-d; }
+  if(d>0.9995) return qNorm(a.map((c,i)=>c+(b[i]-c)*t));
+  const th=Math.acos(d), s=Math.sin(th), wa=Math.sin((1-t)*th)/s, wb=Math.sin(t*th)/s;
+  return a.map((c,i)=>wa*c+wb*b[i]);
+}
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const ss=(a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+const ease=t=> t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const f1=x=>x.toFixed(1);
+function hex2rgb(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.substr(i,2),16)); }
+function mixCol(a,b,t){ const A=hex2rgb(a),B=hex2rgb(b); return '#'+A.map((c,i)=>Math.round(lerp(c,B[i],t)).toString(16).padStart(2,'0')).join(''); }
+
+/* ================= Zuckerkatalog ================= */
+const G = {AH:'Aldohexosen',AP:'Aldopentosen',KH:'Ketohexosen',KP:'Ketopentosen',DE:'Desoxyzucker',AM:'Aminozucker',UR:'Uronsäuren'};
+// t: Typ, c: Konfiguration der Ringstereozentren (R = rechts in Fischer, L = links), ab dem C nach dem anomeren C
+const SUGARS = [
+ {k:'glc',n:'Glucose',g:G.AH,t:'AH',c:'RLR',stem:'Gluco',al:['glucose','traubenzucker','dextrose','glc','gluco','glucopyranose']},
+ {k:'man',n:'Mannose',g:G.AH,t:'AH',c:'LLR',stem:'Manno',al:['mannose','man','manno']},
+ {k:'gal',n:'Galactose',g:G.AH,t:'AH',c:'RLL',stem:'Galacto',al:['galactose','gal','galacto','schleimzucker']},
+ {k:'all',n:'Allose',g:G.AH,t:'AH',c:'RRR',stem:'Allo',al:['allose','allo']},
+ {k:'alt',n:'Altrose',g:G.AH,t:'AH',c:'LRR',stem:'Altro',al:['altrose','altro']},
+ {k:'gul',n:'Gulose',g:G.AH,t:'AH',c:'RRL',stem:'Gulo',al:['gulose','gulo']},
+ {k:'ido',n:'Idose',g:G.AH,t:'AH',c:'LRL',stem:'Ido',al:['idose','ido']},
+ {k:'tal',n:'Talose',g:G.AH,t:'AH',c:'LLL',stem:'Talo',al:['talose','talo']},
+ {k:'rib',n:'Ribose',g:G.AP,t:'AP',c:'RR',stem:'Ribo',rings:['f','p'],al:['ribose','rib','ribo']},
+ {k:'ara',n:'Arabinose',g:G.AP,t:'AP',c:'LR',stem:'Arabino',rings:['f','p'],al:['arabinose','ara','arabino']},
+ {k:'xyl',n:'Xylose',g:G.AP,t:'AP',c:'RL',stem:'Xylo',rings:['p','f'],al:['xylose','xyl','xylo','holzzucker']},
+ {k:'lyx',n:'Lyxose',g:G.AP,t:'AP',c:'LL',stem:'Lyxo',rings:['p','f'],al:['lyxose','lyx','lyxo']},
+ {k:'fru',n:'Fructose',g:G.KH,t:'KH',c:'LR',stem:'Fructo',rings:['f','p'],al:['fructose','fruchtzucker','levulose','laevulose','fru','fructo']},
+ {k:'psi',n:'Psicose (Allulose)',g:G.KH,t:'KH',c:'RR',stem:'Psico',rings:['f','p'],al:['psicose','allulose','psico','ribohexulose']},
+ {k:'sor',n:'Sorbose',g:G.KH,t:'KH',c:'RL',stem:'Sorbo',rings:['p','f'],al:['sorbose','sorbo']},
+ {k:'tag',n:'Tagatose',g:G.KH,t:'KH',c:'LL',stem:'Tagato',rings:['p','f'],al:['tagatose','tagato']},
+ {k:'rbl',n:'Ribulose',g:G.KP,t:'KP',c:'R',stem:'Ribulo',rings:['f'],al:['ribulose','ribulo']},
+ {k:'xlu',n:'Xylulose',g:G.KP,t:'KP',c:'L',stem:'Xylulo',rings:['f'],al:['xylulose','xylulo']},
+ {k:'dri',n:'2-Desoxyribose',g:G.DE,t:'AP',c:'RR',stem:'Ribo',pre:'2-Desoxy-',deoxy:2,rings:['f','p'],al:['desoxyribose','2desoxyribose','deoxyribose','dribose','dna zucker','dnazucker']},
+ {k:'dgl',n:'2-Desoxyglucose',g:G.DE,t:'AH',c:'RLR',stem:'Gluco',pre:'2-Desoxy-',deoxy:2,al:['desoxyglucose','2desoxyglucose','deoxyglucose','2dg']},
+ {k:'fuc',n:'Fucose',g:G.DE,t:'AH',c:'RLL',stem:'Fuco',exo:'CH3',ser:'L',al:['fucose','fuc','fuco','6desoxygalactose']},
+ {k:'rha',n:'Rhamnose',g:G.DE,t:'AH',c:'LLR',stem:'Rhamno',exo:'CH3',ser:'L',al:['rhamnose','rha','rhamno','6desoxymannose']},
+ {k:'qui',n:'Chinovose',g:G.DE,t:'AH',c:'RLR',stem:'Chinovo',exo:'CH3',al:['chinovose','quinovose','chinovo','6desoxyglucose']},
+ {k:'gln',n:'Glucosamin',g:G.AM,t:'AH',c:'RLR',stem:'Gluco',pre:'2-Amino-2-desoxy-',x:{2:'NH2'},al:['glucosamin','glucosamine','glcn','aminoglucose']},
+ {k:'gan',n:'Galactosamin',g:G.AM,t:'AH',c:'RLL',stem:'Galacto',pre:'2-Amino-2-desoxy-',x:{2:'NH2'},al:['galactosamin','galactosamine','galn']},
+ {k:'mnn',n:'Mannosamin',g:G.AM,t:'AH',c:'LLR',stem:'Manno',pre:'2-Amino-2-desoxy-',x:{2:'NH2'},al:['mannosamin','mannosamine','mann']},
+ {k:'nag',n:'N-Acetylglucosamin',g:G.AM,t:'AH',c:'RLR',stem:'Gluco',pre:'2-Acetamido-2-desoxy-',x:{2:'NHAc'},al:['nacetylglucosamin','acetylglucosamin','nacetylglucosamine','glcnac','nag']},
+ {k:'ngl',n:'N-Acetylgalactosamin',g:G.AM,t:'AH',c:'RLL',stem:'Galacto',pre:'2-Acetamido-2-desoxy-',x:{2:'NHAc'},al:['nacetylgalactosamin','acetylgalactosamin','galnac']},
+ {k:'gca',n:'Glucuronsäure',g:G.UR,t:'AH',c:'RLR',stem:'Gluco',suf:'uronsäure',exo:'COOH',al:['glucuronsaeure','glucuronsaure','glucuronic acid','glca','glucuronat']},
+ {k:'gaa',n:'Galacturonsäure',g:G.UR,t:'AH',c:'RLL',stem:'Galacto',suf:'uronsäure',exo:'COOH',al:['galacturonsaeure','galacturonsaure','galacturonic acid','gala','galacturonat']},
+ {k:'mna',n:'Mannuronsäure',g:G.UR,t:'AH',c:'LLR',stem:'Manno',suf:'uronsäure',exo:'COOH',al:['mannuronsaeure','mannuronsaure','mannuronic acid','mana']},
+ {k:'ida',n:'Iduronsäure',g:G.UR,t:'AH',c:'LRL',stem:'Ido',suf:'uronsäure',exo:'COOH',ser:'L',al:['iduronsaeure','iduronsaure','iduronic acid','idoa']},
+ {k:'gua',n:'Guluronsäure',g:G.UR,t:'AH',c:'RRL',stem:'Gulo',suf:'uronsäure',exo:'COOH',ser:'L',al:['guluronsaeure','guluronsaure','guluronic acid','gula']},
+];
+const TYPE_LABEL = {AH:'Aldohexose',AP:'Aldopentose',KH:'Ketohexose',KP:'Ketopentose'};
+function norm(s){
+  return s.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/desoxy/g,'deoxy').replace(/k/g,'c').replace(/[^a-z0-9]/g,'');
+}
+SUGARS.forEach(s=>{ s.rings = s.rings || ['p']; s.ser = s.ser || 'D'; s.nal = [...new Set([norm(s.n), ...s.al.map(norm)])]; });
+
+/* ================= Molekülaufbau ================= */
+const DEG = Math.PI/180;
+function build(def, an, ser, ring){
+  const n = ring==='p'?6:5, nC=n-1;
+  const angs = ring==='p' ? [0,60,120,180,240] : [342,54,126,198];
+  const first = def.t[0]==='K' ? 2 : 1;
+  const verts = [];
+  for(let i=0;i<nC;i++) verts.push({ang:angs[i]*DEG, num:first+i, isO:false});
+  verts.push({ang:(ring==='p'?300:270)*DEG, num:null, isO:true});
+  const subs=[];
+  const add=(vi,dir,kind,slot,exoNum)=>subs.push({vi,dir,kind,hid:verts[vi].num+':'+slot,exoNum:exoNum||null});
+  const pair=(vi,letter,het)=>{ const d=letter==='R'?-1:1; add(vi,d,het,'x'); add(vi,-d,'H','h'); };
+  const aDown = an==='a';
+  if(def.t[0]==='A'){ add(0,aDown?-1:1,'OH','x'); add(0,aDown?1:-1,'H','h'); }
+  else { add(0,aDown?-1:1,'OH','x'); add(0,aDown?1:-1,'CH2OH','c',1); }
+  const cfg=def.c;
+  for(let j=0;j<cfg.length;j++){
+    const vi=1+j, num=verts[vi].num;
+    if(def.deoxy===num){ add(vi,1,'H','hu'); add(vi,-1,'H','hd'); }
+    else pair(vi,cfg[j],(def.x&&def.x[num])||'OH');
+  }
+  const vi=1+cfg.length, rem=nC-vi;
+  if(rem===1){ add(vi,1,def.exo||'CH2OH','c',verts[vi].num+1); add(vi,-1,'H','h'); }
+  else { pair(vi,'R','OH'); add(vi+1,1,'H','hu'); add(vi+1,-1,'H','hd'); }
+  if(ser==='L') subs.forEach(s=>s.dir*=-1);
+  const anSym = an==='a'?'α':'β';
+  const suf = def.suf||'ose';
+  const stem = def.pre ? def.stem.toLowerCase() : def.stem;
+  const name = (def.pre||'') + anSym + '-' + ser + '-' + stem + (ring==='p'?'pyran':'furan') + suf;
+  return {n, verts, subs, name, trivial:(ser==='L'?'L-':'D-')+def.n, ring};
+}
+function asMerged(M){ return {n:M.n, verts:M.verts.map(v=>({...v, nums: v.num==null?[]:[{num:v.num,a:1}]})), subs:M.subs.map(s=>({...s,a:1}))}; }
+function merge(A,B,t){
+  const key=s=>s.vi+'|'+s.dir+'|'+s.kind+'|'+s.exoNum+'|'+s.hid;
+  const ka=new Map(A.subs.map(s=>[key(s),s])), kb=new Set(B.subs.map(key));
+  const subs=[];
+  B.subs.forEach(s=>subs.push({...s,a:ka.has(key(s))?1:t}));
+  A.subs.forEach(s=>{ if(!kb.has(key(s))) subs.push({...s,a:1-t}); });
+  const verts=B.verts.map((v,i)=>{
+    const o=A.verts[i]; let nums=[];
+    if(v.num!=null){ if(o.num===v.num) nums=[{num:v.num,a:1}]; else { nums=[{num:v.num,a:t}]; if(o.num!=null) nums.push({num:o.num,a:1-t}); } }
+    return {...v,nums};
+  });
+  return {n:B.n,verts,subs};
+}
+
+/* ================= Beschriftungen ================= */
+const LBL = {
+  OH:{R:[['OH']],L:[['HO']]}, H:{S:[['H']]}, O:{S:[['O']]},
+  CH2OH:{R:[['CH'],['2',1],['OH']],L:[['HOH'],['2',1],['C']]},
+  CH3:{R:[['CH'],['3',1]],L:[['H'],['3',1],['C']]},
+  COOH:{R:[['COOH']],L:[['HOOC']]},
+  NH2:{R:[['NH'],['2',1]],L:[['H'],['2',1],['N']]},
+  NHAc:{R:[['NHAc']],L:[['AcHN']]},
+};
+const CW={};
+(function(){ const c=document.createElement('canvas').getContext('2d'); c.font='100px '+FONT; ['O','H','C','N','A'].forEach(ch=>CW[ch]=c.measureText(ch).width); })();
+function textSVG(segs,x,y,anchor,fs,fill,bg,halo){
+  let s=`<text x="${f1(x)}" y="${f1(y)}" font-size="${f1(fs)}" text-anchor="${anchor}" fill="${fill}" stroke="${bg}" stroke-width="${f1(halo)}" stroke-linejoin="round" paint-order="stroke">`;
+  let sh=0;
+  for(const [t,sub] of segs){
+    if(sub){ s+=`<tspan font-size="${f1(fs*0.68)}" dy="${f1(fs*0.28)}">${t}</tspan>`; sh+=fs*0.28; }
+    else { s+= sh? `<tspan dy="${f1(-sh)}">${t}</tspan>` : `<tspan>${t}</tspan>`; sh=0; }
+  }
+  return s+'</text>';
+}
+
+/* ================= Zeichnen: Molekül ================= */
+const L_BOND=0.6, SHR=0.64, L_LAB=0.15, TH=0.016, TK=0.056;
+const PAL=['#E69F00','#009E73','#CC79A7','#56B4E9'];
+const ANOM_COL='#E69F00';
+const STY_MAIN={ink:'#1b1b1b',num:'#d62728',bg:'#ffffff',hl:1};
+const STY_BEF ={ink:'#a2a5aa',num:'#eba3a3',bg:'#f4f5f7',hl:0.55};
+const mixSty=(a,b,t)=>({ink:mixCol(a.ink,b.ink,t),num:mixCol(a.num,b.num,t),bg:mixCol(a.bg,b.bg,t),hl:lerp(a.hl,b.hl,t)});
+function hlColor(c,sty){ return sty.hl>=1?c:mixCol(c,sty.bg,1-sty.hl); }
+
+function molSVG(M,q,cx,cy,sc,sty,opt){
+  opt=opt||{};
+  const X=x=>cx+x*sc, Y=y=>cy-y*sc;
+  const V=M.verts.map(v=>{ const p3=qRot(q,[Math.cos(v.ang),0,Math.sin(v.ang)]); return {p3,s:proj(p3),v}; });
+  const items=[], labels=[], nums=[], disks=[], hits=[];
+  const wOf=p=>sc*(TH+(TK-TH)*ss(-0.1,0.72,p.s.d));
+  // Ringkanten (keilförmig, Dicke aus Tiefe)
+  for(let i=0;i<M.n;i++){
+    const a=V[i], b=V[(i+1)%M.n];
+    const ax=X(a.s.x), ay=Y(a.s.y), bx=X(b.s.x), by=Y(b.s.y);
+    let nx=-(by-ay), ny=bx-ax; const l=Math.hypot(nx,ny)||1; nx/=l; ny/=l;
+    const wa=wOf(a)/2, wb=wOf(b)/2;
+    let d=`M${f1(ax+nx*wa)} ${f1(ay+ny*wa)}L${f1(bx+nx*wb)} ${f1(by+ny*wb)}L${f1(bx-nx*wb)} ${f1(by-ny*wb)}L${f1(ax-nx*wa)} ${f1(ay-ny*wa)}Z`;
+    for(const [px,py,r] of [[ax,ay,wa],[bx,by,wb]]) d+=`M${f1(px-r)} ${f1(py)}a${f1(r)} ${f1(r)} 0 1 0 ${f1(2*r)} 0a${f1(r)} ${f1(r)} 0 1 0 ${f1(-2*r)} 0Z`;
+    items.push({d:(a.s.d+b.s.d)/2, s:`<path d="${d}" fill="${sty.ink}"/>`});
+  }
+  // Ringatome: O-Beschriftung, Nummern, Markierung, Klickziele
+  V.forEach((P,i)=>{
+    const v=P.v, hid=v.isO?'O:ring':v.num+':ring';
+    const col = opt.hl&&opt.hl.has(hid) ? PAL[opt.hl.get(hid)] : (opt.anom&&i===0 ? ANOM_COL : null);
+    if(col) disks.push(`<circle cx="${f1(X(P.s.x))}" cy="${f1(Y(P.s.y))}" r="${f1(0.085*sc)}" fill="${hlColor(col,sty)}"/>`);
+    if(v.isO){
+      const fs=0.15*sc;
+      labels.push({d:P.s.d+0.001, s:`<circle cx="${f1(X(P.s.x))}" cy="${f1(Y(P.s.y))}" r="${f1(0.062*sc)}" fill="${sty.bg}"/>`+textSVG([['O']],X(P.s.x),Y(P.s.y)+0.35*fs,'middle',fs,col?hlColor(col,sty):sty.ink,sty.bg,0.045*sc)});
+    }
+    if(opt.nums && v.nums && v.nums.length){
+      const r3=qRot(q,[Math.cos(v.ang),0,Math.sin(v.ang)]); // radial = Position (Ringzentrum im Ursprung)
+      const pr=proj(r3);
+      const sgn=2*ss(-0.15,0.15,pr.x+0.2)-1;
+      const nx=P.s.x+pr.x*0.2+sgn*0.11, ny=P.s.y+pr.y*0.2;
+      const nfs=0.12*sc;
+      v.nums.forEach(nm=>{ if(nm.a>0.01) nums.push(`<text x="${f1(X(nx))}" y="${f1(Y(ny)+0.36*nfs)}" font-size="${f1(nfs)}" text-anchor="middle" fill="${sty.num}" opacity="${nm.a.toFixed(3)}" stroke="${sty.bg}" stroke-width="${f1(0.03*sc)}" paint-order="stroke" font-weight="600">${nm.num}</text>`); });
+    }
+    if(opt.interactive) hits.push(`<circle data-hid="${hid}" cx="${f1(X(P.s.x))}" cy="${f1(Y(P.s.y))}" r="${f1(0.09*sc)}" fill="transparent" pointer-events="all" style="cursor:pointer"/>`);
+  });
+  // Substituenten
+  M.subs.forEach(sb=>{
+    if(sb.a<=0.004) return;
+    const P=V[sb.vi];
+    const d3=qRot(q,[0,sb.dir,0]); const dS=proj(d3);
+    const vy=P.s.y;
+    const shr=clamp(ss(0.08,0.33,vy)*ss(0.15,0.7,-dS.y)+ss(0.08,0.33,-vy)*ss(0.15,0.7,dS.y),0,1);
+    const Ls=L_BOND*(1-SHR*shr);
+    const e3=[P.p3[0]+d3[0]*Ls,P.p3[1]+d3[1]*Ls,P.p3[2]+d3[2]*Ls];
+    const l3=[P.p3[0]+d3[0]*(Ls+L_LAB),P.p3[1]+d3[1]*(Ls+L_LAB),P.p3[2]+d3[2]*(Ls+L_LAB)];
+    const eS=proj(e3), lS=proj(l3);
+    const col = opt.hl&&opt.hl.has(sb.hid) ? hlColor(PAL[opt.hl.get(sb.hid)],sty) : null;
+    const ink = col||sty.ink;
+    const op = sb.a<1?` opacity="${sb.a.toFixed(3)}"`:'';
+    items.push({d:(P.s.d+eS.d)/2, s:`<line x1="${f1(X(P.s.x))}" y1="${f1(Y(P.s.y))}" x2="${f1(X(eS.x))}" y2="${f1(Y(eS.y))}" stroke="${ink}" stroke-width="${f1(sc*(col?0.019:0.0125))}" stroke-linecap="round"${op}/>`});
+    // Text: Ausrichtung nach Seite des Ringatoms, weich überblendet
+    const fs=0.15*sc, lx=X(lS.x), ly=Y(lS.y)+0.35*fs, halo=0.045*sc;
+    const def=LBL[sb.kind];
+    let g='';
+    const nfs=0.12*sc;
+    if(def.S){ g=textSVG(def.S,lx,ly,'middle',fs,ink,sty.bg,halo); }
+    else {
+      const wR=ss(-0.12,0.12,P.s.x*(1-2*shr)+1.6*dS.x+0.2);
+      const vr=(segs,right,a)=>{
+        if(a<0.01) return '';
+        const ch = right ? segs[0][0][0] : segs[segs.length-1][0].slice(-1);
+        const cw=CW[ch]*fs/100;
+        let s=textSVG(segs, right?lx-cw/2:lx+cw/2, ly, right?'start':'end', fs, ink, sty.bg, halo);
+        if(opt.nums && sb.exoNum) s+=`<text font-weight="600" x="${f1(right?lx-cw/2-0.015*sc:lx+cw/2+0.015*sc)}" y="${f1(ly-0.38*fs)}" font-size="${f1(nfs)}" text-anchor="${right?'end':'start'}" fill="${sty.num}" stroke="${sty.bg}" stroke-width="${f1(0.025*sc)}" paint-order="stroke">${sb.exoNum}</text>`;
+        return a<0.99?`<g opacity="${a.toFixed(3)}">${s}</g>`:s;
+      };
+      g=vr(def.R,true,wR)+vr(def.L,false,1-wR);
+    }
+    labels.push({d:lS.d, s: sb.a<1?`<g opacity="${sb.a.toFixed(3)}">${g}</g>`:g});
+    if(opt.interactive && sb.a>0.5) hits.push(`<circle data-hid="${sb.hid}" cx="${f1(lx)}" cy="${f1(Y(lS.y))}" r="${f1(0.1*sc)}" fill="transparent" pointer-events="all" style="cursor:pointer"/>`);
+  });
+  items.sort((a,b)=>a.d-b.d); labels.sort((a,b)=>a.d-b.d);
+  const body = disks.join('')+items.map(i=>i.s).join('')+labels.map(i=>i.s).join('')+nums.join('')+hits.join('');
+  const a = opt.alpha==null?1:opt.alpha;
+  return a<0.999 ? `<g opacity="${a.toFixed(3)}">${body}</g>` : body;
+}
+
+/* ================= Zeichnen: Drehachse + Pfeil ================= */
+const OPS = {
+  K:{axis:[1,0,0],ang:()=>Math.PI,title:'Umklappen',desc:()=>'180° um die waagerechte Achse',key:'K',line:[-2.0,2.0],arrow:{c:[1.72,0,0],r:0.3,yaw:0.6},u:[0,1,0],w:[0,0,1]},
+  W:{axis:[0,0,1],ang:()=>Math.PI,title:'Wenden',desc:()=>'180° um die senkrechte Achse',key:'W',line:[-2.5,2.5],arrow:{c:[0,0,0],r:1.72,yaw:0},u:[1,0,0],w:[0,1,0]},
+  L:{axis:[0,1,0],ang:()=>Math.PI,title:'Drehen ↺',desc:()=>'180° in der Ringebene',key:'←',line:[-1.25,1.85],arrow:{c:[0,1.62,0],r:0.42,yaw:0},u:[0,0,1],w:[1,0,0]},
+  R:{axis:[0,1,0],ang:()=>-Math.PI,title:'Drehen ↻',desc:()=>'180° in der Ringebene',key:'→',line:[-1.25,1.85],arrow:{c:[0,1.62,0],r:0.42,yaw:0},u:[0,0,1],w:[1,0,0]},
+};
+function opSVG(op,sgn,cx,cy,sc,col,alpha,lwMul,part){
+  if(alpha<=0.01) return '';
+  lwMul=lwMul||1;
+  const X=x=>cx+x*sc, Y=y=>cy-y*sc;
+  const pa=proj(op.axis); let s='';
+  const lw=0.017*sc*lwMul, dash=`stroke-dasharray="${f1(0.05*sc)} ${f1(0.04*sc)}"`;
+  const seg=(t,front)=>`<line x1="${f1(X(0))}" y1="${f1(Y(0))}" x2="${f1(X(pa.x*t))}" y2="${f1(Y(pa.y*t))}" stroke="${col}" stroke-width="${f1(lw)}" ${front?'':dash+' opacity="0.7"'} stroke-linecap="round"/>`;
+  const fr = Math.abs(pa.d)<0.05 ? [true,true] : [pa.d>0, pa.d<0];
+  if(part!=='arrow') s+=seg(op.line[1],fr[0])+seg(op.line[0],fr[1]);
+  if(part==='axis') return `<g opacity="${alpha.toFixed(3)}">${s}</g>`;
+  // Pfeilkreis um die Achse
+  const {c,r,yaw}=op.arrow, u=op.u, w=op.w;
+  const cS=proj(c);
+  const P=ph=>{ const o=[0,1,2].map(i=>(u[i]*Math.cos(ph)+w[i]*Math.sin(ph))*r); const pp=projYaw(o,yaw); return {x:cS.x+pp.x,y:cS.y+pp.y,d:pp.d}; };
+  const du=projYaw(u,yaw).d, dw=projYaw(w,yaw).d;
+  const phF=Math.atan2(dw,du), phE=phF+sgn*0.5, phS=phE-sgn*5.25;
+  const N=90; let cur=null, pts=[];
+  const flush=()=>{ if(pts.length>1) s+=`<polyline points="${pts.map(p=>f1(X(p.x))+','+f1(Y(p.y))).join(' ')}" fill="none" stroke="${col}" stroke-width="${f1(lw*1.35)}" stroke-linecap="round" stroke-linejoin="round" ${cur?'':dash+' opacity="0.6"'}/>`; };
+  const phEnd=phE-sgn*0.1;
+  for(let i=0;i<=N;i++){
+    const ph=lerp(phS,phEnd,i/N), p=P(ph), f=p.d>=-1e-6;
+    if(cur===null) cur=f;
+    if(f!==cur){ pts.push(p); flush(); pts=[p]; cur=f; } else pts.push(p);
+  }
+  flush();
+  const tip=P(phE), bk=P(phE-sgn*0.16);
+  let tx=X(tip.x)-X(bk.x), ty=Y(tip.y)-Y(bk.y); const tl=Math.hypot(tx,ty)||1; tx/=tl; ty/=tl;
+  const hl=0.11*sc*Math.min(1,lwMul*1.1), hw=0.075*sc*Math.min(1,lwMul*1.1);
+  const bx=X(tip.x)-tx*hl, by=Y(tip.y)-ty*hl;
+  s+=`<path d="M${f1(X(tip.x))} ${f1(Y(tip.y))}L${f1(bx-ty*hw)} ${f1(by+tx*hw)}L${f1(bx+ty*hw)} ${f1(by-tx*hw)}Z" fill="${col}"/>`;
+  return `<g opacity="${alpha.toFixed(3)}">${s}</g>`;
+}
+function opText(op,sgn){
+  if(!op) return '';
+  if(op===OPS.L||op===OPS.R){ const ccw=(op===OPS.L)===(sgn>0); return (ccw?'Drehen ↺':'Drehen ↻')+' · '+op.desc(); }
+  return op.title+(sgn<0?' (rückwärts)':'')+' · '+op.desc();
+}
+
+/* ================= Zustand ================= */
+const MAIN={cx:1095,cy:500,sc:205}, BEF={cx:335,cy:500,sc:112};
+const S={def:SUGARS[0],an:'b',ser:'D',ring:'p',M:null,q:qId.slice(),hist:[],hl:new Map(),nums:false,anom:false,hover:null,tempo:1};
+S.M=build(S.def,S.an,S.ser,S.ring);
+let bf={q:qId.slice(),op:null,sgn:1,label:''};
+const A={};
+let raf=0;
+const DUR=()=>1700/S.tempo;
+const busy=()=>!!(A.rot||A.reset);
+function kick(){ if(!raf) raf=requestAnimationFrame(loop); }
+const prog=(a,t)=>clamp((t-a.t0)/a.dur,0,1);
+
+function startFly(q0,info){
+  A.fly={q:q0,t0:performance.now(),dur:Math.min(650,DUR()*0.45),old:bf,next:{q:q0,...info}};
+}
+function doOp(id,sgn){
+  if(busy()) return;
+  finishMolFade();
+  const op=OPS[id]; sgn=sgn||1;
+  const ang=op.ang()*sgn, q0=S.q, q1=qNorm(qMul(qAA(op.axis,ang),q0));
+  A.rot={q0,q1,axis:op.axis,ang,op,sgn:Math.sign(ang)*(op===OPS.R?-1:1),t0:performance.now(),dur:DUR()};
+  // sgn für Pfeil: Richtung relativ zur Achse
+  A.rot.arrowSgn=Math.sign(ang);
+  startFly(q0,{op,sgn:Math.sign(ang),label:opText(op,op===OPS.R?-Math.sign(ang):Math.sign(ang))});
+  if(sgn>0) S.hist.push({id,q0});
+  document.body.classList.add('busy'); kick();
+}
+function undo(){
+  if(busy()||!S.hist.length) return;
+  const h=S.hist.pop(); doOp(h.id,-1);
+}
+function reset(){
+  if(busy()) return;
+  finishMolFade();
+  const d=Math.abs(S.q[0]);
+  S.hist=[];
+  if(d>0.99999){ return; }
+  A.reset={q0:S.q,t0:performance.now(),dur:DUR()*0.9};
+  startFly(S.q,{op:null,sgn:1,label:'Zurücksetzen'});
+  document.body.classList.add('busy'); kick();
+}
+function finishMolFade(){ if(A.mol){ A.mol=null; } }
+function setMol(newDef,an,ser,ring){
+  if(A.rot){ S.q=A.rot.q1; A.rot=null; }
+  if(A.reset){ S.q=qId.slice(); A.reset=null; }
+  if(A.fly){ bf=A.fly.next; A.fly=null; }
+  document.body.classList.remove('busy');
+  const oldM = A.mol ? A.mol.newM : S.M;
+  const ringChanged = oldM.n!==(ring==='p'?6:5);
+  S.def=newDef; S.an=an; S.ser=ser; S.ring=ring;
+  const M=build(newDef,an,ser,ring);
+  if(ringChanged){
+    A.mol={mode:'group',oldM,newM:M,oldQ:S.q,oldBf:bf,t0:performance.now(),dur:450};
+    S.q=qId.slice(); S.hist=[]; bf={q:qId.slice(),op:null,sgn:1,label:''};
+  } else {
+    A.mol={mode:'subs',oldM,newM:M,t0:performance.now(),dur:420};
+  }
+  S.M=M; updateUI(); kick();
+}
+
+/* ================= Hauptschleife ================= */
+function loop(t){
+  raf=0;
+  let q=S.q, more=false;
+  let rotP=null;
+  if(A.rot){ const p=prog(A.rot,t); rotP=p; q=qMul(qAA(A.rot.axis,A.rot.ang*ease(p)),A.rot.q0); if(p>=1){ S.q=A.rot.q1; q=S.q; } else more=true; }
+  if(A.reset){ const p=prog(A.reset,t); q=qSlerp(A.reset.q0,qId,ease(p)); if(p>=1){ S.q=qId.slice(); q=S.q; } else more=true; }
+  const flyP=A.fly?prog(A.fly,t):null, molP=A.mol?prog(A.mol,t):null, bfOpP=A.bfOp?prog(A.bfOp,t):null;
+  if((flyP!==null&&flyP<1)||(molP!==null&&molP<1)||(bfOpP!==null&&bfOpP<1)) more=true;
+  draw(q,rotP,flyP,molP,bfOpP);
+  if(A.rot&&rotP>=1) A.rot=null;
+  if(A.reset&&prog(A.reset,t)>=1) A.reset=null;
+  if(A.fly&&flyP>=1){ bf=A.fly.next; A.fly=null; A.bfOp={t0:t,dur:280}; more=true; }
+  if(A.mol&&molP>=1) A.mol=null;
+  if(A.bfOp&&bfOpP>=1) A.bfOp=null;
+  if(!busy()) document.body.classList.remove('busy');
+  if(more) kick();
+}
+
+function draw(q,rotP,flyP,molP,bfOpP){
+  let h='';
+  // Kopfzeile und Panels
+  h+=`<rect x="38" y="104" width="594" height="762" rx="26" fill="${STY_BEF.bg}"/>`;
+  h+=`<text x="${BEF.cx}" y="146" font-size="22" text-anchor="middle" fill="#8b9097" letter-spacing="2">VORHER</text>`;
+  h+=`<text x="${MAIN.cx}" y="146" font-size="22" text-anchor="middle" fill="#8b9097" letter-spacing="2">NACHHER</text>`;
+  h+=`<path d="M650 478 L672 500 L650 522" fill="none" stroke="#c4c8cd" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  h+=`<text x="800" y="66" font-size="38" font-weight="600" text-anchor="middle" fill="#1b1b1b">${S.M.name}<tspan font-size="24" font-weight="400" fill="#8b9097" dx="16">${S.M.trivial}</tspan></text>`;
+  // Moleküldaten (ggf. Überblendung)
+  let Mdraw, layersMain=[];
+  const optBase={nums:S.nums,anom:S.anom,hl:S.hl};
+  if(A.mol&&A.mol.mode==='subs'){ Mdraw=merge(A.mol.oldM,A.mol.newM,ease(molP)); }
+  else Mdraw=asMerged(S.M);
+  // Vorher-Panel
+  let bh='';
+  const groupFade = A.mol&&A.mol.mode==='group';
+  if(groupFade){
+    const e=ease(molP), Mo=asMerged(A.mol.oldM);
+    bh+=molSVG(Mo,A.mol.oldBf.q,BEF.cx,BEF.cy,BEF.sc,STY_BEF,{...optBase,alpha:1-e});
+    bh+=molSVG(Mdraw,bf.q,BEF.cx,BEF.cy,BEF.sc,STY_BEF,{...optBase,alpha:e});
+  } else if(A.fly){
+    const e=ease(flyP), o=A.fly.old;
+    const oa=1-ss(0,0.55,flyP);
+    if(oa>0.01){
+      bh+=molSVG(Mdraw,o.q,BEF.cx,BEF.cy,BEF.sc,STY_BEF,{...optBase,alpha:oa});
+      if(o.op) bh=opSVG(o.op,o.sgn,BEF.cx,BEF.cy,BEF.sc,'#8fb6d3',oa*0.9,1.3,'axis')+bh+opSVG(o.op,o.sgn,BEF.cx,BEF.cy,BEF.sc,'#8fb6d3',oa*0.9,1.3,'arrow');
+    }
+    const sty=mixSty(STY_MAIN,STY_BEF,e);
+    bh+=molSVG(Mdraw,A.fly.q,lerp(MAIN.cx,BEF.cx,e),lerp(MAIN.cy,BEF.cy,e),lerp(MAIN.sc,BEF.sc,e),sty,optBase);
+  } else {
+    bh+=molSVG(Mdraw,bf.q,BEF.cx,BEF.cy,BEF.sc,STY_BEF,optBase);
+    if(bf.op){ const a=bfOpP==null?1:ease(bfOpP); bh=opSVG(bf.op,bf.sgn,BEF.cx,BEF.cy,BEF.sc,'#8fb6d3',a*0.9,1.3,'axis')+bh+opSVG(bf.op,bf.sgn,BEF.cx,BEF.cy,BEF.sc,'#8fb6d3',a*0.9,1.3,'arrow'); }
+  }
+  const lbl = A.fly ? '' : (groupFade?'':bf.label);
+  if(lbl) h+=`<text x="${BEF.cx}" y="834" font-size="21" text-anchor="middle" fill="#8b9097">${lbl}</text>`;
+  // Hauptpanel
+  let mh='';
+  if(groupFade){
+    const e=ease(molP);
+    mh+=molSVG(asMerged(A.mol.oldM),A.mol.oldQ,MAIN.cx,MAIN.cy,MAIN.sc,STY_MAIN,{...optBase,alpha:1-e});
+    mh+=molSVG(Mdraw,q,MAIN.cx,MAIN.cy,MAIN.sc,STY_MAIN,{...optBase,alpha:e,interactive:true});
+  } else mh+=molSVG(Mdraw,q,MAIN.cx,MAIN.cy,MAIN.sc,STY_MAIN,{...optBase,interactive:!busy()});
+  // Achse/Pfeil: Vorschau beim Hover oder während der Drehung
+  let ov=null;
+  if(A.rot) ov={op:A.rot.op,sgn:A.rot.arrowSgn,a:Math.min(1,rotP/0.12,(1-rotP)/0.15)*0.85};
+  else if(!A.reset && S.hover){ const op=OPS[S.hover]; ov={op,sgn:Math.sign(op.ang()),a:0.9}; }
+  if(ov) mh=opSVG(ov.op,ov.sgn,MAIN.cx,MAIN.cy,MAIN.sc,'#0072B2',ov.a,1,'axis')+mh+opSVG(ov.op,ov.sgn,MAIN.cx,MAIN.cy,MAIN.sc,'#0072B2',ov.a,1,'arrow');
+  h+=bh+mh;
+  stage.innerHTML=h;
+}
+
+/* ================= UI ================= */
+const stage=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+function iconSVG(id){
+  const op=OPS[id], sc=14.5, cx=39, cy=31;
+  const M=asMerged({...S.M,subs:[]});
+  const ring=molSVG(M,qId,cx,cy,sc,{ink:'#9aa0a6',num:'#000',bg:'#fff',hl:1},{});
+  return `<svg width="78" height="62" viewBox="0 0 78 62">${ring}${opSVG(op,Math.sign(op.ang()),cx,cy,sc,'#0072B2',1,1.9)}</svg>`;
+}
+function updateUI(){
+  document.querySelectorAll('.op').forEach(b=>{
+    const id=b.dataset.op, op=OPS[id];
+    b.innerHTML=iconSVG(id)+`<div><b>${op.title}<kbd>${op.key}</kbd></b><span>${op.desc()}</span></div>`;
+    b.title=op.title+' – '+op.desc();
+  });
+  const seg=(el,val,avail)=>el.querySelectorAll('button').forEach(b=>{ b.classList.toggle('on',b.dataset.v===val); b.disabled=avail?!avail.includes(b.dataset.v):false; });
+  seg($('segAn'),S.an); seg($('segSer'),S.ser); seg($('segRing'),S.ring,S.def.rings);
+  $('chkNum').checked=S.nums; $('chkAnom').checked=S.anom;
+  renderList();
+}
+/* Suche mit Tippfehlertoleranz */
+function dl(a,b){
+  const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  const d=[]; for(let i=0;i<=m;i++){ d[i]=[i]; } for(let j=1;j<=n;j++) d[0][j]=j;
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++){
+    const c=a[i-1]===b[j-1]?0:1;
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);
+    if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);
+  }
+  return d[m][n];
+}
+function parseQuery(raw){
+  let s=' '+raw.toLowerCase()+' '; const mods={};
+  if(/α|alpha/.test(s)){ mods.an='a'; s=s.replace(/α|alpha/g,' '); }
+  if(/β|beta/.test(s)){ mods.an='b'; s=s.replace(/β|beta/g,' '); }
+  if(/pyranos?e?|pyran/.test(s)){ mods.ring='p'; s=s.replace(/pyranose|pyranos|pyran/g,''); }
+  if(/furanos?e?|furan/.test(s)){ mods.ring='f'; s=s.replace(/furanose|furanos|furan/g,''); }
+  const m=s.match(/(^|[\s(\-])([dl])\s*-/); if(m){ mods.ser=m[2].toUpperCase(); s=s.replace(m[0],m[1]); }
+  const m2=s.match(/^\s*([dl])\s+(?=\S)/); if(!mods.ser&&m2){ mods.ser=m2[1].toUpperCase(); s=s.replace(m2[0],' '); }
+  return {core:norm(s),mods};
+}
+function scoreSugar(def,q){
+  let best=99; const L=q.length;
+  const tol = L<=3?0 : L<=5?1 : L<=8?2 : 3;
+  for(const a of def.nal){
+    let sc=99;
+    if(a===q) sc=0;
+    else if(a.startsWith(q)) sc=1+(a.length-L)*0.01;
+    else if(L>=3&&a.includes(q)) sc=2+(a.length-L)*0.01;
+    else if(L>=3){
+      const d=Math.min(dl(q,a), dl(q,a.slice(0,L))+0.5, L>a.length?99:dl(q,a.slice(0,L+1))+0.5);
+      if(d<=tol) sc=3+d;
+    }
+    best=Math.min(best,sc);
+  }
+  return best;
+}
+let listItems=[], actIdx=0, kbNav=false;
+function renderList(){
+  const el=$('list'); const {core}=parseQuery($('search').value);
+  let html='';
+  if(!core){
+    listItems=SUGARS.slice(); let g='';
+    SUGARS.forEach((s,i)=>{ if(s.g!==g){ g=s.g; html+=`<div class="grp">${g}</div>`; } html+=itemHTML(s,i); });
+  } else {
+    listItems=SUGARS.map(s=>({s,sc:scoreSugar(s,core)})).filter(x=>x.sc<99).sort((a,b)=>a.sc-b.sc).map(x=>x.s);
+    if(!listItems.length) html='<div class="none">Kein Treffer</div>';
+    listItems.forEach((s,i)=>html+=itemHTML(s,i));
+  }
+  if(actIdx>=listItems.length) actIdx=0;
+  el.innerHTML=html;
+}
+function itemHTML(s,i){
+  const sel=s===S.def, act=(listItems.length&&$('search').value.trim()||kbNav)&&i===actIdx;
+  return `<div class="item${sel?' sel':''}${act?' act':''}" data-i="${i}">${s.n}<small>${TYPE_LABEL[s.t]}</small></div>`;
+}
+function pick(def,mods){
+  mods=mods||{};
+  const an=mods.an||S.an, ser=mods.ser||def.ser;
+  let ring;
+  if(mods.ring&&def.rings.includes(mods.ring)) ring=mods.ring;
+  else if(def.t===S.def.t&&def.rings.includes(S.ring)) ring=S.ring;
+  else ring=def.rings[0];
+  setMol(def,an,ser,ring);
+}
+function openList(){ if(!document.body.classList.contains('listopen')){ document.body.classList.add('listopen'); renderList(); const sel=$('list').querySelector('.sel'); if(sel&&!$('search').value.trim()) sel.scrollIntoView({block:'center'}); } }
+function closeList(){ kbNav=false; document.body.classList.remove('listopen'); $('search').value=''; actIdx=0; renderList(); }
+$('list').addEventListener('mousedown',e=>e.preventDefault());
+$('list').addEventListener('click',e=>{ const it=e.target.closest('.item'); if(!it) return; const {mods}=parseQuery($('search').value); pick(listItems[+it.dataset.i],mods); closeList(); $('search').blur(); });
+$('search').addEventListener('focus',openList);
+$('search').addEventListener('click',openList);
+$('search').addEventListener('blur',()=>setTimeout(()=>{ if(document.activeElement!==$('search')) closeList(); },0));
+$('search').addEventListener('input',()=>{ actIdx=0; openList(); renderList(); });
+$('search').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowUp') kbNav=true;
+  if(e.key==='ArrowDown'){ actIdx=Math.min(listItems.length-1,actIdx+1); renderList(); e.preventDefault(); }
+  else if(e.key==='ArrowUp'){ actIdx=Math.max(0,actIdx-1); renderList(); e.preventDefault(); }
+  else if(e.key==='Enter'){ if(listItems[actIdx]){ const {mods}=parseQuery($('search').value); pick(listItems[actIdx],mods); $('search').blur(); } }
+  else if(e.key==='Escape'){ $('search').blur(); }
+});
+$('segAn').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b&&b.dataset.v!==S.an) setMol(S.def,b.dataset.v,S.ser,S.ring); });
+$('segSer').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b&&b.dataset.v!==S.ser) setMol(S.def,S.an,b.dataset.v,S.ring); });
+$('segRing').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b&&!b.disabled&&b.dataset.v!==S.ring) setMol(S.def,S.an,S.ser,b.dataset.v); });
+$('chkNum').addEventListener('change',e=>{ S.nums=e.target.checked; kick(); });
+$('chkAnom').addEventListener('change',e=>{ S.anom=e.target.checked; kick(); });
+$('clearHL').addEventListener('click',()=>{ S.hl.clear(); S.anom=false; updateUI(); kick(); });
+stage.addEventListener('click',e=>{
+  const h=e.target.closest('[data-hid]'); if(!h) return;
+  const id=h.dataset.hid, c=S.hl.get(id);
+  if(c==null) S.hl.set(id,0); else if(c<PAL.length-1) S.hl.set(id,c+1); else S.hl.delete(id);
+  kick();
+});
+document.querySelectorAll('.op').forEach(b=>{
+  b.addEventListener('click',()=>doOp(b.dataset.op,1));
+  b.addEventListener('mouseenter',()=>{ S.hover=b.dataset.op; kick(); });
+  b.addEventListener('mouseleave',()=>{ S.hover=null; kick(); });
+  b.addEventListener('focus',()=>{ S.hover=b.dataset.op; kick(); });
+  b.addEventListener('blur',()=>{ S.hover=null; kick(); });
+});
+$('undo').addEventListener('click',undo);
+$('reset').addEventListener('click',reset);
+$('tempo').addEventListener('input',e=>S.tempo=+e.target.value);
+$('tglSide').addEventListener('click',()=>document.body.classList.toggle('collapsed'));
+function toggleFS(){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); }
+$('fs').addEventListener('click',toggleFS);
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'&&e.target.type==='text') return;
+  if(e.ctrlKey&&e.key.toLowerCase()==='z'){ undo(); e.preventDefault(); return; }
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const k=e.key;
+  if(k==='k'||k==='K') doOp('K');
+  else if(k==='w'||k==='W') doOp('W');
+  else if(k==='ArrowLeft'){ doOp('L'); e.preventDefault(); }
+  else if(k==='ArrowRight'){ doOp('R'); e.preventDefault(); }
+  else if(k==='Backspace'||k==='z'||k==='Z'){ undo(); e.preventDefault(); }
+  else if(k==='0'||k==='r'||k==='R') reset();
+  else if(k==='n'||k==='N'){ S.nums=!S.nums; updateUI(); kick(); }
+  else if(k==='a'||k==='A'){ S.anom=!S.anom; updateUI(); kick(); }
+  else if(k==='f'||k==='F') toggleFS();
+  else if(k==='s'||k==='S') document.body.classList.toggle('collapsed');
+  else if(k==='/'){ $('search').focus(); e.preventDefault(); }
+});
+updateUI(); kick();
+</script>
+</body>
+</html>

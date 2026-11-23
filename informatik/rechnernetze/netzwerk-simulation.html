@@ -455,21 +455,104 @@
     }
 
     /* SERVER */
+    .node.server {
+      cursor: pointer;
+    }
     .server-card {
       fill: var(--surface);
       stroke: var(--ink);
       stroke-width: 2.2px;
-      transition: transform 0.2s, stroke 0.2s;
+      transition: transform 0.2s, stroke 0.2s, filter 0.2s;
+    }
+    .node.server:hover .server-card {
+      filter: drop-shadow(0 6px 14px rgba(0, 114, 178, 0.25));
+      transform: translateY(-2px);
+    }
+    .node.router {
+      cursor: grab;
+    }
+    .node.router:hover .router-core {
+      stroke: var(--blue);
+      filter: drop-shadow(0 0 6px rgba(0, 114, 178, 0.3));
+    }
+    .node.dragging,
+    .node.dragging * {
+      cursor: grabbing !important;
+      transition: none !important;
     }
 
-    /* Im Chat-Modus sind Server anonyme Netzknoten */
-    body.mode-chat .server-label,
-    body.mode-chat .server-icon-badge {
-      display: none;
+    /* ==========================================================================
+       GRUPPEN / SUBNETZE (LAN-HÜLLEN & BADGES)
+       ========================================================================== */
+    .group-container {
+      cursor: grab;
     }
+
+    .group-container.dragging {
+      cursor: grabbing !important;
+    }
+
+    .group-container.dragging * {
+      cursor: grabbing !important;
+      transition: none !important;
+    }
+
+    .group-hull-rect {
+      transition: stroke-opacity 0.2s, fill-opacity 0.2s;
+    }
+
+    .group-container:hover .group-hull-rect {
+      stroke-opacity: 0.85 !important;
+      fill-opacity: 0.09 !important;
+    }
+
+    .group-badge {
+      cursor: grab;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.22));
+    }
+
+    .group-badge-bg {
+      transition: filter 0.15s;
+    }
+
+    .group-badge:hover .group-badge-bg {
+      filter: brightness(1.12);
+    }
+
+    .group-badge-text {
+      user-select: none;
+      pointer-events: none;
+      font-family: var(--font-heading);
+      letter-spacing: 0.02em;
+    }
+
+    .group-badge-edit {
+      transition: transform 0.15s, opacity 0.15s;
+      opacity: 0.85;
+    }
+
+    .group-badge-edit:hover {
+      opacity: 1;
+    }
+
+    /* LAN Router Hervorhebung */
+    .node.router.lan-router .router-halo {
+      transition: opacity 0.25s;
+    }
+
+    .node.router.lan-router:hover .router-halo {
+      opacity: 0.28 !important;
+    }
+
+    .router-sublabel {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    /* Im Chat-Modus Server dezent kennzeichnen, aber beschriftet lassen */
     body.mode-chat .node.server .server-card {
       stroke: var(--ink-muted);
-      stroke-dasharray: 4 3;
     }
 
     /* ONLINE / OFFLINE ANZEIGEN */
@@ -587,10 +670,10 @@
        ========================================================================== */
     #side-panel {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 14px;
+      right: 14px;
       width: 320px;
-      max-height: calc(100% - 24px);
+      max-height: calc(100% - 28px);
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: var(--radius-lg);
@@ -598,7 +681,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      z-index: 15;
+      z-index: 30;
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;
     }
 
@@ -1239,6 +1322,327 @@
     input:checked + .slider-switch:before {
       transform: translateX(18px);
     }
+
+    /* ==========================================================================
+       INTERAKTIVE BÜHNEN-WERKZEUGE (STAGE TOOLBAR, TOASTS & MODALS)
+       ========================================================================== */
+    .stage-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 6px 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      z-index: 20;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 22px;
+      background: var(--surface-border);
+      margin: 0 4px;
+    }
+
+    .tool-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      height: 32px;
+      padding: 0 9px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .tool-btn:hover {
+      background: var(--surface-subtle);
+      border-color: var(--surface-border);
+    }
+
+    .tool-btn.active {
+      background: var(--blue-light);
+      border-color: var(--blue);
+      color: var(--blue);
+      box-shadow: 0 1px 3px rgba(0, 114, 178, 0.2);
+    }
+
+    .tool-btn-add {
+      background: var(--surface-subtle);
+      border-color: var(--surface-border);
+    }
+
+    .tool-btn-add:hover {
+      border-color: var(--blue);
+      background: #ffffff;
+      color: var(--blue);
+    }
+
+    .tool-btn-lan {
+      background: var(--orange-light);
+      border-color: #f0c060;
+      color: #9a6300;
+    }
+
+    .tool-btn-lan:hover {
+      background: #fde6b8;
+      border-color: var(--orange);
+      color: #7a4e00;
+    }
+
+    .tool-btn:disabled, .tool-btn.disabled {
+      opacity: 0.42;
+      cursor: not-allowed !important;
+      pointer-events: none;
+      background: var(--surface-subtle) !important;
+      border-color: var(--surface-border) !important;
+      color: var(--ink-muted) !important;
+    }
+
+    .badge-count {
+      font-size: 0.7rem;
+      background: var(--surface-border);
+      color: var(--ink);
+      padding: 1px 5px;
+      border-radius: var(--radius-full);
+      margin-left: 2px;
+      font-weight: 700;
+    }
+
+    .tool-btn:disabled .badge-count,
+    .tool-btn.disabled .badge-count {
+      background: var(--vermillion);
+      color: #ffffff;
+    }
+
+    /* Cable drag / selection indicator */
+    .node.cable-source .client-card-inner,
+    .node.cable-source .server-card,
+    .node.cable-source .router-core {
+      stroke: var(--orange) !important;
+      stroke-width: 3.5px !important;
+      filter: drop-shadow(0 0 10px var(--orange)) !important;
+      animation: pulseSource 1.1s infinite alternate;
+    }
+
+    @keyframes pulseSource {
+      from { transform: scale(1); }
+      to { transform: scale(1.06); }
+    }
+
+    /* Toasts in der Ecke unten rechts */
+    .toast-container {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-end;
+      gap: 8px;
+      z-index: 100;
+      pointer-events: none;
+      max-width: 360px;
+    }
+
+    .toast-message {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--surface-border);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.22s, transform 0.22s;
+      pointer-events: auto;
+    }
+
+    .toast-message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-message.warning {
+      background: #fff8f5;
+      color: var(--vermillion);
+      border-color: var(--vermillion);
+    }
+
+    .toast-message.success {
+      background: #f4faf6;
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .toast-message.info {
+      background: var(--surface);
+      color: var(--ink);
+      border-color: var(--surface-border);
+    }
+
+    .toast-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Server Templates Grid */
+    .server-templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      max-height: 430px;
+      overflow-y: auto;
+      padding: 4px;
+      margin-top: 10px;
+    }
+
+    .server-template-card {
+      border: 1.5px solid var(--surface-border);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .server-template-card:hover {
+      border-color: var(--blue);
+      background: var(--surface-subtle);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .server-template-card.active {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      box-shadow: 0 0 0 1px var(--blue);
+    }
+
+    .server-tmpl-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--surface-subtle);
+      color: var(--blue);
+    }
+
+    .server-template-card.active .server-tmpl-icon {
+      background: #ffffff;
+    }
+
+    .server-tmpl-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .server-tmpl-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .server-tmpl-desc {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      margin-top: 1px;
+      line-height: 1.2;
+    }
+
+    .server-tmpl-url {
+      font-size: 0.67rem;
+      color: var(--blue);
+      font-family: monospace;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Presets Grid */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .preset-card-item {
+      border: 1.5px solid var(--surface-border);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .preset-card-item:hover {
+      border-color: var(--blue);
+      background: var(--surface-subtle);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .preset-card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preset-card-desc {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      line-height: 1.35;
+    }
+
+    .preset-card-stats {
+      display: flex;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--blue);
+      font-weight: 600;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body class="mode-chat">
@@ -1265,20 +1669,6 @@
     </div>
 
     <div class="controls-bar">
-      <!-- Topologie Generator Button -->
-      <button class="btn-action-text" id="btn-open-topology" title="Netzwerk-Aufbau anpassen">
-        <span class="icon">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="6" height="6" rx="1"></rect>
-            <rect x="16" y="2" width="6" height="6" rx="1"></rect>
-            <rect x="9" y="16" width="6" height="6" rx="1"></rect>
-            <line x1="5" y1="8" x2="12" y2="16"></line>
-            <line x1="19" y1="8" x2="12" y2="16"></line>
-          </svg>
-        </span>
-        <span>Topologie</span>
-      </button>
-
       <!-- Schritt-Modus (Debugger) Schalter -->
       <button class="btn-action-text" id="btn-toggle-step-mode" title="Schritt-für-Schritt Debug-Modus ein/ausschalten">
         <span class="icon">
@@ -1328,10 +1718,85 @@
   </header>
 
   <!-- ========================================================================
+       WERKZEUGLEISTE (INTERAKTIONS- & BÜHNENSTEUERUNG)
+       ======================================================================== -->
+  <div class="stage-toolbar" id="stage-toolbar">
+    <div class="toolbar-group">
+      <button class="tool-btn active" id="tool-select" title="Auswählen & Verschieben: Ziehe Knoten mit der Maus">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path></svg>
+        </span>
+        <span>Bewegen</span>
+      </button>
+      <button class="tool-btn" id="tool-cable" title="Kabel verbinden: Klicke 2 Knoten nacheinander an (Client max. 1, Server max. 3)">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h4v6H4zM16 14h4v6h-4zM6 10v4c0 3 4 3 4 6v0M18 14v-4c0-3-4-3-4-6v0"></path></svg>
+        </span>
+        <span>Kabel</span>
+      </button>
+      <button class="tool-btn" id="tool-delete" title="Element löschen: Klicke auf einen Knoten oder ein Kabel">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </span>
+        <span>Löschen</span>
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <button class="tool-btn tool-btn-add" id="btn-add-client" title="Neuen Client-PC hinzufügen">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M2 20h20"></path></svg>
+        </span>
+        <span>+ Client</span>
+      </button>
+      <button class="tool-btn tool-btn-add" id="btn-add-router" title="Neuen Router / Netzknoten hinzufügen">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v10M7 12h10"></path></svg>
+        </span>
+        <span>+ Router</span>
+      </button>
+      <button class="tool-btn tool-btn-add" id="btn-add-server" title="Neuen Server hinzufügen (max. 5 im Netzwerk)">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+        </span>
+        <span>+ Server</span>
+        <span class="badge-count" id="server-count-badge">3/5</span>
+      </button>
+      <button class="tool-btn tool-btn-add tool-btn-lan" id="btn-add-lan" title="Kleines LAN hinzufügen (1 Router + 3 verbundene Clients)">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        </span>
+        <span>+ Kleines LAN</span>
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <button class="tool-btn" id="btn-quick-presets" title="Fertige Netzwerk-Vorlagen öffnen">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="6" height="6" rx="1"></rect><rect x="16" y="2" width="6" height="6" rx="1"></rect><rect x="9" y="16" width="6" height="6" rx="1"></rect><line x1="5" y1="8" x2="12" y2="16"></line><line x1="19" y1="8" x2="12" y2="16"></line></svg>
+        </span>
+        <span>Vorlagen</span>
+      </button>
+      <button class="tool-btn" id="btn-clear-plane" title="Netzwerk leeren">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </span>
+        <span>Leeren</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
        HAUPTBEREICH (SIMULATIONS-BÜHNE + SEITEN-PANEL)
        ======================================================================== -->
   <main>
     <div id="network-stage">
+      <!-- Schwebende Benachrichtigungen -->
+      <div id="toast-container" class="toast-container"></div>
       <svg id="network-svg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet">
         <!-- Hintergrund-Grid -->
         <defs>
@@ -1344,6 +1809,9 @@
         <g id="viewport-group">
           <!-- Dynamischer Grid-Hintergrund -->
           <rect id="bg-grid-rect" x="-3000" y="-3000" width="7000" height="7000" fill="url(#grid-pattern)" />
+
+          <!-- GRUPPEN / LAN-HÜLLEN (Gruppe) -->
+          <g id="groups-group"></g>
 
           <!-- KANTEN / LEITUNGEN (Gruppe) -->
           <g id="edges-group"></g>
@@ -1574,8 +2042,8 @@
 
         <div class="form-group">
           <div class="slider-row">
-            <label for="range-servers">Anzahl Webserver (0–4):</label>
-            <input type="range" id="range-servers" min="0" max="4" value="3">
+            <label for="range-servers">Anzahl Webserver (0–5):</label>
+            <input type="range" id="range-servers" min="0" max="5" value="3">
             <span class="slider-value" id="val-servers">3</span>
           </div>
         </div>
@@ -1657,6 +2125,69 @@
   </div>
 
   <!-- ========================================================================
+       MODAL 3: SERVER KONFIGURIEREN (25 AUSWAHLMÖGLICHKEITEN)
+       ======================================================================== -->
+  <div class="modal-overlay" id="server-config-modal">
+    <div class="modal-card" style="width: 760px; max-width: 95vw;">
+      <div class="modal-header">
+        <h2>
+          <span class="icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          </span>
+          <span id="server-modal-title">Server konfigurieren</span>
+        </h2>
+        <button class="panel-close" id="server-config-close" aria-label="Schließen">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+          <div>
+            <div id="server-modal-subtitle" style="font-weight:700; font-size:0.85rem; color:var(--ink);">Aktuelle Adresse</div>
+            <div id="server-modal-connections" style="font-size:0.75rem; color:var(--ink-muted); margin-top:2px;">Kabel-Verbindungen: 0 von maximal 3</div>
+          </div>
+          <span style="font-size:0.75rem; background:var(--blue-light); color:var(--blue); padding:3px 8px; border-radius:var(--radius-full); font-weight:700;">25 Webseiten verfügbar</span>
+        </div>
+
+        <div class="server-templates-grid" id="server-templates-grid"></div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <button class="btn-step" id="btn-delete-configured-server" style="color:var(--vermillion); border-color:var(--vermillion);">
+          <span class="icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+          <span>Diesen Server löschen</span>
+        </button>
+        <button class="btn-step btn-step-primary" id="btn-close-server-modal">Fertig</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: VORLAGEN LADEN
+       ======================================================================== -->
+  <div class="modal-overlay" id="presets-modal">
+    <div class="modal-card" style="width: 780px; max-width: 95vw;">
+      <div class="modal-header">
+        <h2>
+          <span class="icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="6" height="6" rx="1"></rect><rect x="16" y="2" width="6" height="6" rx="1"></rect><rect x="9" y="16" width="6" height="6" rx="1"></rect><line x1="5" y1="8" x2="12" y2="16"></line><line x1="19" y1="8" x2="12" y2="16"></line></svg>
+          </span>
+          <span>Netzwerk-Vorlagen laden</span>
+        </h2>
+        <button class="panel-close" id="presets-close" aria-label="Schließen">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.8rem; color:var(--ink-muted); margin-bottom:12px;">Wähle eine didaktische Netzwerk-Vorlage, um sie direkt auf die Simulations-Ebene zu laden.</p>
+        <div class="presets-grid" id="presets-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-step" id="btn-cancel-presets">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
        JAVASCRIPT LOGIK
        ======================================================================== -->
   <script>
@@ -1680,7 +2211,28 @@
       weather: `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`,
       check: `<polyline points="20 6 9 17 4 12"></polyline>`,
       branch: `<circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>`,
-      lightning: `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>`
+      lightning: `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>`,
+      video: `<polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>`,
+      music: `<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>`,
+      gamepad: `<line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="6"></rect>`,
+      map: `<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line>`,
+      library: `<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M6 6h10M6 10h10"></path>`,
+      newspaper: `<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"></path>`,
+      landmark: `<line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon>`,
+      paw: `<circle cx="12" cy="5" r="2"></circle><circle cx="5" cy="8" r="2"></circle><circle cx="19" cy="8" r="2"></circle><circle cx="7" cy="14" r="2"></circle><circle cx="17" cy="14" r="2"></circle><path d="M12 11c-3 0-5 3-5 6 0 2.5 2 4 5 4s5-1.5 5-4c0-3-2-6-5-6z"></path>`,
+      rocket: `<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-1.5 5-1.5"></path><path d="M12 15v5s3.03-.55 4.5-2c1.63-1.62 1.5-5 1.5-5"></path>`,
+      utensils: `<path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path><path d="M15 11v11"></path><path d="M5 2v20"></path><path d="M2 2h6v5a3 3 0 0 1-6 0V2z"></path>`,
+      graduation: `<path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path>`,
+      trophy: `<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>`,
+      smile: `<circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line>`,
+      flask: `<path d="M10 2v7.31L4.69 19.46A2 2 0 0 0 6.38 22h11.24a2 2 0 0 0 1.69-2.54L14 9.31V2"></path><line x1="8.5" y1="2" x2="15.5" y2="2"></line><line x1="6" y1="16" x2="18" y2="16"></line>`,
+      cloud: `<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>`,
+      palette: `<circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"></path>`,
+      leaf: `<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>`,
+      shield: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>`,
+      cpu: `<rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line>`,
+      code: `<polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>`,
+      edit: `<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>`
     };
 
     function getIconSvgHtml(key, size = 18, color = "currentColor", strokeWidth = 2) {
@@ -1689,31 +2241,787 @@
     }
 
     /* ==========================================================================
-       TOPOLOGIE-DATEN & GENERATOR MIT ZENTRALEN SERVERN & GROSSZÜGIGEM SPACING
+       25 DIDAKTISCHE SERVER-VORLAGEN (AUSWAHL FÜR JEDEN SERVER)
        ========================================================================== */
-    const CLIENT_PRESETS = [
-      { name: "Mia", device: "Laptop", iconKey: "laptop" },
-      { name: "Leo", device: "Schul-PC", iconKey: "desktop" },
-      { name: "Noah", device: "Tablet", iconKey: "tablet" },
-      { name: "Emma", device: "Smartphone", iconKey: "smartphone" },
-      { name: "Ben", device: "Laptop", iconKey: "laptop" },
-      { name: "Sophie", device: "Tablet", iconKey: "tablet" },
-      { name: "Jonas", device: "Schul-PC", iconKey: "desktop" },
-      { name: "Lea", device: "Smartphone", iconKey: "smartphone" }
+    const SERVER_TEMPLATES = [
+      {
+        id: "schule",
+        name: "Schul-Website",
+        category: "Schule & Bildung",
+        iconKey: "school",
+        url: "https://goethe-schule.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--blue); font-size:0.95rem; margin-bottom:4px;">Goethe-Schule Online</h3>
+            <p style="font-size:0.75rem; color:var(--ink-muted); margin-bottom:8px;">Gemeinsam lernen, entdecken & forschen</p>
+            <div style="background:var(--blue-light); padding:8px; border-radius:6px; font-size:0.78rem; margin-bottom:6px;">
+              <strong>Schulfest am Freitag!</strong><br>
+              Ab 14:00 Uhr gibt es Waffeln, Spiele und die Roboter-Ausstellung!
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.75rem; margin-bottom:6px;">
+              <strong>Mensa heute:</strong> Bio-Pizza Margherita mit buntem Salat.
+            </div>
+            <div style="font-size:0.72rem; color:var(--ink-muted);">Vertretung: 7b 5. Std. Informatik Raum 204</div>
+          </div>`
+      },
+      {
+        id: "suchmaschine",
+        name: "Suchmaschine",
+        category: "Web-Dienste",
+        iconKey: "search",
+        url: "https://such-fuchs.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--orange); font-size:0.95rem; margin-bottom:8px;">Findefuchs – Kindersuche</h3>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px 10px; border-radius:18px; font-size:0.75rem; color:var(--ink-muted); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+              <span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Wie funktioniert das Internet?</span>
+              <span style="color:var(--blue); font-weight:700;">Suchen</span>
+            </div>
+            <div style="border-bottom:1px solid var(--surface-border); padding-bottom:6px; margin-bottom:6px;">
+              <strong style="color:var(--blue); font-size:0.8rem;">Wie funktioniert das Internet?</strong>
+              <p style="font-size:0.74rem; color:var(--ink);">Computer verbinden sich über Router und Kabel zu einem weltweiten Datennetz.</p>
+            </div>
+            <div>
+              <strong style="color:var(--blue); font-size:0.8rem;">Warum heißen Daten Pakete?</strong>
+              <p style="font-size:0.74rem; color:var(--ink);">Große Webseiten werden in kleine Päckchen zerlegt und einzeln übertragen.</p>
+            </div>
+          </div>`
+      },
+      {
+        id: "lexikon",
+        name: "Online-Lexikon",
+        category: "Wissen",
+        iconKey: "book",
+        url: "https://kinder-lexikon.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--green); font-size:0.95rem; margin-bottom:6px;">Klexikon: Rechnernetz</h3>
+            <p style="font-size:0.75rem; margin-bottom:8px;">Ein <strong>Netzwerk</strong> entsteht, wenn zwei oder mehr Computer Daten austauschen.</p>
+            <div style="background:var(--green-light); border-left:3px solid var(--green); padding:6px 8px; font-size:0.74rem; margin-bottom:6px;">
+              <strong>Wissenswert:</strong><br>
+              Router sind wie Post-Verteilzentren: Sie schauen auf das Ziel jedes Datenpakets und wählen den schnellsten freien Weg.
+            </div>
+            <div style="font-size:0.72rem; color:var(--ink-muted);">Artikel-Kategorien: Informatik, Technik, Internet-Protokolle</div>
+          </div>`
+      },
+      {
+        id: "wetter",
+        name: "Wetterdienst",
+        category: "Alltag & Wetter",
+        iconKey: "weather",
+        url: "https://wetter-frosch.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--sky); font-size:0.95rem; margin-bottom:6px;">Wetterdienst Online</h3>
+            <p style="font-size:0.75rem; color:var(--ink-muted); margin-bottom:8px;">Aktuelle Vorhersage für heute</p>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.78rem; margin-bottom:6px;">
+              <strong>Heiter & sonnig, 21°C</strong><br>
+              Perfektes Wetter für die große Pause auf dem Schulhof!
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">Wind: 12 km/h West • Luftfeuchtigkeit: 48% • Regen: 0%</div>
+          </div>`
+      },
+      {
+        id: "video",
+        name: "Video-Portal",
+        category: "Medien",
+        iconKey: "video",
+        url: "https://tubekids.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--vermillion); font-size:0.95rem; margin-bottom:6px;">TubeKids – Lernen mit Video</h3>
+            <div style="background:#1b252e; color:#fff; padding:22px; text-align:center; border-radius:6px; margin-bottom:8px;">
+              <div style="font-size:1.6rem; margin-bottom:4px;">▶️</div>
+              <strong style="font-size:0.8rem;">Wie Tiefseekabel Kontinente vernetzen</strong>
+              <div style="font-size:0.68rem; color:#9cb1c4; margin-top:3px;">HD • 08:42 • 14.800 Aufrufe</div>
+            </div>
+            <p style="font-size:0.73rem; color:var(--ink-muted);">Kanal: <strong>InformatikMachtSpass</strong> (Schul-Kanal)</p>
+          </div>`
+      },
+      {
+        id: "musik",
+        name: "Musik-Streaming",
+        category: "Unterhaltung",
+        iconKey: "music",
+        url: "https://soundwave-app.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--purple); font-size:0.95rem; margin-bottom:6px;">SoundWave – Schülerradio</h3>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:10px; border-radius:8px; margin-bottom:8px;">
+              <div style="font-size:0.72rem; color:var(--ink-muted); text-transform:uppercase;">Jetzt läuft:</div>
+              <strong style="font-size:0.85rem; color:var(--ink);">Lo-Fi Study & Coding Beats</strong>
+              <div style="font-size:0.72rem; color:var(--purple);">Schulhof-Band feat. DJ Bit</div>
+              <div style="background:var(--surface-border); height:4px; border-radius:2px; margin:8px 0 4px; overflow:hidden;">
+                <div style="background:var(--purple); width:65%; height:100%;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--ink-muted);">
+                <span>02:18</span><span>03:35</span>
+              </div>
+            </div>
+          </div>`
+      },
+      {
+        id: "gaming",
+        name: "Gaming-Server",
+        category: "Gaming",
+        iconKey: "gamepad",
+        url: "https://pixelcraft-online.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--green); font-size:0.95rem; margin-bottom:6px;">PixelCraft Multiplayer</h3>
+            <div style="background:var(--green-light); border:1px solid var(--green); padding:8px; border-radius:6px; font-size:0.75rem; margin-bottom:8px;">
+              <strong style="color:var(--green);"><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--green); margin-right:5px; vertical-align:1px;"></span>Server-Status: ONLINE</strong><br>
+              Spieler online: <strong>142 / 200</strong> • Latenz: <strong>14 ms</strong>
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.74rem;">
+              <strong>Aktuelle Welt:</strong> Abenteuer-Insel<br>
+              <span style="color:var(--ink-muted);">Event heute um 17:00 Uhr: Großes Bau-Turnier!</span>
+            </div>
+          </div>`
+      },
+      {
+        id: "karten",
+        name: "Karten & Navi",
+        category: "Navigation",
+        iconKey: "map",
+        url: "https://karten-planer.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--blue); font-size:0.95rem; margin-bottom:6px;">StadtPlan – Sicherer Schulweg</h3>
+            <div style="background:var(--blue-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Fahrrad-Route zur Schule (2,4 km)</strong><br>
+              Dauer: <strong>9 Minuten</strong> • 95% Fahrradwege getrennt vom Autoverkehr
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Ampeln: 2 • Gefahrenstellen: 0 • Fahrradstellplätze an Schule: Frei
+            </div>
+          </div>`
+      },
+      {
+        id: "bibliothek",
+        name: "Online-Bibliothek",
+        category: "Bücher",
+        iconKey: "library",
+        url: "https://lese-oase.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--orange); font-size:0.95rem; margin-bottom:6px;">LeseOase – Digitale Ausleihe</h3>
+            <p style="font-size:0.75rem; color:var(--ink-muted); margin-bottom:8px;">Stadtbibliothek für Kinder & Jugendliche</p>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Empfehlung der Woche:</strong><br>
+              <em>"Die Hacker-Detektive und der gestohlene Code"</em><br>
+              <span style="color:var(--green); font-weight:700;">Sofort als E-Book verfügbar</span>
+            </div>
+            <div style="font-size:0.72rem; color:var(--ink-muted);">Ausgeliehene Medien: 2 Bücher (Rückgabe in 12 Tagen)</div>
+          </div>`
+      },
+      {
+        id: "nachrichten",
+        name: "Nachrichten-Portal",
+        category: "Nachrichten",
+        iconKey: "newspaper",
+        url: "https://junior-news.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--ink); font-size:0.95rem; margin-bottom:6px;">JuniorNews – Weltnachrichten</h3>
+            <div style="border-left:3px solid var(--blue); padding-left:8px; margin-bottom:8px;">
+              <strong style="font-size:0.8rem; color:var(--blue);">Eilmeldung: Raumsonde sendet Farbfotos von Monden!</strong>
+              <p style="font-size:0.73rem; color:var(--ink); margin-top:2px;">Das James-Webb-Teleskop hat neue atemberaubende Bilder von Jupiter-Monden geliefert.</p>
+            </div>
+            <div style="border-left:3px solid var(--green); padding-left:8px;">
+              <strong style="font-size:0.8rem; color:var(--green);">Schüler pflanzen 300 Bäume im Schulwald</strong>
+              <p style="font-size:0.73rem; color:var(--ink); margin-top:2px;">Aktion für mehr Klimaschutz und Artenvielfalt vor Ort.</p>
+            </div>
+          </div>`
+      },
+      {
+        id: "museum",
+        name: "Virtuelles Museum",
+        category: "Geschichte",
+        iconKey: "landmark",
+        url: "https://virtuelles-museum.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--purple); font-size:0.95rem; margin-bottom:6px;">Informatik-Museum Online</h3>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Exponat: Konrad Zuses Z3 (1941)</strong><br>
+              Der erste funktionsfähige Digitalrechner der Welt – gesteuert über Lochstreifen aus altem 35mm-Film!
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Virtuelle 3D-Führung: Vom Abakus über den Röhrencomputer bis zum Smartphone.
+            </div>
+          </div>`
+      },
+      {
+        id: "tiere",
+        name: "Zoo & Tierlexikon",
+        category: "Tiere & Natur",
+        iconKey: "paw",
+        url: "https://zoolive-welt.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--orange); font-size:0.95rem; margin-bottom:6px;">ZooLive – Tiere der Welt</h3>
+            <div style="background:var(--orange-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--vermillion); margin-right:5px; vertical-align:1px;"></span>Live-Webcam: Erdmännchen-Kolonie</strong><br>
+              Fütterungszeit heute um 15:30 Uhr mit Pfleger Thomas!
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.73rem;">
+              <strong>Tier des Tages: Der Rote Panda</strong> – verbringt fast sein ganzes Leben in Baumkronen und frisst Bambusblätter.
+            </div>
+          </div>`
+      },
+      {
+        id: "weltraum",
+        name: "Weltraum & Sterne",
+        category: "Astronomie",
+        iconKey: "rocket",
+        url: "https://astro-kids.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--blue); font-size:0.95rem; margin-bottom:6px;">AstroKids – Entdecke das All</h3>
+            <div style="background:var(--blue-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>ISS-Überflug heute um 20:14 Uhr</strong><br>
+              Die Raumstation fliegt mit 28.000 km/h in 400 km Höhe und ist als heller Stern sichtbar!
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Planeten-Radar: Saturn und Jupiter heute Abend am Südhimmel mit Fernglas gut zu sehen.
+            </div>
+          </div>`
+      },
+      {
+        id: "kochen",
+        name: "Koch- & Backlabor",
+        category: "Rezepte",
+        iconKey: "utensils",
+        url: "https://kochen-backen.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--vermillion); font-size:0.95rem; margin-bottom:6px;">Schulküche – Lecker & Schnell</h3>
+            <div style="background:var(--vermillion-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Rezept des Tages: Knusprige Vollkorn-Wraps</strong><br>
+              Mit buntem Grillgemüse, Feta und frischem Kräuterquark.<br>
+              Dauer: <strong>15 Minuten</strong> • Schwierigkeit: <strong>Leicht</strong>
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Nährwert-Ampel: Reich an Ballaststoffen, Proteinen und Vitamin C!
+            </div>
+          </div>`
+      },
+      {
+        id: "lernen",
+        name: "Mathe-Lernplattform",
+        category: "Lernen",
+        iconKey: "graduation",
+        url: "https://mathe-ass.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--blue); font-size:0.95rem; margin-bottom:6px;">MatheAss – Interaktives Üben</h3>
+            <div style="background:var(--blue-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Tageschallenge: Bruchrechnen Level 3</strong><br>
+              Aufgabe: <em>Berechne 3/4 + 2/3</em><br>
+              Dein Highscore: <strong>950 Punkte</strong> • Serie: <strong>5 Tage</strong>
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Nächste Lektion: Dreisatz und Prozentrechnung kinderleicht erklärt.
+            </div>
+          </div>`
+      },
+      {
+        id: "sport",
+        name: "Sportverein Online",
+        category: "Sport",
+        iconKey: "trophy",
+        url: "https://jugendsport-live.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--green); font-size:0.95rem; margin-bottom:6px;">TSV Eintracht – JugendSport</h3>
+            <div style="background:var(--green-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v2h10v-2h-2c-.55 0-1-.45-1-1v-2.34c3.2-1.34 5-4.22 5-7.66V3H6v4c0 3.44 1.8 6.32 5 7.66z"></path></svg>Fußball U14 gewinnt Stadtmeisterschaft!</strong><br>
+              Endstand 3:1 im spannenden Derby gegen den FC Nord.
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.73rem;">
+              <strong>Trainingszeiten:</strong> Leichtathletik Di & Do 16:30 Uhr • Basketball Fr 15:00 Uhr
+            </div>
+          </div>`
+      },
+      {
+        id: "memes",
+        name: "Meme-Archiv",
+        category: "Spaß",
+        iconKey: "smile",
+        url: "https://lach-flash.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--orange); font-size:0.95rem; margin-bottom:6px;">LachFlash – IT-Humor & Witze</h3>
+            <div style="background:var(--orange-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Informatiker-Witz des Tages:</strong><br>
+              Es gibt genau 10 Arten von Menschen auf der Welt:<br>
+              Die, die Binärcode verstehen, und die, die es nicht tun!
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.73rem;">
+              <em>"Router neugestartet – Internet funktioniert wieder: Ich fühle mich wie ein Meister-Hacker."</em>
+            </div>
+          </div>`
+      },
+      {
+        id: "labor",
+        name: "Wissenschaftslabor",
+        category: "Wissenschaft",
+        iconKey: "flask",
+        url: "https://sciencelab-online.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--sky); font-size:0.95rem; margin-bottom:6px;">ScienceLab – Virtuelles Labor</h3>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Experiment: Der Rotkohl-Indikator</strong><br>
+              Farbskala testen: Sauer (Rot) ➔ Neutral (Violett) ➔ Basisch (Grün/Gelb).
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Laborsicherheit: Immer Schutzbrille tragen und Reagenzgläser beschriften!
+            </div>
+          </div>`
+      },
+      {
+        id: "cloud",
+        name: "Cloud-Speicher",
+        category: "Dateien",
+        iconKey: "cloud",
+        url: "https://schul-drive.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--blue); font-size:0.95rem; margin-bottom:6px;">SchulDrive – Meine Cloud</h3>
+            <div style="background:var(--blue-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Speicherplatz: 3,4 GB von 15 GB belegt</strong><br>
+              Status: Alle Dateien synchronisiert
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.73rem;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-1px; margin-right:3px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><strong>Biologie_Referat_Endfassung.pdf</strong> (1,8 MB)<br>
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-1px; margin-right:3px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><strong>Informatik_Netzwerk_Hausaufgabe.docx</strong> (420 KB)
+            </div>
+          </div>`
+      },
+      {
+        id: "kunst",
+        name: "Kunstgalerie",
+        category: "Kunst & Foto",
+        iconKey: "palette",
+        url: "https://artstudio-galerie.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--purple); font-size:0.95rem; margin-bottom:6px;">ArtStudio – Digitale Galerie</h3>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Ausstellung: "Zukunft unserer Stadt"</strong><br>
+              28 digitale Schüler-Kunstwerke aus den Jahrgängen 6 bis 8 ausgestellt.
+            </div>
+            <div style="font-size:0.73rem; color:var(--purple); font-weight:700;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path></svg>Bild der Woche: "Neon-Wald" von Clara (Klasse 7a)
+            </div>
+          </div>`
+      },
+      {
+        id: "umwelt",
+        name: "Umwelt & Natur",
+        category: "Umweltschutz",
+        iconKey: "leaf",
+        url: "https://gruenes-klassenzimmer.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--green); font-size:0.95rem; margin-bottom:6px;">Grünes Klassenzimmer</h3>
+            <div style="background:var(--green-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>Schulgarten-Erntebericht:</strong><br>
+              Erste Bio-Tomaten und Minze für den Schultee geerntet!
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Energiespartipp: PC-Monitore in den Pausen ausschalten spart bis zu 15% Strom.
+            </div>
+          </div>`
+      },
+      {
+        id: "notruf",
+        name: "Notruf-Info",
+        category: "Sicherheit",
+        iconKey: "shield",
+        url: "https://erste-hilfe-info.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--vermillion); font-size:0.95rem; margin-bottom:6px;">Notruf & Erste Hilfe</h3>
+            <div style="background:var(--vermillion-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Wichtige Notrufnummern:</strong><br>
+              Feuerwehr & Rettungsdienst: <strong>112</strong><br>
+              Polizei: <strong>110</strong>
+            </div>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.73rem;">
+              <strong>Die 5 W-Fragen beim Notruf:</strong> Wo? Was? Wie viele? Welche Verletzungen? Warten auf Rückfragen!
+            </div>
+          </div>`
+      },
+      {
+        id: "ki",
+        name: "KI-Lernassistent",
+        category: "Technologie",
+        iconKey: "cpu",
+        url: "https://schulbot-ai.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--sky); font-size:0.95rem; margin-bottom:6px;">SchulBot KI – Lernassistent</h3>
+            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.75rem; margin-bottom:6px;">
+              <div style="color:var(--blue); font-weight:700;">Frage an die KI:</div>
+              <em>"Wie weiß ein Router, wohin ein Paket muss?"</em>
+              <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--surface-border); color:var(--ink);">
+                <strong>SchulBot:</strong> "Er liest die Ziel-IP-Adresse im Kopf des Pakets und schaut in seiner Routing-Tabelle nach dem kürzesten offenen Weg."
+              </div>
+            </div>
+          </div>`
+      },
+      {
+        id: "coding",
+        name: "Coding-Werkstatt",
+        category: "Programmierung",
+        iconKey: "code",
+        url: "https://codekids-studio.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--ink); font-size:0.95rem; margin-bottom:6px;">CodeKids – Programmieren</h3>
+            <div style="background:#1b252e; color:#a6e22e; padding:8px; border-radius:6px; font-family:monospace; font-size:0.72rem; margin-bottom:6px;">
+              // Ping-Simulation<br>
+              function sendPacket(target) {<br>
+              &nbsp;&nbsp;console.log("Routing to: " + target);<br>
+              }
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Challenge: Programmiere einen Algorithmus, der bei Leitungsausfall eine Ausweichroute wählt!
+            </div>
+          </div>`
+      },
+      {
+        id: "zeitung",
+        name: "Schülerzeitung",
+        category: "Schulleben",
+        iconKey: "edit",
+        url: "https://flurfunk-zeitung.de",
+        render: () => `
+          <div style="padding:4px;">
+            <h3 style="color:var(--orange); font-size:0.95rem; margin-bottom:6px;">Der Flurfunk – Schülerzeitung</h3>
+            <div style="background:var(--orange-light); padding:8px; border-radius:6px; font-size:0.76rem; margin-bottom:6px;">
+              <strong>Exklusives Lehrer-Interview:</strong><br>
+              <em>"Was machen Lehrer eigentlich in den Sommerferien?"</em><br>
+              Herr Meyer packt im großen Interview aus!
+            </div>
+            <div style="font-size:0.73rem; color:var(--ink-muted);">
+              Schulumfrage: 78% der Schüler wünschen sich mehr Informatik-Unterricht.
+            </div>
+          </div>`
+      }
     ];
 
-    const SERVER_PRESETS = [
-      { id: "server-schule", name: "Schul-Website", iconKey: "school", url: "https://schul-web.de" },
-      { id: "server-suchmaschine", name: "Suchmaschine", iconKey: "search", url: "https://such-fuchs.de" },
-      { id: "server-lexikon", name: "Online-Lexikon", iconKey: "book", url: "https://kinder-lexikon.de" },
-      { id: "server-wetter", name: "Wetterdienst", iconKey: "weather", url: "https://wetter-frosch.de" }
+    /* ==========================================================================
+       TOPOLOGIE-DATEN & GENERATOR MIT ZENTRALEN SERVERN & GROSSZÜGIGEM SPACING
+       ========================================================================== */
+    const DEVICE_TYPES = [
+      { device: "Laptop", iconKey: "laptop" },
+      { device: "Schul-PC", iconKey: "desktop" },
+      { device: "Tablet", iconKey: "tablet" },
+      { device: "Smartphone", iconKey: "smartphone" }
     ];
+    const CLIENT_PRESETS = DEVICE_TYPES;
+
+    /* Farb-Palette für LAN-Gruppen / Subnetze */
+    const GROUP_PALETTE = [
+      { name: "blue", stroke: "#2563eb", fill: "rgba(37, 99, 235, 0.06)", badgeBg: "#2563eb", badgeText: "#ffffff" },
+      { name: "emerald", stroke: "#059669", fill: "rgba(5, 150, 105, 0.06)", badgeBg: "#059669", badgeText: "#ffffff" },
+      { name: "violet", stroke: "#7c3aed", fill: "rgba(124, 58, 237, 0.06)", badgeBg: "#7c3aed", badgeText: "#ffffff" },
+      { name: "amber", stroke: "#d97706", fill: "rgba(217, 119, 6, 0.06)", badgeBg: "#d97706", badgeText: "#ffffff" },
+      { name: "rose", stroke: "#e11d48", fill: "rgba(225, 29, 72, 0.06)", badgeBg: "#e11d48", badgeText: "#ffffff" },
+      { name: "cyan", stroke: "#0891b2", fill: "rgba(8, 145, 178, 0.06)", badgeBg: "#0891b2", badgeText: "#ffffff" }
+    ];
+
+    function getGroupColor(group) {
+      if (!group) return GROUP_PALETTE[0];
+      const idx = (typeof group.colorIndex === "number" && group.colorIndex >= 0)
+        ? (group.colorIndex % GROUP_PALETTE.length)
+        : 0;
+      return GROUP_PALETTE[idx];
+    }
+
+    function getNextAvailableGroupLabel() {
+      const existing = new Set((TOPOLOGY.groups || []).map(g => (g.label || "").trim().toUpperCase()));
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      for (let i = 0; i < letters.length; i++) {
+        if (!existing.has(letters[i])) return letters[i];
+      }
+      for (let i = 0; i < letters.length; i++) {
+        for (let j = 0; j < letters.length; j++) {
+          const combo = letters[i] + letters[j];
+          if (!existing.has(combo)) return combo;
+        }
+      }
+      return "X";
+    }
+
+    function getAllNodes() {
+      return [...TOPOLOGY.clients, ...TOPOLOGY.routers, ...TOPOLOGY.servers];
+    }
+
+    function getNextClientNumber(groupId = null) {
+      if (groupId) {
+        return TOPOLOGY.clients.filter(c => c.groupId === groupId).length + 1;
+      }
+      return TOPOLOGY.clients.filter(c => !c.groupId).length + 1;
+    }
+
+    function renumberClients() {
+      if (!TOPOLOGY || !TOPOLOGY.clients) return;
+      const groupCounts = new Map();
+      (TOPOLOGY.groups || []).forEach(g => groupCounts.set(g.id, 0));
+
+      let ungroupedCount = 0;
+
+      TOPOLOGY.clients.forEach(c => {
+        if (c.groupId && groupCounts.has(c.groupId)) {
+          const cnt = groupCounts.get(c.groupId) + 1;
+          groupCounts.set(c.groupId, cnt);
+          c.name = `Client ${cnt}`;
+        } else {
+          ungroupedCount++;
+          c.name = `Client ${ungroupedCount}`;
+        }
+      });
+    }
+
+    const SERVER_PRESETS = [
+      { id: "server-schule", templateId: "schule", name: "Schul-Website", iconKey: "school", url: "https://goethe-schule.de" },
+      { id: "server-suchmaschine", templateId: "suchmaschine", name: "Suchmaschine", iconKey: "search", url: "https://such-fuchs.de" },
+      { id: "server-lexikon", templateId: "lexikon", name: "Online-Lexikon", iconKey: "book", url: "https://kinder-lexikon.de" },
+      { id: "server-wetter", templateId: "wetter", name: "Wetterdienst", iconKey: "weather", url: "https://wetter-frosch.de" }
+    ];
+
+    /* ==========================================================================
+       8 FERTIGE NETZWERK-VORLAGEN (PRESETS ZUM DIREKTEN LADEN)
+       ========================================================================== */
+    const PRESET_DEFINITIONS = {
+      standard: {
+        name: "Standard-Internet",
+        desc: "4 Clients an einem vermaschten Netz aus 5 Routern mit 3 Webservern.",
+        stats: "4 Clients • 5 Router • 3 Server",
+        generate: () => generateTopology("mesh", 4, 5, 3)
+      },
+      "star-classroom": {
+        name: "Klassenraum (Stern)",
+        desc: "6 Schülergeräte an einem zentralen Klassen-Switch mit 2 Servern.",
+        stats: "6 Clients • 1 Router • 2 Server",
+        generate: () => {
+          const t = generateTopology("star", 6, 1, 2);
+          if (t.servers[1]) {
+            t.servers[1].templateId = "lernen";
+            t.servers[1].name = "Mathe-Lernplattform";
+            t.servers[1].iconKey = "graduation";
+            t.servers[1].url = "https://mathe-ass.de";
+          }
+          const groupId = "group-lan-schule";
+          t.groups = [{ id: groupId, label: "A", colorIndex: 0 }];
+          t.clients.forEach(c => c.groupId = groupId);
+          t.routers.forEach(r => r.groupId = groupId);
+          t.servers.forEach(s => s.groupId = groupId);
+          return t;
+        }
+      },
+      "two-lans": {
+        name: "Zwei LANs über WAN-Strecke",
+        desc: "Schule A und Schule B (je 1 Router + 3 Clients), verbunden über Weitverkehrs-Router.",
+        stats: "6 Clients • 4 Router • 3 Server",
+        generate: () => {
+          const clients = [
+            { id: "client-1", name: "Client 1", device: "Laptop", iconKey: "laptop", x: 90, y: 190, groupId: "group-lan-a" },
+            { id: "client-2", name: "Client 2", device: "Schul-PC", iconKey: "desktop", x: 90, y: 260, groupId: "group-lan-a" },
+            { id: "client-3", name: "Client 3", device: "Tablet", iconKey: "tablet", x: 90, y: 330, groupId: "group-lan-a" },
+            { id: "client-4", name: "Client 1", device: "Smartphone", iconKey: "smartphone", x: 670, y: 190, groupId: "group-lan-b" },
+            { id: "client-5", name: "Client 2", device: "Laptop", iconKey: "laptop", x: 670, y: 260, groupId: "group-lan-b" },
+            { id: "client-6", name: "Client 3", device: "Tablet", iconKey: "tablet", x: 670, y: 330, groupId: "group-lan-b" }
+          ];
+          const routers = [
+            { id: "router-1", x: 210, y: 260, groupId: "group-lan-a" },
+            { id: "router-2", x: 550, y: 260, groupId: "group-lan-b" },
+            { id: "router-3", x: 310, y: 390 },
+            { id: "router-4", x: 450, y: 390 }
+          ];
+          const servers = [
+            { id: "server-1", templateId: "schule", name: "Schul-Website", iconKey: "school", url: "https://goethe-schule.de", x: 380, y: 140 },
+            { id: "server-2", templateId: "cloud", name: "Cloud-Speicher", iconKey: "cloud", url: "https://schul-drive.de", x: 250, y: 510 },
+            { id: "server-3", templateId: "lexikon", name: "Online-Lexikon", iconKey: "book", url: "https://kinder-lexikon.de", x: 510, y: 510 }
+          ];
+          const groups = [
+            { id: "group-lan-a", label: "A", colorIndex: 0 },
+            { id: "group-lan-b", label: "B", colorIndex: 1 }
+          ];
+          const edges = [
+            // LAN 1 (Clients max 1)
+            { from: "client-1", to: "router-1" },
+            { from: "client-2", to: "router-1" },
+            { from: "client-3", to: "router-1" },
+            // LAN 2 (Clients max 1)
+            { from: "client-4", to: "router-2" },
+            { from: "client-5", to: "router-2" },
+            { from: "client-6", to: "router-2" },
+            // WAN Backbone
+            { from: "router-1", to: "router-3" },
+            { from: "router-2", to: "router-4" },
+            { from: "router-3", to: "router-4" },
+            // Server (max 3)
+            { from: "server-1", to: "router-1" },
+            { from: "server-1", to: "router-2" },
+            { from: "server-2", to: "router-3" },
+            { from: "server-3", to: "router-4" }
+          ];
+          return { clients, routers, servers, edges, groups };
+        }
+      },
+      "triangle-redundant": {
+        name: "Redundantes Dreiecks-Netz",
+        desc: "3 Router im Dreieck. Ideal um Leitungsunterbrechungen und Ausweichrouten zu testen!",
+        stats: "4 Clients • 3 Router • 2 Server",
+        generate: () => {
+          const clients = [
+            { id: "client-1", name: "Client 1", device: "Laptop", iconKey: "laptop", x: 100, y: 210 },
+            { id: "client-2", name: "Client 2", device: "Schul-PC", iconKey: "desktop", x: 100, y: 300 },
+            { id: "client-3", name: "Client 3", device: "Tablet", iconKey: "tablet", x: 660, y: 210 },
+            { id: "client-4", name: "Client 4", device: "Smartphone", iconKey: "smartphone", x: 660, y: 300 }
+          ];
+          const routers = [
+            { id: "router-1", x: 250, y: 255 },
+            { id: "router-2", x: 510, y: 255 },
+            { id: "router-3", x: 380, y: 430 }
+          ];
+          const servers = [
+            { id: "server-1", templateId: "suchmaschine", name: "Suchmaschine", iconKey: "search", url: "https://such-fuchs.de", x: 380, y: 130 },
+            { id: "server-2", templateId: "wetter", name: "Wetterdienst", iconKey: "weather", url: "https://wetter-frosch.de", x: 380, y: 535 }
+          ];
+          const edges = [
+            // Triangle Routers
+            { from: "router-1", to: "router-2" },
+            { from: "router-2", to: "router-3" },
+            { from: "router-3", to: "router-1" },
+            // Clients (1 link each)
+            { from: "client-1", to: "router-1" },
+            { from: "client-2", to: "router-1" },
+            { from: "client-3", to: "router-2" },
+            { from: "client-4", to: "router-2" },
+            // Servers (Server 1 has 2 links, Server 2 has 1 link <= 3)
+            { from: "server-1", to: "router-1" },
+            { from: "server-1", to: "router-2" },
+            { from: "server-2", to: "router-3" }
+          ];
+          return { clients, routers, servers, edges, groups: [] };
+        }
+      },
+      p2p: {
+        name: "P2P Direktverbindung",
+        desc: "2 Computer direkt mit einem einzigen Netzwerkkabel verbunden (kein Router).",
+        stats: "2 Clients • 0 Router • 0 Server",
+        generate: () => ({
+          clients: [
+            { id: "client-1", name: "Client 1", device: "Laptop", iconKey: "laptop", x: 260, y: 300 },
+            { id: "client-2", name: "Client 2", device: "Schul-PC", iconKey: "desktop", x: 500, y: 300 }
+          ],
+          routers: [],
+          servers: [],
+          edges: [{ from: "client-1", to: "client-2" }],
+          groups: []
+        })
+      },
+      "server-farm": {
+        name: "Rechenzentrum / Server-Farm",
+        desc: "4 verschiedene Webserver an einem zentralen Switch-Cluster für 3 Clients.",
+        stats: "3 Clients • 2 Router • 4 Server",
+        generate: () => {
+          const clients = [
+            { id: "client-1", name: "Client 1", device: "Laptop", iconKey: "laptop", x: 100, y: 220 },
+            { id: "client-2", name: "Client 2", device: "Schul-PC", iconKey: "desktop", x: 100, y: 300 },
+            { id: "client-3", name: "Client 3", device: "Tablet", iconKey: "tablet", x: 100, y: 380 }
+          ];
+          const routers = [
+            { id: "router-1", x: 270, y: 300 },
+            { id: "router-2", x: 440, y: 300 }
+          ];
+          const servers = [
+            { id: "server-1", templateId: "schule", name: "Schul-Website", iconKey: "school", url: "https://goethe-schule.de", x: 630, y: 150 },
+            { id: "server-2", templateId: "video", name: "Video-Portal", iconKey: "video", url: "https://tubekids.de", x: 630, y: 250 },
+            { id: "server-3", templateId: "gaming", name: "Gaming-Server", iconKey: "gamepad", url: "https://pixelcraft-online.de", x: 630, y: 350 },
+            { id: "server-4", templateId: "cloud", name: "Cloud-Speicher", iconKey: "cloud", url: "https://schul-drive.de", x: 630, y: 450 }
+          ];
+          const edges = [
+            { from: "client-1", to: "router-1" },
+            { from: "client-2", to: "router-1" },
+            { from: "client-3", to: "router-1" },
+            { from: "router-1", to: "router-2" },
+            // Servers dual-homed to routers (2 links each <= 3)
+            { from: "server-1", to: "router-2" },
+            { from: "server-2", to: "router-2" },
+            { from: "server-3", to: "router-2" },
+            { from: "server-4", to: "router-2" },
+            { from: "server-1", to: "router-1" },
+            { from: "server-4", to: "router-1" }
+          ];
+          return { clients, routers, servers, edges, groups: [] };
+        }
+      },
+      "smart-home": {
+        name: "Smart Home & IoT",
+        desc: "Ein Heim-WLAN-Router vernetzt Laptop, Tablet, Smartphone und zwei Medienserver.",
+        stats: "4 Clients • 1 Router • 2 Server",
+        generate: () => {
+          const groupId = "group-lan-home";
+          const clients = [
+            { id: "client-1", name: "Client 1", device: "Laptop", iconKey: "laptop", x: 190, y: 220, groupId },
+            { id: "client-2", name: "Client 2", device: "Smartphone", iconKey: "smartphone", x: 190, y: 360, groupId },
+            { id: "client-3", name: "Client 3", device: "Tablet", iconKey: "tablet", x: 570, y: 220, groupId },
+            { id: "client-4", name: "Client 4", device: "Schul-PC", iconKey: "desktop", x: 570, y: 360, groupId }
+          ];
+          const routers = [{ id: "router-1", x: 380, y: 290, groupId }];
+          const servers = [
+            { id: "server-1", templateId: "musik", name: "Musik-Streaming", iconKey: "music", url: "https://soundwave-app.de", x: 380, y: 135, groupId },
+            { id: "server-2", templateId: "cloud", name: "Cloud-Speicher", iconKey: "cloud", url: "https://schul-drive.de", x: 380, y: 460, groupId }
+          ];
+          const groups = [{ id: groupId, label: "A", colorIndex: 0 }];
+          const edges = [
+            { from: "client-1", to: "router-1" },
+            { from: "client-2", to: "router-1" },
+            { from: "client-3", to: "router-1" },
+            { from: "client-4", to: "router-1" },
+            { from: "server-1", to: "router-1" },
+            { from: "server-2", to: "router-1" }
+          ];
+          return { clients, routers, servers, edges, groups };
+        }
+      },
+      "big-mesh": {
+        name: "Großes vermaschtes Netz",
+        desc: "Internet-Simulation mit 8 Clients, 10 Routern und 4 Servern mit vielen Ausweichpfaden.",
+        stats: "8 Clients • 10 Router • 4 Server",
+        generate: () => {
+          const t = generateTopology("mesh", 8, 10, 4);
+          if (t.servers[2]) {
+            t.servers[2].templateId = "gaming";
+            t.servers[2].name = "Gaming-Server";
+            t.servers[2].iconKey = "gamepad";
+            t.servers[2].url = "https://pixelcraft-online.de";
+          }
+          if (t.servers[3]) {
+            t.servers[3].templateId = "weltraum";
+            t.servers[3].name = "Weltraum & Sterne";
+            t.servers[3].iconKey = "rocket";
+            t.servers[3].url = "https://astro-kids.de";
+          }
+          return t;
+        }
+      }
+    };
 
     let TOPOLOGY = {
       clients: [],
       routers: [],
       servers: [],
-      edges: []
+      edges: [],
+      groups: []
     };
 
     const nodeMap = new Map();
@@ -1760,7 +3068,7 @@
 
         clients.push({
           id: `client-${i + 1}`,
-          name: cPreset.name,
+          name: `Client ${i + 1}`,
           device: cPreset.device,
           iconKey: cPreset.iconKey,
           x: Math.round(x),
@@ -1956,6 +3264,7 @@
 
         servers.push({
           id: sPreset.id,
+          templateId: sPreset.templateId || sPreset.id.replace("server-", ""),
           name: sPreset.name,
           iconKey: sPreset.iconKey,
           url: sPreset.url,
@@ -2031,22 +3340,16 @@
       servers.forEach(s => { s.x = Math.round(s.x); s.y = Math.round(s.y); });
       routers.forEach(r => { r.x = Math.round(r.x); r.y = Math.round(r.y); });
 
-      // 5. Clients verbinden: Clients verbinden sich mit Routern (nie untereinander)
+      // 5. Clients verbinden: Jeder Client hat genau 1 Kabelverbindung (Regel: Client max. 1)
       if (routers.length > 0) {
         clients.forEach(c => {
           const nearest = [...routers].sort((a,b) => Math.hypot(a.x - c.x, a.y - c.y) - Math.hypot(b.x - c.x, b.y - c.y));
           edges.push({ from: c.id, to: nearest[0].id });
-          if (nearest.length > 1 && (numClients <= 4 || Math.random() > 0.3)) {
-            edges.push({ from: c.id, to: nearest[1].id });
-          }
         });
       } else {
-        // 0 Router: Direktverbindung untereinander (P2P)
-        for (let i = 0; i < clients.length - 1; i++) {
+        // 0 Router: Direktverbindung untereinander (P2P mit max. 1 Link je Client)
+        for (let i = 0; i < clients.length - 1; i += 2) {
           edges.push({ from: clients[i].id, to: clients[i + 1].id });
-        }
-        if (clients.length > 2) {
-          edges.push({ from: clients[clients.length - 1].id, to: clients[0].id });
         }
       }
 
@@ -2063,7 +3366,7 @@
         }
       });
 
-      return { clients, routers, servers, edges };
+      return { clients, routers, servers, edges, groups: [] };
     }
 
     /* ==========================================================================
@@ -2081,6 +3384,9 @@
       brokenEdges: new Set(),
       autoGlitchTimer: null,
       glitchRecoveryTimers: [],
+      activeTool: "select",     // "select" | "cable" | "break" | "delete"
+      cableStartNodeId: null,
+      configuringServerId: null,
       audio: {
         master: false,
         send: true,
@@ -2101,6 +3407,7 @@
     const stage = document.getElementById("network-stage");
     const svg = document.getElementById("network-svg");
     const viewportGroup = document.getElementById("viewport-group");
+    const groupsGroup = document.getElementById("groups-group");
     const edgesGroup = document.getElementById("edges-group");
     const nodesGroup = document.getElementById("nodes-group");
     const svgPacket = document.getElementById("svg-packet");
@@ -2120,6 +3427,21 @@
     const tabWeb = document.getElementById("tab-web");
     const viewChat = document.getElementById("view-chat");
     const viewWeb = document.getElementById("view-web");
+
+    const toolSelect = document.getElementById("tool-select");
+    const toolCable = document.getElementById("tool-cable");
+    const toolDelete = document.getElementById("tool-delete");
+    const btnAddClient = document.getElementById("btn-add-client");
+    const btnAddRouter = document.getElementById("btn-add-router");
+    const btnAddServer = document.getElementById("btn-add-server");
+    const btnAddLan = document.getElementById("btn-add-lan");
+    const btnQuickPresets = document.getElementById("btn-quick-presets");
+    const btnClearPlane = document.getElementById("btn-clear-plane");
+    const serverCountBadge = document.getElementById("server-count-badge");
+    const toastContainer = document.getElementById("toast-container");
+
+    const serverConfigModal = document.getElementById("server-config-modal");
+    const presetsModal = document.getElementById("presets-modal");
 
     const speechBubble = document.getElementById("receiver-speech-bubble");
     const bubbleTitle = document.getElementById("bubble-title");
@@ -2144,6 +3466,908 @@
     const btnStepPrev = document.getElementById("btn-step-prev");
     const btnStepNext = document.getElementById("btn-step-next");
     const btnStepAuto = document.getElementById("btn-step-auto");
+
+    /* ==========================================================================
+       STORAGE & PERSISTENZ (ÜBERLEBT RELOAD)
+       ========================================================================== */
+    const STORAGE_KEY = "chemsims_rechnernetze_topo";
+
+    function saveTopologyToStorage() {
+      try {
+        const payload = {
+          clients: TOPOLOGY.clients,
+          routers: TOPOLOGY.routers,
+          servers: TOPOLOGY.servers,
+          edges: TOPOLOGY.edges,
+          groups: TOPOLOGY.groups || [],
+          brokenEdges: Array.from(state.brokenEdges)
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch (e) {
+        console.warn("Konnte Topologie nicht im localStorage speichern:", e);
+      }
+    }
+
+    function loadTopologyFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (!data || !Array.isArray(data.clients) || !Array.isArray(data.routers) || !Array.isArray(data.servers) || !Array.isArray(data.edges)) {
+          return null;
+        }
+        return data;
+      } catch (e) {
+        console.warn("Konnte Topologie nicht aus localStorage laden:", e);
+        return null;
+      }
+    }
+
+    /* ==========================================================================
+       INTERAKTIVE HILFSFUNKTIONEN (WERKZEUGE, TOASTS, KABEL, SERVER-LIMIT)
+       ========================================================================== */
+    function showToast(message, type = "info") {
+      if (!toastContainer) return;
+      const toast = document.createElement("div");
+      toast.className = `toast-message ${type}`;
+      let iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+      if (type === "warning") {
+        iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+      } else if (type === "success") {
+        iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 10 11 15 8 12"></polyline></svg>`;
+      }
+      toast.innerHTML = `<span class="toast-icon">${iconSvg}</span><span>${escapeHtml(message)}</span>`;
+      toastContainer.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add("visible"));
+      setTimeout(() => {
+        toast.classList.remove("visible");
+        setTimeout(() => toast.remove(), 260);
+      }, 2600);
+    }
+
+    function setTool(tool) {
+      state.activeTool = tool;
+      document.querySelectorAll(".stage-toolbar .tool-btn").forEach(b => {
+        if (b.id && b.id.startsWith("tool-")) b.classList.remove("active");
+      });
+      const btn = document.getElementById(`tool-${tool}`);
+      if (btn) btn.classList.add("active");
+
+      // Vorherige unvollständige Kabel-Auswahl aufheben
+      if (state.cableStartNodeId) {
+        document.querySelectorAll(".node.cable-source").forEach(el => el.classList.remove("cable-source"));
+        state.cableStartNodeId = null;
+      }
+
+      if (tool === "cable") {
+        showToast("Kabel-Modus: Wähle nacheinander 2 Knoten zum Verbinden.", "info");
+      } else if (tool === "break") {
+        showToast("Kappen-Modus: Klicke auf ein Kabel zum Unterbrechen / Reparieren.", "info");
+      } else if (tool === "delete") {
+        showToast("Lösch-Modus: Klicke auf einen Knoten oder ein Kabel zum Entfernen.", "warning");
+      }
+    }
+
+    function updateServerLimitUI() {
+      const count = TOPOLOGY.servers.length;
+      const isMax = count >= 5;
+      if (serverCountBadge) {
+        serverCountBadge.textContent = `${count}/5`;
+      }
+      if (btnAddServer) {
+        btnAddServer.disabled = isMax;
+        btnAddServer.classList.toggle("disabled", isMax);
+        if (isMax) {
+          btnAddServer.title = "Maximal 5 Server im Netzwerk erlaubt (Server-Limit erreicht)";
+        } else {
+          btnAddServer.title = "Neuen Webserver hinzufügen (max. 5 im Netzwerk)";
+        }
+      }
+    }
+
+    function getNodeConnectionCount(nodeId) {
+      return TOPOLOGY.edges.filter(e => e.from === nodeId || e.to === nodeId).length;
+    }
+
+    function updateServerNames() {
+      if (!TOPOLOGY || !TOPOLOGY.servers) return;
+
+      // Zähle Vorkommen pro templateId
+      const templateCounts = new Map();
+      TOPOLOGY.servers.forEach(s => {
+        const key = s.templateId || s.id.replace(/-\d+$/, "");
+        templateCounts.set(key, (templateCounts.get(key) || 0) + 1);
+      });
+
+      const templateIndices = new Map();
+      TOPOLOGY.servers.forEach(s => {
+        const key = s.templateId || s.id.replace(/-\d+$/, "");
+        const tmpl = SERVER_TEMPLATES.find(t => t.id === s.templateId);
+        const baseName = tmpl ? tmpl.name : s.name.replace(/\s+\d+$/, "");
+        const count = templateCounts.get(key) || 0;
+
+        if (count > 1) {
+          const idx = (templateIndices.get(key) || 0) + 1;
+          templateIndices.set(key, idx);
+          s.name = `${baseName} ${idx}`;
+        } else {
+          s.name = baseName;
+        }
+      });
+    }
+
+    function updateSidePanelDropdowns() {
+      if (!selectRecipient || !selectServer) return;
+
+      const curRecipient = selectRecipient.value;
+      selectRecipient.innerHTML = "";
+      TOPOLOGY.clients.filter(c => c.id !== state.selectedClientId).forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        const group = c.groupId ? (TOPOLOGY.groups || []).find(g => g.id === c.groupId) : null;
+        const lanTag = group ? ` (LAN ${group.label})` : "";
+        opt.textContent = `${c.name}${lanTag} – ${c.device}`;
+        selectRecipient.appendChild(opt);
+      });
+      if (curRecipient && TOPOLOGY.clients.some(c => c.id === curRecipient)) {
+        selectRecipient.value = curRecipient;
+      }
+
+      const curServer = selectServer.value;
+      selectServer.innerHTML = "";
+      TOPOLOGY.servers.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        const group = s.groupId ? (TOPOLOGY.groups || []).find(g => g.id === s.groupId) : null;
+        const lanTag = group ? ` (LAN ${group.label})` : "";
+        opt.textContent = `${s.name}${lanTag} (${s.url.replace("https://", "")})`;
+        selectServer.appendChild(opt);
+      });
+      if (curServer && TOPOLOGY.servers.some(s => s.id === curServer)) {
+        selectServer.value = curServer;
+      }
+    }
+
+    /* ==========================================================================
+       GRUPPEN / LAN-SUBNETZE: HÜLLEN, BEWEGUNG & ZERFALLS-LOGIK
+       ========================================================================== */
+    function getGroupBounds(groupId) {
+      const groupNodes = getAllNodes().filter(n => n.groupId === groupId);
+      if (groupNodes.length === 0) return null;
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      groupNodes.forEach(n => {
+        const padX = n.id.startsWith("router-") ? 30 : 42;
+        const padY = n.id.startsWith("router-") ? 30 : 42;
+        if (n.x - padX < minX) minX = n.x - padX;
+        if (n.x + padX > maxX) maxX = n.x + padX;
+        if (n.y - padY < minY) minY = n.y - padY;
+        if (n.y + padY + 16 > maxY) maxY = n.y + padY + 16;
+      });
+      const margin = 16;
+      return {
+        x: Math.round(minX - margin),
+        y: Math.round(minY - margin),
+        width: Math.round((maxX - minX) + margin * 2),
+        height: Math.round((maxY - minY) + margin * 2)
+      };
+    }
+
+    function promptRenameGroup(groupId) {
+      const group = (TOPOLOGY.groups || []).find(g => g.id === groupId);
+      if (!group) return;
+      const input = prompt("LAN / Subnetz Bezeichnung (z.B. A, B, B1):", group.label);
+      if (input !== null) {
+        const clean = input.trim().slice(0, 4);
+        if (clean) {
+          group.label = clean;
+          renderGroups();
+          renderNodes();
+          saveTopologyToStorage();
+          showToast(`LAN umbenannt in "${clean}".`, "success");
+        }
+      }
+    }
+
+    function validateAndRecomputeGroups() {
+      if (!TOPOLOGY.groups) TOPOLOGY.groups = [];
+      const groupsToKeep = [];
+
+      for (const group of TOPOLOGY.groups) {
+        const groupNodes = getAllNodes().filter(n => n.groupId === group.id);
+        if (groupNodes.length === 0) continue;
+
+        // Regel: Ein Router gehört nur dann zu einem LAN, wenn an ihm direkt ein Endgerät (Client/Server) hängt!
+        // Router, an denen nur noch andere Router hängen, werden automatisch zu WAN-Routern (groupId = null).
+        groupNodes.filter(n => n.id.startsWith("router-")).forEach(r => {
+          const hasDirectEndDevice = TOPOLOGY.edges.some(e => {
+            const otherId = (e.from === r.id) ? e.to : (e.to === r.id ? e.from : null);
+            if (!otherId) return false;
+            const otherNode = nodeMap.get(otherId);
+            return otherNode && otherNode.groupId === group.id && (otherNode.id.startsWith("client-") || otherNode.id.startsWith("server-"));
+          });
+          if (!hasDirectEndDevice) {
+            r.groupId = null;
+          }
+        });
+
+        // Verbleibende Knoten dieser Gruppe prüfen
+        const remainingGroupNodes = getAllNodes().filter(n => n.groupId === group.id);
+        const groupNodeIds = new Set(remainingGroupNodes.map(n => n.id));
+        const internalEdges = TOPOLOGY.edges.filter(e => groupNodeIds.has(e.from) && groupNodeIds.has(e.to));
+
+        const adj = new Map();
+        groupNodeIds.forEach(id => adj.set(id, []));
+        internalEdges.forEach(e => {
+          adj.get(e.from).push(e.to);
+          adj.get(e.to).push(e.from);
+        });
+
+        const visited = new Set();
+        const components = [];
+
+        for (const startId of groupNodeIds) {
+          if (visited.has(startId)) continue;
+          const comp = [];
+          const queue = [startId];
+          visited.add(startId);
+          while (queue.length > 0) {
+            const curr = queue.shift();
+            comp.push(curr);
+            for (const neighbor of (adj.get(curr) || [])) {
+              if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                queue.push(neighbor);
+              }
+            }
+          }
+          components.push(comp);
+        }
+
+        let keptOriginal = false;
+        for (const comp of components) {
+          const compNodes = comp.map(id => nodeMap.get(id)).filter(Boolean);
+          const hasRouter = compNodes.some(n => n.id.startsWith("router-"));
+          const hasEndDevice = compNodes.some(n => n.id.startsWith("client-") || n.id.startsWith("server-"));
+
+          // Regel: Eine Gruppe MUSS min. 1 Router UND min. 1 Endgerät (Client/Server) besitzen
+          if (hasRouter && hasEndDevice) {
+            if (!keptOriginal) {
+              keptOriginal = true;
+              compNodes.forEach(n => n.groupId = group.id);
+              groupsToKeep.push(group);
+            } else {
+              // Zweites Subnetz abspalten mit neuem Kennbuchstaben
+              const newLabel = getNextAvailableGroupLabel();
+              const newGroupId = `group-${Date.now() % 10000}-${Math.floor(Math.random() * 100)}`;
+              const newColorIndex = (group.colorIndex + 1) % GROUP_PALETTE.length;
+              const newGroup = {
+                id: newGroupId,
+                label: newLabel,
+                colorIndex: newColorIndex
+              };
+              compNodes.forEach(n => n.groupId = newGroupId);
+              groupsToKeep.push(newGroup);
+              showToast(`Subnetz getrennt: Neues Netz "${newLabel}" entstanden!`, "info");
+            }
+          } else {
+            // Verliert Gruppierung (ein Netz nur aus Routern oder ohne Router ist kein LAN)
+            compNodes.forEach(n => {
+              n.groupId = null;
+            });
+          }
+        }
+      }
+
+      TOPOLOGY.groups = groupsToKeep;
+      renumberClients();
+    }
+
+    let groupDragState = {
+      isDragging: false,
+      groupId: null,
+      startX: 0,
+      startY: 0,
+      lastPt: null,
+      hasMoved: false
+    };
+
+    function attachGroupInteractions(gContainer, group) {
+      const editBtn = gContainer.querySelector(`#btn-edit-${group.id}`);
+      if (editBtn) {
+        editBtn.addEventListener("pointerdown", (e) => {
+          e.stopPropagation();
+        });
+        editBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          promptRenameGroup(group.id);
+        });
+      }
+
+      gContainer.addEventListener("pointerdown", (e) => {
+        if (state.activeTool === "cable" || state.activeTool === "delete") {
+          return;
+        }
+        e.stopPropagation();
+        const pt = clientToViewportPoint(e.clientX, e.clientY);
+        groupDragState.isDragging = true;
+        groupDragState.groupId = group.id;
+        groupDragState.startX = e.clientX;
+        groupDragState.startY = e.clientY;
+        groupDragState.lastPt = pt;
+        groupDragState.hasMoved = false;
+
+        gContainer.setPointerCapture(e.pointerId);
+        gContainer.classList.add("dragging");
+      });
+
+      gContainer.addEventListener("pointermove", (e) => {
+        if (!groupDragState.isDragging || groupDragState.groupId !== group.id) return;
+        if (Math.hypot(e.clientX - groupDragState.startX, e.clientY - groupDragState.startY) > 3) {
+          groupDragState.hasMoved = true;
+        }
+
+        const pt = clientToViewportPoint(e.clientX, e.clientY);
+        const dx = pt.x - groupDragState.lastPt.x;
+        const dy = pt.y - groupDragState.lastPt.y;
+        groupDragState.lastPt = pt;
+
+        const groupNodes = getAllNodes().filter(n => n.groupId === group.id);
+        groupNodes.forEach(n => {
+          n.x = Math.round(n.x + dx);
+          n.y = Math.round(n.y + dy);
+          const el = document.getElementById(`node-${n.id}`);
+          if (el) el.setAttribute("transform", `translate(${n.x}, ${n.y})`);
+          updateEdgesForNode(n.id);
+        });
+
+        updateGroupVisual(group.id);
+        if (groupNodes.some(n => state.selectedClientId === n.id || state.lastBubbleReceiver?.id === n.id)) {
+          updateBubblePosition();
+        }
+      });
+
+      const stopGroupDrag = (e) => {
+        if (groupDragState.isDragging && groupDragState.groupId === group.id) {
+          const moved = groupDragState.hasMoved;
+          groupDragState.isDragging = false;
+          groupDragState.groupId = null;
+          gContainer.classList.remove("dragging");
+          try { gContainer.releasePointerCapture(e.pointerId); } catch (_) {}
+
+          if (moved) {
+            saveTopologyToStorage();
+          }
+        }
+      };
+
+      gContainer.addEventListener("pointerup", stopGroupDrag);
+      gContainer.addEventListener("pointercancel", stopGroupDrag);
+    }
+
+    function renderGroups() {
+      if (!groupsGroup) return;
+      groupsGroup.innerHTML = "";
+      if (!TOPOLOGY.groups || TOPOLOGY.groups.length === 0) return;
+
+      TOPOLOGY.groups.forEach(group => {
+        const bounds = getGroupBounds(group.id);
+        if (!bounds) return;
+
+        const color = getGroupColor(group);
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.className.baseVal = "group-container";
+        g.id = `group-hull-${group.id}`;
+        g.dataset.groupId = group.id;
+
+        const labelText = `LAN ${group.label}`;
+        const badgeWidth = Math.max(68, labelText.length * 9.5 + 28);
+
+        g.innerHTML = `
+          <!-- LAN Schattierung / Kontur -->
+          <rect class="group-hull-rect" id="hull-rect-${group.id}"
+                x="${bounds.x}" y="${bounds.y}" 
+                width="${bounds.width}" height="${bounds.height}" 
+                rx="20" ry="20" 
+                fill="${color.fill}" 
+                stroke="${color.stroke}" 
+                stroke-width="1.8" 
+                stroke-dasharray="6 4"
+                stroke-opacity="0.6" />
+
+          <!-- LAN Gruppen-Badge mit Name & Stift zum Umbenennen -->
+          <g class="group-badge" id="badge-${group.id}" transform="translate(${bounds.x + 16}, ${bounds.y - 12})">
+            <rect class="group-badge-bg" x="0" y="0" width="${badgeWidth}" height="24" rx="12" fill="${color.badgeBg}" />
+            <text class="group-badge-text" x="12" y="16" fill="${color.badgeText}" font-size="12" font-weight="700">${escapeHtml(labelText)}</text>
+            <g class="group-badge-edit" id="btn-edit-${group.id}" transform="translate(${badgeWidth - 20}, 4)" style="cursor: pointer;" title="LAN umbenennen">
+              <circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.2)" />
+              <path d="M 5 11 L 11 5 L 12 6 L 6 12 L 4 12 Z" fill="${color.badgeText}" />
+            </g>
+          </g>
+        `;
+
+        attachGroupInteractions(g, group);
+        groupsGroup.appendChild(g);
+      });
+    }
+
+    function updateGroupVisual(groupId) {
+      const g = document.getElementById(`group-hull-${groupId}`);
+      if (!g) return;
+      const bounds = getGroupBounds(groupId);
+      if (!bounds) {
+        g.style.display = "none";
+        return;
+      }
+      g.style.display = "";
+      const rect = document.getElementById(`hull-rect-${groupId}`);
+      if (rect) {
+        rect.setAttribute("x", bounds.x);
+        rect.setAttribute("y", bounds.y);
+        rect.setAttribute("width", bounds.width);
+        rect.setAttribute("height", bounds.height);
+      }
+      const badge = document.getElementById(`badge-${groupId}`);
+      if (badge) {
+        badge.setAttribute("transform", `translate(${bounds.x + 16}, ${bounds.y - 12})`);
+      }
+    }
+
+    function handleRouterDeviceConnect(router, device) {
+      // 1. Wenn der Router bereits zu einem LAN gehört:
+      // Das neue Gerät tritt diesem LAN bei
+      if (router.groupId) {
+        device.groupId = router.groupId;
+        const group = TOPOLOGY.groups.find(g => g.id === router.groupId);
+        showToast(`${device.name} zu LAN ${group ? group.label : ""} hinzugefügt.`, "success");
+        return;
+      }
+
+      // 2. Router hat noch kein LAN (war bisher WAN-Router).
+      // Prüfen, ob der Router direkt mit einem anderen Router verbunden ist, der bereits in einem LAN ist!
+      // (User-Regel: Client/Server -- Router (LAN1) -- Router -- Client/Server => Alles geht in LAN 1 zusammen rein)
+      const adjacentLanRouter = TOPOLOGY.edges.map(e => {
+        if (e.from === router.id) return nodeMap.get(e.to);
+        if (e.to === router.id) return nodeMap.get(e.from);
+        return null;
+      }).find(n => n && n.id.startsWith("router-") && n.groupId);
+
+      if (adjacentLanRouter) {
+        // Schließt sich dem LAN des benachbarten Routers an
+        const targetGroupId = adjacentLanRouter.groupId;
+        router.groupId = targetGroupId;
+        device.groupId = targetGroupId;
+        const group = TOPOLOGY.groups.find(g => g.id === targetGroupId);
+        showToast(`Router und ${device.name} zu LAN ${group ? group.label : ""} hinzugefügt!`, "success");
+      } else {
+        // 3. Kein benachbarter LAN-Router vorhanden -> Neues LAN gründen!
+        const label = getNextAvailableGroupLabel();
+        const groupId = `group-${Date.now() % 10000}-${Math.floor(Math.random() * 100)}`;
+        const colorIndex = TOPOLOGY.groups.length % GROUP_PALETTE.length;
+        const newGroup = { id: groupId, label, colorIndex };
+        TOPOLOGY.groups.push(newGroup);
+        router.groupId = groupId;
+        device.groupId = groupId;
+        showToast(`Neues LAN (Gruppe ${label}) gebildet!`, "success");
+      }
+    }
+
+    function handleNodeCableClick(node) {
+      if (!state.cableStartNodeId) {
+        // 1. Ersten Knoten auswählen
+        if (node.id.startsWith("client-") && getNodeConnectionCount(node.id) >= 1) {
+          showToast(`${node.name} hat bereits 1 Kabel-Verbindung (Maximum für Clients)!`, "warning");
+          return;
+        }
+        if (node.id.startsWith("server-") && getNodeConnectionCount(node.id) >= 3) {
+          showToast(`${node.name} hat bereits 3 Kabel-Verbindungen (Maximum für Server)!`, "warning");
+          return;
+        }
+        state.cableStartNodeId = node.id;
+        const nodeEl = document.getElementById(`node-${node.id}`);
+        if (nodeEl) nodeEl.classList.add("cable-source");
+        showToast(`1. Knoten: ${node.name || node.id} gewählt. Klicke auf den 2. Knoten.`, "info");
+      } else {
+        // 2. Zweiter Knoten gewählt
+        const startNode = nodeMap.get(state.cableStartNodeId);
+        const endNode = node;
+        const clearSource = () => {
+          document.querySelectorAll(".node.cable-source").forEach(el => el.classList.remove("cable-source"));
+          state.cableStartNodeId = null;
+        };
+
+        if (!startNode || startNode.id === endNode.id) {
+          clearSource();
+          showToast("Kabel-Auswahl aufgehoben.", "info");
+          return;
+        }
+
+        const edgeExists = TOPOLOGY.edges.some(e => 
+          (e.from === startNode.id && e.to === endNode.id) || 
+          (e.from === endNode.id && e.to === startNode.id)
+        );
+        if (edgeExists) {
+          showToast("Diese Kabelverbindung existiert bereits!", "warning");
+          clearSource();
+          return;
+        }
+
+        // Verbindungslimits prüfen
+        if (startNode.id.startsWith("client-") && getNodeConnectionCount(startNode.id) >= 1) {
+          showToast(`${startNode.name} hat bereits 1 Verbindung (Maximum für Clients)!`, "warning");
+          clearSource();
+          return;
+        }
+        if (startNode.id.startsWith("server-") && getNodeConnectionCount(startNode.id) >= 3) {
+          showToast(`${startNode.name} hat bereits 3 Verbindungen (Maximum für Server)!`, "warning");
+          clearSource();
+          return;
+        }
+        if (endNode.id.startsWith("client-") && getNodeConnectionCount(endNode.id) >= 1) {
+          showToast(`${endNode.name} hat bereits 1 Verbindung (Maximum für Clients)!`, "warning");
+          return;
+        }
+        if (endNode.id.startsWith("server-") && getNodeConnectionCount(endNode.id) >= 3) {
+          showToast(`${endNode.name} hat bereits 3 Verbindungen (Maximum für Server)!`, "warning");
+          return;
+        }
+
+        // Verbindung anlegen
+        TOPOLOGY.edges.push({ from: startNode.id, to: endNode.id });
+
+        // Gruppen-Logik beim Verbinden von Kabeln
+        if (!TOPOLOGY.groups) TOPOLOGY.groups = [];
+
+        const isStartRouter = startNode.id.startsWith("router-");
+        const isEndRouter = endNode.id.startsWith("router-");
+
+        if (isStartRouter && !isEndRouter) {
+          handleRouterDeviceConnect(startNode, endNode);
+        } else if (!isStartRouter && isEndRouter) {
+          handleRouterDeviceConnect(endNode, startNode);
+        }
+        // Hinweis: Wenn zwei Router verbunden werden (isStartRouter && isEndRouter),
+        // bleibt ein Router ohne Client/Server ein WAN-Router, und zwei Router mit bestehenden LANs
+        // bleiben in ihren jeweiligen getrennten LANs (inter-LAN WAN-Verbindung).
+
+        renumberClients();
+        updateServerNames();
+        renderGroups();
+        renderEdges();
+        renderNodes();
+        updateOnlineIndicators();
+        updateSidePanelDropdowns();
+        saveTopologyToStorage();
+        playSound("hop");
+        showToast(`Kabel verbunden: ${startNode.name || startNode.id} -> ${endNode.name || endNode.id}`, "success");
+        clearSource();
+      }
+    }
+
+    function deleteNode(nodeId) {
+      TOPOLOGY.clients = TOPOLOGY.clients.filter(c => c.id !== nodeId);
+      TOPOLOGY.routers = TOPOLOGY.routers.filter(r => r.id !== nodeId);
+      TOPOLOGY.servers = TOPOLOGY.servers.filter(s => s.id !== nodeId);
+      nodeMap.delete(nodeId);
+
+      TOPOLOGY.edges = TOPOLOGY.edges.filter(e => e.from !== nodeId && e.to !== nodeId);
+
+      validateAndRecomputeGroups();
+      updateServerNames();
+
+      if (state.selectedClientId === nodeId) {
+        state.selectedClientId = TOPOLOGY.clients[0]?.id || null;
+        if (state.selectedClientId) {
+          selectClient(state.selectedClientId);
+        } else {
+          sidePanel.classList.add("closed");
+        }
+      }
+
+      renderGroups();
+      renderEdges();
+      renderNodes();
+      updateOnlineIndicators();
+      updateServerLimitUI();
+      updateSidePanelDropdowns();
+      saveTopologyToStorage();
+      playSound("hop");
+      showToast("Element gelöscht.", "info");
+    }
+
+    function deleteEdge(from, to) {
+      const k = getEdgeKey(from, to);
+      TOPOLOGY.edges = TOPOLOGY.edges.filter(e => getEdgeKey(e.from, e.to) !== k);
+      state.brokenEdges.delete(k);
+      validateAndRecomputeGroups();
+      renderGroups();
+      renderEdges();
+      renderNodes();
+      updateOnlineIndicators();
+      saveTopologyToStorage();
+      playSound("hop");
+      showToast("Kabel gelöscht.", "info");
+    }
+
+    function clearPlane(quiet = false) {
+      TOPOLOGY = { clients: [], routers: [], servers: [], edges: [], groups: [] };
+      nodeMap.clear();
+      state.brokenEdges.clear();
+      renderGroups();
+      renderEdges();
+      renderNodes();
+      updateOnlineIndicators();
+      updateServerLimitUI();
+      updateSidePanelDropdowns();
+      sidePanel.classList.add("closed");
+      speechBubble.classList.remove("visible");
+      saveTopologyToStorage();
+      if (!quiet) {
+        showToast("Netzwerk-Ebene geleert. Füge neue Elemente hinzu!", "info");
+      }
+    }
+
+    function addClient(x, y) {
+      if (x === undefined || y === undefined) {
+        const offset = (TOPOLOGY.clients.length % 6) * 45;
+        x = 90 + offset;
+        y = 150 + ((TOPOLOGY.clients.length * 65) % 320);
+      }
+      const num = getNextClientNumber();
+      const devType = DEVICE_TYPES[(num - 1) % DEVICE_TYPES.length];
+      const name = `Client ${num}`;
+      const clientId = `client-${Date.now() % 10000}-${Math.floor(Math.random() * 100)}`;
+
+      const client = {
+        id: clientId,
+        name,
+        device: devType.device,
+        iconKey: devType.iconKey,
+        x: Math.round(x),
+        y: Math.round(y),
+        groupId: null
+      };
+
+      TOPOLOGY.clients.push(client);
+      nodeMap.set(clientId, client);
+      renderNodes();
+      updateOnlineIndicators();
+      updateSidePanelDropdowns();
+      saveTopologyToStorage();
+      playSound("hop");
+      showToast(`Client "${name}" hinzugefügt.`, "success");
+    }
+
+    function addRouter(x, y) {
+      if (x === undefined || y === undefined) {
+        const offset = (TOPOLOGY.routers.length % 6) * 45;
+        x = 300 + offset;
+        y = 180 + ((TOPOLOGY.routers.length * 55) % 260);
+      }
+      const routerId = `router-${Date.now() % 10000}-${Math.floor(Math.random() * 100)}`;
+      const router = { id: routerId, x: Math.round(x), y: Math.round(y), groupId: null };
+      TOPOLOGY.routers.push(router);
+      nodeMap.set(routerId, router);
+      renderNodes();
+      updateOnlineIndicators();
+      saveTopologyToStorage();
+      playSound("hop");
+      showToast("Router hinzugefügt.", "success");
+    }
+
+    function addServer(templateId = null, x, y) {
+      if (TOPOLOGY.servers.length >= 5) {
+        showToast("Maximal 5 Server im Netzwerk erlaubt!", "warning");
+        return;
+      }
+      if (x === undefined || y === undefined) {
+        const offset = (TOPOLOGY.servers.length % 4) * 60;
+        x = 420 + offset;
+        y = 130 + (TOPOLOGY.servers.length * 85);
+      }
+
+      const usedTmpls = new Set(TOPOLOGY.servers.map(s => s.templateId));
+      const tmpl = templateId ? (SERVER_TEMPLATES.find(t => t.id === templateId) || SERVER_TEMPLATES[0])
+                              : (SERVER_TEMPLATES.find(t => !usedTmpls.has(t.id)) || SERVER_TEMPLATES[0]);
+
+      const serverId = `server-${Date.now() % 10000}-${Math.floor(Math.random() * 100)}`;
+      const server = {
+        id: serverId,
+        templateId: tmpl.id,
+        name: tmpl.name,
+        iconKey: tmpl.iconKey,
+        url: tmpl.url,
+        x: Math.round(x),
+        y: Math.round(y),
+        groupId: null
+      };
+
+      TOPOLOGY.servers.push(server);
+      nodeMap.set(serverId, server);
+      updateServerNames();
+      renderNodes();
+      updateOnlineIndicators();
+      updateServerLimitUI();
+      updateSidePanelDropdowns();
+      saveTopologyToStorage();
+      playSound("hop");
+      showToast(`Server "${server.name}" hinzugefügt (${TOPOLOGY.servers.length}/5). Klicke ihn an, um ihn anzupassen!`, "success");
+    }
+
+    function addSmallLan(cx, cy) {
+      if (cx === undefined || cy === undefined) {
+        const offset = (TOPOLOGY.routers.length % 4) * 45;
+        cx = 360 + offset - 50;
+        cy = 280 + offset - 30;
+      }
+
+      if (!TOPOLOGY.groups) TOPOLOGY.groups = [];
+      const label = getNextAvailableGroupLabel();
+      const groupId = `group-lan-${Date.now() % 10000}-${Math.floor(Math.random() * 100)}`;
+      const colorIndex = TOPOLOGY.groups.length % GROUP_PALETTE.length;
+      const group = { id: groupId, label, colorIndex };
+      TOPOLOGY.groups.push(group);
+
+      const routerId = `router-lan-${Date.now() % 10000}`;
+      const router = { id: routerId, x: Math.round(cx), y: Math.round(cy), groupId };
+      TOPOLOGY.routers.push(router);
+      nodeMap.set(routerId, router);
+
+      const offsets = [
+        { dx: -90, dy: -60 },
+        { dx: -90, dy: 60 },
+        { dx: 90, dy: 0 }
+      ];
+
+      for (let i = 0; i < 3; i++) {
+        const num = i + 1;
+        const devType = DEVICE_TYPES[i % DEVICE_TYPES.length];
+        const name = `Client ${num}`;
+        const clientId = `client-lan-${Date.now() % 10000}-${i + 1}`;
+
+        const client = {
+          id: clientId,
+          name,
+          device: devType.device,
+          iconKey: devType.iconKey,
+          x: Math.round(cx + offsets[i].dx),
+          y: Math.round(cy + offsets[i].dy),
+          groupId
+        };
+        TOPOLOGY.clients.push(client);
+        nodeMap.set(clientId, client);
+
+        // Genau 1 Kabel zum Router pro Client (Regel: Client max 1 Verbindung)
+        TOPOLOGY.edges.push({ from: clientId, to: routerId });
+      }
+
+      renderGroups();
+      renderEdges();
+      renderNodes();
+      updateOnlineIndicators();
+      updateSidePanelDropdowns();
+      saveTopologyToStorage();
+      playSound("hop");
+      showToast(`Kleines LAN (Gruppe ${label}) hinzugefügt: 1 LAN-Router + 3 Clients!`, "success");
+    }
+
+    function openServerConfig(serverId) {
+      const server = TOPOLOGY.servers.find(s => s.id === serverId);
+      if (!server) return;
+      state.configuringServerId = serverId;
+
+      const modal = document.getElementById("server-config-modal");
+      const title = document.getElementById("server-modal-title");
+      const subtitle = document.getElementById("server-modal-subtitle");
+      const connInfo = document.getElementById("server-modal-connections");
+      const grid = document.getElementById("server-templates-grid");
+
+      title.textContent = `Server konfigurieren: ${server.name}`;
+      subtitle.textContent = `Adresse: ${server.url}`;
+
+      const connCount = getNodeConnectionCount(serverId);
+      connInfo.innerHTML = `Kabel-Verbindungen: <strong>${connCount} von maximal 3</strong> belegt`;
+
+      grid.innerHTML = "";
+      SERVER_TEMPLATES.forEach(tmpl => {
+        const card = document.createElement("div");
+        card.classList.add("server-template-card");
+        if (server.templateId === tmpl.id || (!server.templateId && server.name === tmpl.name)) {
+          card.classList.add("active");
+        }
+
+        card.innerHTML = `
+          <div class="server-tmpl-icon">
+            ${getIconSvgHtml(tmpl.iconKey, 20, "var(--blue)")}
+          </div>
+          <div class="server-tmpl-info">
+            <div class="server-tmpl-title">${escapeHtml(tmpl.name)}</div>
+            <div class="server-tmpl-desc">${escapeHtml(tmpl.category)}</div>
+            <div class="server-tmpl-url">${escapeHtml(tmpl.url.replace("https://", ""))}</div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          server.templateId = tmpl.id;
+          server.name = tmpl.name;
+          server.iconKey = tmpl.iconKey;
+          server.url = tmpl.url;
+
+          updateServerNames();
+          renderNodes();
+          updateSidePanelDropdowns();
+          saveTopologyToStorage();
+
+          if (selectServer && selectServer.value === server.id) {
+            browserUrl.value = server.url;
+            renderServerWebpage(server.id);
+          }
+
+          modal.classList.remove("open");
+          playSound("arrive");
+          showToast(`Server konfiguriert als "${tmpl.name}"`, "success");
+        });
+
+        grid.appendChild(card);
+      });
+
+      modal.classList.add("open");
+    }
+
+    function openPresetsModal() {
+      const modal = document.getElementById("presets-modal");
+      const grid = document.getElementById("presets-grid");
+      grid.innerHTML = "";
+
+      Object.entries(PRESET_DEFINITIONS).forEach(([key, preset]) => {
+        const card = document.createElement("div");
+        card.classList.add("preset-card-item");
+        card.innerHTML = `
+          <div class="preset-card-title">
+            <span>${escapeHtml(preset.name)}</span>
+            <span class="icon" style="color:var(--blue);">${getIconSvgHtml("branch", 16, "var(--blue)")}</span>
+          </div>
+          <div class="preset-card-desc">${escapeHtml(preset.desc)}</div>
+          <div class="preset-card-stats">${escapeHtml(preset.stats)}</div>
+        `;
+        card.addEventListener("click", () => {
+          loadPreset(key);
+        });
+        grid.appendChild(card);
+      });
+
+      modal.classList.add("open");
+    }
+
+    function loadPreset(key) {
+      const preset = PRESET_DEFINITIONS[key];
+      if (!preset) return;
+
+      TOPOLOGY = preset.generate();
+      if (!TOPOLOGY.groups) TOPOLOGY.groups = [];
+      nodeMap.clear();
+      [...TOPOLOGY.clients, ...TOPOLOGY.routers, ...TOPOLOGY.servers].forEach(n => nodeMap.set(n.id, n));
+      state.brokenEdges.clear();
+
+      renumberClients();
+      updateServerNames();
+      renderGroups();
+      renderEdges();
+      renderNodes();
+      updateOnlineIndicators();
+      updateServerLimitUI();
+      updateSidePanelDropdowns();
+      saveTopologyToStorage();
+
+      if (TOPOLOGY.clients.length > 0) {
+        selectClient(TOPOLOGY.clients[0].id);
+      } else {
+        sidePanel.classList.add("closed");
+      }
+
+      document.getElementById("presets-modal").classList.remove("open");
+      playSound("send");
+      showToast(`Vorlage "${preset.name}" geladen!`, "success");
+    }
 
     /* ==========================================================================
        AUDIO SYNTHESIZER (WEB AUDIO API)
@@ -2272,7 +4496,7 @@
       updateViewportTransform();
 
       stage.addEventListener("pointerdown", (e) => {
-        if (e.target.closest(".node") || e.target.closest(".edge-hitbox") || e.target.closest("button") || e.target.closest("aside") || e.target.closest("#receiver-speech-bubble")) {
+        if (e.target.closest(".node") || e.target.closest(".edge-hitbox") || e.target.closest("button") || e.target.closest("aside") || e.target.closest("#receiver-speech-bubble") || e.target.closest(".stage-toolbar")) {
           return;
         }
         state.panZoom.isDragging = true;
@@ -2424,6 +4648,7 @@
       }
       updateEdgeVisuals();
       updateOnlineIndicators();
+      saveTopologyToStorage();
     }
 
     function updateEdgeVisuals() {
@@ -2478,15 +4703,21 @@
         const my = (n1.y + n2.y) / 2;
         const brokenGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
         brokenGroup.classList.add("edge-broken-icon");
+        brokenGroup.setAttribute("transform", `translate(${mx}, ${my})`);
         brokenGroup.innerHTML = `
-          <circle cx="${mx}" cy="${my}" r="11" fill="var(--vermillion)" />
-          <g transform="translate(${mx - 6}, ${my - 6}) scale(0.5)" fill="#ffffff" stroke="none">
+          <circle cx="0" cy="0" r="11" fill="var(--vermillion)" />
+          <g transform="translate(-6, -6) scale(0.5)" fill="#ffffff" stroke="none">
             ${SVG_PATHS.lightning}
           </g>
         `;
 
-        hitbox.addEventListener("click", () => {
-          toggleEdgeBroken(edge.from, edge.to);
+        hitbox.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (state.activeTool === "delete") {
+            deleteEdge(edge.from, edge.to);
+          } else if (state.disturbanceMode === "manual") {
+            toggleEdgeBroken(edge.from, edge.to);
+          }
         });
 
         if (isEdgeBroken(edge.from, edge.to)) {
@@ -2501,65 +4732,205 @@
       });
     }
 
+    function updateEdgesForNode(nodeId) {
+      document.querySelectorAll(`.edge[data-from="${nodeId}"], .edge[data-to="${nodeId}"]`).forEach(edgeEl => {
+        const fromId = edgeEl.dataset.from;
+        const toId = edgeEl.dataset.to;
+        const n1 = nodeMap.get(fromId);
+        const n2 = nodeMap.get(toId);
+        if (!n1 || !n2) return;
+        edgeEl.querySelectorAll(".edge-line, .edge-pulse, .edge-hitbox").forEach(l => {
+          l.setAttribute("x1", n1.x);
+          l.setAttribute("y1", n1.y);
+          l.setAttribute("x2", n2.x);
+          l.setAttribute("y2", n2.y);
+        });
+        const brokenGroup = edgeEl.querySelector(".edge-broken-icon");
+        if (brokenGroup) {
+          brokenGroup.setAttribute("transform", `translate(${(n1.x + n2.x) / 2}, ${(n1.y + n2.y) / 2})`);
+        }
+      });
+    }
+
+    function clientToViewportPoint(clientX, clientY) {
+      if (svg && typeof svg.createSVGPoint === "function" && viewportGroup && typeof viewportGroup.getScreenCTM === "function") {
+        const ctm = viewportGroup.getScreenCTM();
+        if (ctm) {
+          const pt = svg.createSVGPoint();
+          pt.x = clientX;
+          pt.y = clientY;
+          const local = pt.matrixTransform(ctm.inverse());
+          return { x: local.x, y: local.y };
+        }
+      }
+      const rect = stage ? stage.getBoundingClientRect() : { left: 0, top: 0, width: 1000, height: 620 };
+      const scaleX = 1000 / (rect.width || 1000);
+      const scaleY = 620 / (rect.height || 620);
+      return {
+        x: ((clientX - rect.left) * scaleX - state.panZoom.x) / (state.panZoom.scale || 1),
+        y: ((clientY - rect.top) * scaleY - state.panZoom.y) / (state.panZoom.scale || 1)
+      };
+    }
+
+    let nodeDragState = {
+      isDragging: false,
+      node: null,
+      offsetX: 0,
+      offsetY: 0,
+      startX: 0,
+      startY: 0,
+      hasMoved: false
+    };
+
+    function attachNodeInteractions(g, node) {
+      g.addEventListener("pointerdown", (e) => {
+        if (state.activeTool === "cable") {
+          e.stopPropagation();
+          handleNodeCableClick(node);
+          return;
+        }
+        if (state.activeTool === "delete") {
+          e.stopPropagation();
+          deleteNode(node.id);
+          return;
+        }
+
+        // Bewegen / Auswählen
+        e.stopPropagation();
+        const pt = clientToViewportPoint(e.clientX, e.clientY);
+        nodeDragState.isDragging = true;
+        nodeDragState.node = node;
+        nodeDragState.offsetX = node.x - pt.x;
+        nodeDragState.offsetY = node.y - pt.y;
+        nodeDragState.startX = e.clientX;
+        nodeDragState.startY = e.clientY;
+        nodeDragState.hasMoved = false;
+
+        g.setPointerCapture(e.pointerId);
+        g.classList.add("dragging");
+      });
+
+      g.addEventListener("pointermove", (e) => {
+        if (!nodeDragState.isDragging || nodeDragState.node?.id !== node.id) return;
+        if (Math.hypot(e.clientX - nodeDragState.startX, e.clientY - nodeDragState.startY) > 3) {
+          nodeDragState.hasMoved = true;
+        }
+
+        const pt = clientToViewportPoint(e.clientX, e.clientY);
+        node.x = Math.round(pt.x + nodeDragState.offsetX);
+        node.y = Math.round(pt.y + nodeDragState.offsetY);
+
+        g.setAttribute("transform", `translate(${node.x}, ${node.y})`);
+        updateEdgesForNode(node.id);
+        if (node.groupId) {
+          updateGroupVisual(node.groupId);
+        }
+        if (state.selectedClientId === node.id || state.lastBubbleReceiver?.id === node.id) {
+          updateBubblePosition();
+        }
+      });
+
+      const stopNodeDrag = (e) => {
+        if (nodeDragState.isDragging && nodeDragState.node?.id === node.id) {
+          const moved = nodeDragState.hasMoved;
+          nodeDragState.isDragging = false;
+          nodeDragState.node = null;
+          g.classList.remove("dragging");
+          try { g.releasePointerCapture(e.pointerId); } catch (_) {}
+
+          if (moved) {
+            saveTopologyToStorage();
+          } else {
+            if (node.id.startsWith("client-")) {
+              selectClient(node.id);
+            } else if (node.id.startsWith("server-")) {
+              openServerConfig(node.id);
+            }
+          }
+        }
+      };
+
+      g.addEventListener("pointerup", stopNodeDrag);
+      g.addEventListener("pointercancel", stopNodeDrag);
+    }
+
     function renderNodes() {
       nodesGroup.innerHTML = "";
 
-      // 1. ROUTER (Namenlos & ohne LEDs, kompakt und übersichtlich)
+      // 1. ROUTER (Namenlos & ohne LEDs, als LAN-Router mit Halo und Kennzeichnung)
       const rRadius = TOPOLOGY.routers.length > 14 ? 11 : (TOPOLOGY.routers.length > 8 ? 13 : 15);
       const crossArm = Math.round(rRadius * 0.48);
       const dotOffset = Math.round(rRadius * 0.35);
       TOPOLOGY.routers.forEach(r => {
+        const group = r.groupId ? (TOPOLOGY.groups || []).find(g => g.id === r.groupId) : null;
+        const color = group ? getGroupColor(group) : null;
+        const isLanRouter = !!group;
+
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.classList.add("node", "router");
+        if (isLanRouter) g.classList.add("lan-router");
         g.id = `node-${r.id}`;
         g.dataset.id = r.id;
+        g.setAttribute("transform", `translate(${r.x}, ${r.y})`);
+
+        let haloHtml = "";
+        let sublabelHtml = "";
+        if (isLanRouter) {
+          haloHtml = `<circle cx="0" cy="0" r="${rRadius + 8}" fill="${color.stroke}" opacity="0.14" stroke="${color.stroke}" stroke-width="1.6" stroke-dasharray="3 3" class="router-halo" />`;
+          sublabelHtml = `<text x="0" y="${rRadius + 14}" class="node-label router-sublabel" fill="${color.stroke}" text-anchor="middle">LAN-Router ${escapeHtml(group.label)}</text>`;
+        }
 
         g.innerHTML = `
-          <circle cx="${r.x}" cy="${r.y + 1.5}" r="${rRadius}" fill="rgba(0,0,0,0.08)" />
-          <circle cx="${r.x}" cy="${r.y}" r="${rRadius}" class="router-core" />
-          <path d="M ${r.x - crossArm} ${r.y} L ${r.x + crossArm} ${r.y} M ${r.x} ${r.y - crossArm} L ${r.x} ${r.y + crossArm}" 
-                stroke="var(--ink-muted)" stroke-width="1.8" stroke-linecap="round" />
-          <circle cx="${r.x - dotOffset}" cy="${r.y}" r="1.5" fill="var(--ink-muted)" />
-          <circle cx="${r.x + dotOffset}" cy="${r.y}" r="1.5" fill="var(--ink-muted)" />
-          <circle cx="${r.x}" cy="${r.y - dotOffset}" r="1.5" fill="var(--ink-muted)" />
-          <circle cx="${r.x}" cy="${r.y + dotOffset}" r="1.5" fill="var(--ink-muted)" />
+          ${haloHtml}
+          <circle cx="0" cy="1.5" r="${rRadius}" fill="rgba(0,0,0,0.08)" />
+          <circle cx="0" cy="0" r="${rRadius}" class="router-core" ${isLanRouter ? `style="stroke: ${color.stroke}; stroke-width: 2.2;"` : ""} />
+          <path d="M ${-crossArm} 0 L ${crossArm} 0 M 0 ${-crossArm} L 0 ${crossArm}" 
+                stroke="${isLanRouter ? color.stroke : "var(--ink-muted)"}" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="${-dotOffset}" cy="0" r="1.5" fill="${isLanRouter ? color.stroke : "var(--ink-muted)"}" />
+          <circle cx="${dotOffset}" cy="0" r="1.5" fill="${isLanRouter ? color.stroke : "var(--ink-muted)"}" />
+          <circle cx="0" cy="${-dotOffset}" r="1.5" fill="${isLanRouter ? color.stroke : "var(--ink-muted)"}" />
+          <circle cx="0" cy="${dotOffset}" r="1.5" fill="${isLanRouter ? color.stroke : "var(--ink-muted)"}" />
+          ${sublabelHtml}
         `;
+        attachNodeInteractions(g, r);
         nodesGroup.appendChild(g);
       });
 
-      // 2. SERVER (mit funktionaler Status-LED)
+      // 2. SERVER (mit funktionaler Status-LED & 25 auswählbaren Webseiten)
       TOPOLOGY.servers.forEach(s => {
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.classList.add("node", "server");
         g.id = `node-${s.id}`;
         g.dataset.id = s.id;
+        g.setAttribute("transform", `translate(${s.x}, ${s.y})`);
 
         const serverIconPath = SVG_PATHS[s.iconKey] || SVG_PATHS.server;
 
         g.innerHTML = `
-          <rect x="${s.x - 28}" y="${s.y - 20}" width="56" height="46" rx="8" fill="rgba(0,0,0,0.08)" />
-          <rect x="${s.x - 28}" y="${s.y - 24}" width="56" height="46" rx="8" class="server-card" />
-          <line x1="${s.x - 20}" y1="${s.y - 14}" x2="${s.x + 10}" y2="${s.y - 14}" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
-          <circle cx="${s.x + 16}" cy="${s.y - 14}" r="2.5" fill="var(--green)" />
-          <line x1="${s.x - 20}" y1="${s.y - 5}" x2="${s.x + 10}" y2="${s.y - 5}" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
-          <circle cx="${s.x + 16}" cy="${s.y - 5}" r="2.5" fill="var(--sky)" />
-          <line x1="${s.x - 20}" y1="${s.y + 4}" x2="${s.x + 10}" y2="${s.y + 4}" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
-          <circle cx="${s.x + 16}" cy="${s.y + 4}" r="2.5" fill="var(--orange)" />
-          <line x1="${s.x - 20}" y1="${s.y + 13}" x2="${s.x + 10}" y2="${s.y + 13}" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
-          <circle cx="${s.x + 16}" cy="${s.y + 13}" r="2.5" fill="var(--blue)" />
+          <rect x="-28" y="-20" width="56" height="46" rx="8" fill="rgba(0,0,0,0.08)" />
+          <rect x="-28" y="-24" width="56" height="46" rx="8" class="server-card" />
+          <line x1="-20" y1="-14" x2="10" y2="-14" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
+          <circle cx="16" cy="-14" r="2.5" fill="var(--green)" />
+          <line x1="-20" y1="-5" x2="10" y2="-5" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
+          <circle cx="16" cy="-5" r="2.5" fill="var(--sky)" />
+          <line x1="-20" y1="4" x2="10" y2="4" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
+          <circle cx="16" cy="4" r="2.5" fill="var(--orange)" />
+          <line x1="-20" y1="13" x2="10" y2="13" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" />
+          <circle cx="16" cy="13" r="2.5" fill="var(--blue)" />
 
           <!-- Funktionale Server-Online-LED -->
-          <circle cx="${s.x - 21}" cy="${s.y - 18}" r="3.5" fill="var(--green)" class="status-led server-led" id="led-${s.id}" />
+          <circle cx="-21" cy="-18" r="3.5" fill="var(--green)" class="status-led server-led" id="led-${s.id}" />
 
           <g class="server-icon-badge">
-            <circle cx="${s.x + 22}" cy="${s.y - 20}" r="12" fill="var(--blue-light)" stroke="var(--blue)" stroke-width="1.5" />
-            <g transform="translate(${s.x + 14}, ${s.y - 28}) scale(0.65)" stroke="var(--blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="22" cy="-20" r="12" fill="var(--blue-light)" stroke="var(--blue)" stroke-width="1.5" />
+            <g transform="translate(14, -28) scale(0.65)" stroke="var(--blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               ${serverIconPath}
             </g>
           </g>
 
-          <text x="${s.x}" y="${s.y + 36}" class="node-label server-label">${s.name}</text>
+          <text x="0" y="36" class="node-label server-label">${escapeHtml(s.name)}</text>
         `;
+        attachNodeInteractions(g, s);
         nodesGroup.appendChild(g);
       });
 
@@ -2569,30 +4940,28 @@
         g.classList.add("node", "client");
         g.id = `node-${c.id}`;
         g.dataset.id = c.id;
+        g.setAttribute("transform", `translate(${c.x}, ${c.y})`);
 
         const devicePath = SVG_PATHS[c.iconKey] || SVG_PATHS.laptop;
 
         g.innerHTML = `
-          <circle cx="${c.x}" cy="${c.y}" r="38" class="client-selection-ring" />
+          <circle cx="0" cy="0" r="38" class="client-selection-ring" />
           <g class="client-card-inner">
-            <rect x="${c.x - 28}" y="${c.y - 24}" width="56" height="48" rx="12" fill="rgba(0,0,0,0.08)" />
-            <rect x="${c.x - 28}" y="${c.y - 28}" width="56" height="48" rx="12" fill="var(--surface)" stroke="var(--blue)" stroke-width="2.2" />
-            <rect x="${c.x - 21}" y="${c.y - 22}" width="42" height="32" rx="7" fill="var(--blue-light)" />
-            <g transform="translate(${c.x - 10}, ${c.y - 12}) scale(0.85)" stroke="var(--blue)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="-28" y="-24" width="56" height="48" rx="12" fill="rgba(0,0,0,0.08)" />
+            <rect x="-28" y="-28" width="56" height="48" rx="12" fill="var(--surface)" stroke="var(--blue)" stroke-width="2.2" />
+            <rect x="-21" y="-22" width="42" height="32" rx="7" fill="var(--blue-light)" />
+            <g transform="translate(-10, -12) scale(0.85)" stroke="var(--blue)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               ${devicePath}
             </g>
             <!-- Funktionale Client-Online-LED -->
-            <circle cx="${c.x + 17}" cy="${c.y + 11}" r="3.5" fill="var(--green)" class="status-led client-led" id="led-${c.id}" />
+            <circle cx="17" cy="11" r="3.5" fill="var(--green)" class="status-led client-led" id="led-${c.id}" />
           </g>
 
-          <text x="${c.x}" y="${c.y + 36}" class="node-label client-name">${c.name}</text>
-          <text x="${c.x}" y="${c.y + 49}" class="node-sublabel client-role">${c.device}</text>
+          <text x="0" y="36" class="node-label client-name">${escapeHtml(c.name)}</text>
+          <text x="0" y="49" class="node-sublabel client-role">${escapeHtml(c.device)}</text>
         `;
 
-        g.addEventListener("click", () => {
-          selectClient(c.id);
-        });
-
+        attachNodeInteractions(g, c);
         nodesGroup.appendChild(g);
       });
 
@@ -2611,30 +4980,16 @@
         el.classList.toggle("selected", el.dataset.id === clientId);
       });
 
-      panelName.textContent = client.name;
+      const group = client.groupId ? (TOPOLOGY.groups || []).find(g => g.id === client.groupId) : null;
+      const lanTag = group ? ` (LAN ${group.label})` : "";
+      panelName.textContent = `${client.name}${lanTag}`;
       panelDevice.textContent = `${client.device} im Netzwerk`;
       panelAvatar.innerHTML = getIconSvgHtml(client.iconKey, 20, "var(--blue)", 2.2);
 
-      // Empfänger-Dropdown befüllen
-      selectRecipient.innerHTML = "";
-      TOPOLOGY.clients.filter(c => c.id !== clientId).forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c.id;
-        opt.textContent = `${c.name} (${c.device})`;
-        selectRecipient.appendChild(opt);
-      });
-
-      // Server-Dropdown befüllen
-      selectServer.innerHTML = "";
-      TOPOLOGY.servers.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s.id;
-        opt.textContent = `${s.name} (${s.url.replace("https://", "")})`;
-        selectServer.appendChild(opt);
-      });
+      updateSidePanelDropdowns();
 
       sidePanel.classList.remove("closed");
-      footerDetailHint.textContent = `Absender ${client.name} gewählt. Wähle Empfänger im rechten Panel.`;
+      footerDetailHint.textContent = `Absender ${client.name}${lanTag} gewählt. Wähle Empfänger im rechten Panel.`;
     }
 
     /* ==========================================================================
@@ -2901,14 +5256,14 @@
 
       const senderId = state.selectedClientId;
       const receiverId = selectRecipient.value;
-      const message = inputMessage.value.trim() || "Hallo! 👋";
+      const message = inputMessage.value.trim() || "Hallo! Wie geht's?";
 
       const sender = nodeMap.get(senderId);
       const receiver = nodeMap.get(receiverId);
 
       const initialPath = findPath(senderId, receiverId, true);
       if (!initialPath) {
-        footerStatus.textContent = "Blockiert ⚠️";
+        footerStatus.textContent = "Blockiert";
         footerStatus.className = "footer-status-pill";
         footerDetailHint.textContent = `Kein freier Weg von ${sender.name} zu ${receiver.name}!`;
         alert(`Kein Weg gefunden: Alle Leitungen zwischen ${sender.name} und ${receiver.name} sind unterbrochen! Repariere eine Leitung.`);
@@ -2942,7 +5297,7 @@
       while (curr !== receiverId) {
         const remainingPath = findPath(curr, receiverId, false);
         if (!remainingPath || remainingPath.length < 2) {
-          footerStatus.textContent = "Blockiert ⚡";
+          footerStatus.textContent = "Blockiert (Unterbrochen)";
           footerStatus.className = "footer-status-pill";
           footerDetailHint.textContent = `Weg blockiert! Keine offene Leitung zum Ziel.`;
           steps.push({ title: `Gestoppt: Leitung zu ${receiver.name} unterbrochen!` });
@@ -3095,7 +5450,7 @@
       const testReturn = findPath(serverId, clientId, true);
 
       if (!testForward || !testReturn) {
-        footerStatus.textContent = "Server nicht erreichbar ⚠️";
+        footerStatus.textContent = "Server nicht erreichbar";
         footerStatus.className = "footer-status-pill";
         footerDetailHint.textContent = `Verbindung zu ${server.name} unterbrochen.`;
         alert(`Server nicht erreichbar: Keine offene Verbindung zwischen ${client.name} und ${server.name}!`);
@@ -3143,7 +5498,7 @@
       while (curr !== serverId) {
         const path = findPath(curr, serverId, false);
         if (!path || path.length < 2) {
-          footerStatus.textContent = "Blockiert ⚡";
+          footerStatus.textContent = "Blockiert (Unterbrochen)";
           footerStatus.className = "footer-status-pill";
           footerDetailHint.textContent = `Weg zum Server blockiert!`;
           steps.push({ title: `Gestoppt: Keine Verbindung zu ${server.name}!` });
@@ -3207,7 +5562,7 @@
       while (curr !== clientId) {
         const path = findPath(curr, clientId, false);
         if (!path || path.length < 2) {
-          footerStatus.textContent = "Antwort blockiert ⚡";
+          footerStatus.textContent = "Antwort blockiert";
           footerStatus.className = "footer-status-pill";
           footerDetailHint.textContent = `Rückweg zu ${client.name} unterbrochen!`;
           steps.push({ title: `Gestoppt: Rückweg blockiert!` });
@@ -3256,57 +5611,10 @@
     }
 
     function renderServerWebpage(serverId) {
-      if (serverId === "server-schule") {
-        browserContent.innerHTML = `
-          <div style="padding:4px;">
-            <h3 style="color:var(--blue); font-size:0.95rem; margin-bottom:4px;">Goethe-Schule Online</h3>
-            <p style="font-size:0.75rem; color:var(--ink-muted); margin-bottom:8px;">Gemeinsam lernen, entdecken & forschen</p>
-            <div style="background:var(--blue-light); padding:8px; border-radius:6px; font-size:0.78rem; margin-bottom:6px;">
-              <strong>Schulfest am Freitag!</strong><br>
-              Ab 14:00 Uhr gibt es Waffeln, Spiele und die Roboter-Ausstellung!
-            </div>
-            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:6px; border-radius:6px; font-size:0.75rem;">
-              <strong>Mensa heute:</strong> Bio-Pizza Margherita mit buntem Salat.
-            </div>
-          </div>
-        `;
-      } else if (serverId === "server-suchmaschine") {
-        browserContent.innerHTML = `
-          <div style="padding:4px;">
-            <h3 style="color:var(--orange); font-size:0.95rem; margin-bottom:8px;">Findefuchs – Kindersuche</h3>
-            <div style="border-bottom:1px solid var(--surface-border); padding-bottom:6px; margin-bottom:6px;">
-              <strong style="color:var(--blue); font-size:0.8rem;">Wie funktioniert das Internet?</strong>
-              <p style="font-size:0.74rem; color:var(--ink);">Computer verbinden sich über Router und Kabel zu einem weltweiten Datennetz.</p>
-            </div>
-            <div>
-              <strong style="color:var(--blue); font-size:0.8rem;">Warum heißen Daten Pakete?</strong>
-              <p style="font-size:0.74rem; color:var(--ink);">Große Webseiten werden in kleine Päckchen zerlegt und einzeln übertragen.</p>
-            </div>
-          </div>
-        `;
-      } else if (serverId === "server-lexikon") {
-        browserContent.innerHTML = `
-          <div style="padding:4px;">
-            <h3 style="color:var(--green); font-size:0.95rem; margin-bottom:6px;">Klexikon: Rechnernetz</h3>
-            <p style="font-size:0.75rem; margin-bottom:8px;">Ein <strong>Netzwerk</strong> entsteht, wenn zwei oder mehr Computer Daten austauschen.</p>
-            <div style="background:var(--green-light); border-left:3px solid var(--green); padding:6px 8px; font-size:0.74rem;">
-              <strong>Wissenswert:</strong><br>
-              Router sind wie Verkehrsschilder: Sie schauen auf das Ziel jedes Datenpakets und wählen den schnellsten freien Weg.
-            </div>
-          </div>
-        `;
-      } else if (serverId === "server-wetter") {
-        browserContent.innerHTML = `
-          <div style="padding:4px;">
-            <h3 style="color:var(--sky); font-size:0.95rem; margin-bottom:6px;">Wetterdienst Online</h3>
-            <p style="font-size:0.75rem; color:var(--ink-muted); margin-bottom:8px;">Aktuelle Vorhersage für heute</p>
-            <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); padding:8px; border-radius:6px; font-size:0.78rem;">
-              <strong>Heiter & sonnig, 21°C</strong><br>
-              Perfektes Wetter für die große Pause auf dem Schulhof!
-            </div>
-          </div>
-        `;
-      }
+      const server = TOPOLOGY.servers.find(s => s.id === serverId);
+      const tmpl = SERVER_TEMPLATES.find(t => t.id === (server?.templateId || server?.id)) || SERVER_TEMPLATES[0];
+      if (browserUrl) browserUrl.value = server ? server.url : tmpl.url;
+      browserContent.innerHTML = tmpl.render();
     }
 
     /* ==========================================================================
@@ -3454,9 +5762,11 @@
     checkSoundHop.addEventListener("change", () => { state.audio.hop = checkSoundHop.checked; });
     checkSoundArrive.addEventListener("change", () => { state.audio.arrive = checkSoundArrive.checked; });
 
-    btnOpenTopology.addEventListener("click", () => {
-      topologyModal.classList.add("open");
-    });
+    if (btnOpenTopology) {
+      btnOpenTopology.addEventListener("click", () => {
+        topologyModal.classList.add("open");
+      });
+    }
     document.getElementById("topology-close").addEventListener("click", () => {
       topologyModal.classList.remove("open");
     });
@@ -3508,10 +5818,14 @@
 
     function applyNewTopology(type, numC, numR, numS) {
       TOPOLOGY = generateTopology(type, numC, numR, numS);
+      if (!TOPOLOGY.groups) TOPOLOGY.groups = [];
       nodeMap.clear();
       [...TOPOLOGY.clients, ...TOPOLOGY.routers, ...TOPOLOGY.servers].forEach(n => nodeMap.set(n.id, n));
       state.brokenEdges.clear();
 
+      renumberClients();
+      updateServerNames();
+      renderGroups();
       renderEdges();
       renderNodes();
 
@@ -3522,6 +5836,8 @@
         sidePanel.classList.add("closed");
       }
       updateOnlineIndicators();
+      updateServerLimitUI();
+      saveTopologyToStorage();
     }
 
     document.getElementById("btn-apply-topology").addEventListener("click", () => {
@@ -3534,9 +5850,49 @@
       topologyModal.classList.remove("open");
     });
 
+    // Toolbar Werkzeuge & Aktionen
+    if (toolSelect) toolSelect.addEventListener("click", () => setTool("select"));
+    if (toolCable) toolCable.addEventListener("click", () => setTool("cable"));
+    if (toolDelete) toolDelete.addEventListener("click", () => setTool("delete"));
+
+    if (btnAddClient) btnAddClient.addEventListener("click", () => addClient());
+    if (btnAddRouter) btnAddRouter.addEventListener("click", () => addRouter());
+    if (btnAddServer) btnAddServer.addEventListener("click", () => addServer());
+    if (btnAddLan) btnAddLan.addEventListener("click", () => addSmallLan());
+    if (btnQuickPresets) btnQuickPresets.addEventListener("click", () => openPresetsModal());
+    if (btnClearPlane) btnClearPlane.addEventListener("click", () => clearPlane());
+
+    const serverConfigClose = document.getElementById("server-config-close");
+    if (serverConfigClose) serverConfigClose.addEventListener("click", () => {
+      serverConfigModal.classList.remove("open");
+    });
+    const btnCloseServerModal = document.getElementById("btn-close-server-modal");
+    if (btnCloseServerModal) btnCloseServerModal.addEventListener("click", () => {
+      serverConfigModal.classList.remove("open");
+    });
+    const btnDeleteConfiguredServer = document.getElementById("btn-delete-configured-server");
+    if (btnDeleteConfiguredServer) btnDeleteConfiguredServer.addEventListener("click", () => {
+      if (state.configuringServerId) {
+        const id = state.configuringServerId;
+        serverConfigModal.classList.remove("open");
+        deleteNode(id);
+      }
+    });
+
+    const presetsClose = document.getElementById("presets-close");
+    if (presetsClose) presetsClose.addEventListener("click", () => {
+      presetsModal.classList.remove("open");
+    });
+    const btnCancelPresets = document.getElementById("btn-cancel-presets");
+    if (btnCancelPresets) btnCancelPresets.addEventListener("click", () => {
+      presetsModal.classList.remove("open");
+    });
+
     document.addEventListener("click", (e) => {
       if (e.target === topologyModal) topologyModal.classList.remove("open");
       if (e.target === settingsModal) settingsModal.classList.remove("open");
+      if (e.target === serverConfigModal) serverConfigModal.classList.remove("open");
+      if (e.target === presetsModal) presetsModal.classList.remove("open");
     });
 
     document.getElementById("panel-close").addEventListener("click", () => {
@@ -3560,14 +5916,50 @@
 
     function initApp() {
       setMode("chat");
-      applyNewTopology("mesh", 4, 5, 3);
       initPanZoom();
 
       const hash = window.location.hash;
       const urlParams = new URLSearchParams(window.location.search);
+
+      const savedData = loadTopologyFromStorage();
+
       if (urlParams.get("topo")) {
         applyNewTopology(urlParams.get("topo"), 4, 6, 3);
+      } else if (urlParams.get("preset") && PRESET_DEFINITIONS[urlParams.get("preset")]) {
+        loadPreset(urlParams.get("preset"));
+      } else if (savedData && (savedData.clients?.length > 0 || savedData.routers?.length > 0 || savedData.servers?.length > 0)) {
+        TOPOLOGY = {
+          clients: savedData.clients || [],
+          routers: savedData.routers || [],
+          servers: savedData.servers || [],
+          edges: savedData.edges || [],
+          groups: savedData.groups || []
+        };
+        nodeMap.clear();
+        TOPOLOGY.clients.forEach(c => nodeMap.set(c.id, c));
+        TOPOLOGY.routers.forEach(r => nodeMap.set(r.id, r));
+        TOPOLOGY.servers.forEach(s => nodeMap.set(s.id, s));
+        state.brokenEdges.clear();
+        if (Array.isArray(savedData.brokenEdges)) {
+          savedData.brokenEdges.forEach(k => state.brokenEdges.add(k));
+        }
+        renumberClients();
+        updateServerNames();
+        renderGroups();
+        renderEdges();
+        renderNodes();
+        updateOnlineIndicators();
+        updateSidePanelDropdowns();
+        updateServerLimitUI();
+        if (TOPOLOGY.clients.length > 0) {
+          selectClient(TOPOLOGY.clients[0].id);
+        } else {
+          sidePanel.classList.add("closed");
+        }
+      } else {
+        clearPlane(true);
       }
+
       if (urlParams.get("mode") === "web" || hash === "#web") {
         setMode("web");
       }
@@ -3577,6 +5969,9 @@
       if (urlParams.get("modal") === "settings" || hash === "#settings") {
         settingsModal.classList.add("open");
       }
+      if (urlParams.get("modal") === "presets" || hash === "#presets") {
+        openPresetsModal();
+      }
       if (urlParams.get("debug") === "step" || hash === "#step") {
         btnToggleStepMode.click();
         stepDebuggerBar.classList.remove("hidden");
@@ -3584,11 +5979,12 @@
         btnStepPrev.disabled = true;
       }
       if (urlParams.get("test") === "offline") {
-        // Break all edges connected to client-0 to demonstrate offline indicator
-        state.edges.forEach(e => {
-          if (e.from === "client-0" || e.to === "client-0") e.broken = true;
+        TOPOLOGY.edges.forEach(e => {
+          if (e.from.startsWith("client-") || e.to.startsWith("client-")) {
+            state.brokenEdges.add(getEdgeKey(e.from, e.to));
+          }
         });
-        renderNetwork();
+        renderEdges();
         updateOnlineIndicators();
       }
       if (urlParams.get("test") === "bubble") {

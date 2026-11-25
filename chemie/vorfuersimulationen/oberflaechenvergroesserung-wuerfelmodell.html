@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zerteilungsgrad und Oberfläche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* VOICE: klar, ruhig, beamertauglich – ein Vorführobjekt, keine Lernplattform
+   IDEA: ein Würfel auf dem Labortisch, der mit dem Messer zerteilt wird
+   PICTURE: großer drehbarer 3D-Würfel, alte Oberfläche blau, neue Schnittflächen orange
+   COLOUR and TYPE: weiß bzw. tiefes Blaugrau, Blau + Orange (farbenblind-sicher); Atkinson Hyperlegible
+   LAYOUT: Würfel links groß, Messwerte + Balkendiagramm rechts; darunter log-Ausblick bis Nanometer */
+:root{color-scheme:light dark;
+ --bg:light-dark(#ffffff,#11161d);--ink:light-dark(#14202b,#e6ecf2);--mut:light-dark(#566472,#9eabb8);
+ --panel:light-dark(#f2f5f8,#19212b);--line:light-dark(#d6dde4,#2d3844);
+ --orig:light-dark(#2f6db5,#5e9de2);--new:light-dark(#e07818,#f3994a);--focus:light-dark(#14202b,#ffffff)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,3vw,44px) max(4vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+h1{font-size:clamp(28px,4vw,42px);line-height:1.08;margin:0 0 8px;text-wrap:balance}
+h2{font-size:clamp(22px,2.6vw,30px);line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.lead{color:var(--mut);margin:0;max-width:68ch}
+header.band{padding-bottom:8px}
+.main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(18px,3vw,40px);align-items:start}
+.stage{background:var(--panel);border-radius:14px;overflow:hidden}
+.fig{position:relative;min-height:340px}
+.cube{height:clamp(340px,52vh,560px)}
+.fig>svg,.fig>canvas{position:absolute;inset:0;width:100%;height:100%}
+canvas{touch-action:none;cursor:grab}canvas:active{cursor:grabbing}
+.legend{position:absolute;left:14px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;pointer-events:none}
+.legend span{display:flex;align-items:center;gap:7px}
+.sw{width:16px;height:16px;border-radius:3px;display:inline-block}
+.hint{position:absolute;right:14px;top:10px;font-size:13px;color:var(--mut);pointer-events:none}
+.ctrl{padding:16px;display:grid;gap:14px;border-top:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.row label.t{font-weight:700;min-width:9.5em}
+.nval{font-size:22px;font-weight:700;min-width:3.6em;white-space:nowrap}
+input[type=range]{flex:1 1 180px;height:44px;accent-color:var(--orig);margin:0}
+button,.chip{font:inherit;font-size:16px;min-height:44px;min-width:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;padding:0 14px}
+button.sq{font-size:22px;font-weight:700;padding:0}
+.chip{display:inline-flex;align-items:center;gap:8px}
+.chip input{width:20px;height:20px;accent-color:var(--orig);margin:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.big{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 14px;margin:0 0 4px}
+.big b{font-size:clamp(40px,6vw,60px);line-height:1;white-space:nowrap}
+.big span{color:var(--mut)}
+.klabel{font-weight:700;color:var(--mut);font-size:14px;margin:0}
+table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:15px}
+td{padding:6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+td small{color:var(--mut)}
+.vt{margin:0;font-size:clamp(16px,1.6vw,19px)}
+.vt th{text-align:right;padding:8px 12px 8px 10px;border-bottom:2px solid var(--ink);font-weight:700}.vt th:first-child,.vt td:first-child{text-align:left;padding-left:12px}
+.vt td{text-align:right;padding:8px 12px 8px 10px;cursor:pointer;font-variant-numeric:tabular-nums}
+.vt tr.on td{background:var(--ink);color:var(--bg);font-weight:700}
+svg text{fill:var(--mut);font:13px "Atkinson Hyperlegible",system-ui,sans-serif}
+svg .cur{fill:var(--ink);font-weight:700;font-size:14px}
+.grid line{stroke:var(--line)}
+.log{background:var(--panel)}
+.logg{display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);gap:clamp(18px,3vw,40px);align-items:start;margin-top:18px}
+.logfig{min-height:340px;height:380px;background:var(--bg);border-radius:14px}
+.cmp{font-size:18px;margin:4px 0 0}
+.cmp b{white-space:nowrap}
+body.fs header{display:none}
+body.fs .band{padding:12px 16px!important}
+body.fs .wrap{max-width:none}
+body.fs .cube{height:calc(100vh - 230px);min-height:320px}
+.keys{position:absolute;right:12px;top:36px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 16px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:15px;max-width:calc(100% - 24px);z-index:2}
+.keys dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;margin:8px 0 0}
+.keys dt{font-weight:700;white-space:nowrap}.keys dd{margin:0;color:var(--mut)}
+@media(max-width:860px){.main,.logg{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.row label.t{min-width:0;width:100%}.hint{display:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+ <h1>Zerteilen vergrößert die Oberfläche</h1>
+ <p class="lead">Würfelmodell: Jede Kante wird in <i>n</i> gleiche Teile geteilt. Das Volumen bleibt gleich, die Oberfläche wächst auf das <i>n</i>-Fache.</p>
+</div></header>
+
+<section class="band" style="padding-top:12px"><div class="wrap main">
+ <div class="stage">
+  <div class="fig cube"><canvas id="cv" aria-label="3D-Würfel, in Teilwürfel zerlegt"></canvas>
+   <div class="hint">Ziehen zum Drehen · ? für Tastenkürzel</div>
+   <div id="keys" class="keys" hidden><b>Tastenkürzel</b><dl>
+    <dt>← → &nbsp;+ −</dt><dd>Zerteilungsgrad n</dd><dt>1 … 9, 0</dt><dd>n direkt wählen (0 = 10)</dd>
+    <dt>↑ ↓</dt><dd>Auseinanderziehen</dd><dt>W A S D</dt><dd>Würfel drehen</dd>
+    <dt>R</dt><dd>Ansicht zurücksetzen</dd><dt>Leertaste</dt><dd>Automatisch drehen an/aus</dd>
+    <dt>H</dt><dd>Neue Flächen färben an/aus</dd><dt>E</dt><dd>Einheit wechseln</dd>
+    <dt>F</dt><dd>Vollbild</dd><dt>? oder T</dt><dd>Diese Übersicht</dd></dl></div>
+   <div class="legend"><span><i class="sw" style="background:var(--orig)"></i>ursprüngliche Oberfläche</span><span id="lgNew"><i class="sw" style="background:var(--new)"></i>neu entstandene Fläche</span></div>
+  </div>
+  <div class="ctrl">
+   <div class="row"><label class="t" for="n">Zerteilungsgrad</label>
+    <button class="sq" id="minus" aria-label="weniger">−</button>
+    <input type="range" id="n" min="1" max="10" step="1" value="1">
+    <button class="sq" id="plus" aria-label="mehr">+</button>
+    <span class="nval" id="nv">n = 1</span></div>
+   <div class="row"><label class="t" for="gap">Auseinanderziehen</label>
+    <input type="range" id="gap" min="0" max="100" step="1" value="45"></div>
+   <div class="row">
+    <label class="chip"><input type="checkbox" id="hl" checked>Neue Flächen färben</label>
+    <label class="chip"><input type="checkbox" id="auto" checked>Automatisch drehen</label>
+    <button id="fs" aria-pressed="false">Vollbild</button>
+    <button id="keysB" aria-pressed="false">Tastenkürzel</button>
+    <div class="seg" role="group" aria-label="Einheit"><button id="uCm" aria-pressed="true">a = 1 cm</button><button id="uA" aria-pressed="false">allgemein a</button></div>
+   </div>
+  </div>
+ </div>
+
+ <div>
+  <table class="vt"><thead><tr><th>n</th><th>Anzahl Würfel</th><th>Oberfläche</th></tr></thead><tbody id="tab"></tbody></table>
+ </div>
+</div></section>
+
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
+let n=1,gapT=0.45*0.75,gap=0,yaw=-0.62,pitch=0.5,auto=true,hl=true,unit='cm',dirty=true;
+let anim=null,dragging=false,last=null,sCur=0,W=0,H=0,dpr=1;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduce){auto=false;$('auto').checked=false}
+
+/* ---------- Formatierung ---------- */
+const nf=(x,d=3)=>x.toLocaleString('de-DE',{maximumFractionDigits:d});
+const exact=(x,d=3)=>Math.abs(x*10**d-Math.round(x*10**d))<1e-9;
+const SUP='⁻⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sup=s=>String(s).replace(/[-0-9]/g,c=>SUP['-0123456789'.indexOf(c)]);
+function sci(x){if(x<1e4)return nf(Math.round(x),0);let e=Math.floor(Math.log10(x)),m=x/10**e;m=Math.round(m*100)/100;if(m>=10){m/=10;e++}
+ return (Math.abs(m-1)<1e-9?'':nf(m,2)+' · ')+'10'+sup(e)}
+function area(cm2){return cm2<1e4?nf(cm2,cm2<10?3:0)+' cm²':(cm2/1e4<10?nf(cm2/1e4,2):sci(cm2/1e4))+' m²'}
+
+/* ---------- Farben aus CSS ---------- */
+const probe=document.createElement('i');probe.style.display='none';document.body.appendChild(probe);
+const rgb=v=>{probe.style.color=`var(${v})`;return getComputedStyle(probe).color.match(/[\d.]+/g).slice(0,3).map(Number)};
+let C={};
+function readColors(){C={orig:rgb('--orig'),neu:rgb('--new')};dirty=true}
+new MutationObserver(readColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readColors);
+
+/* ---------- 3D-Würfel ---------- */
+function resize(){const r=cv.getBoundingClientRect();dpr=devicePixelRatio||1;W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);dirty=true}
+const roCv=new ResizeObserver(resize);roCv.observe(cv);
+function rot([x,y,z]){const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+ const x1=cy*x+sy*z,z1=-sy*x+cy*z;return [x1,cp*y-sp*z1,sp*y+cp*z1]}
+const Lv=(()=>{const v=[-0.35,0.6,0.8],l=Math.hypot(...v);return v.map(a=>a/l)})();
+const extent=g=>{const s=2/n;return (n-1)/2*s*(1+g)+s/2};
+
+function render(){
+ if(!W)return;
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+ const S=Math.min(W,H)/2*0.92/(1.675*1.7),ox=W/2,oy=H/2-8;
+ const ex=rot([1,0,0]),ey=rot([0,1,0]),ez=rot([0,0,1]);
+ const s=2/n,h=s/2,off=(n-1)/2;
+ // Flächen: Achse, Vorzeichen, Normale
+ const F=[[ex,ey,ez,0,1],[ex,ey,ez,0,-1],[ey,ez,ex,1,1],[ey,ez,ex,1,-1],[ez,ex,ey,2,1],[ez,ex,ey,2,-1]]
+  .map(([a,b,c,ax,sg])=>({a,b,c,ax,sg,nz:a[2]*sg,sh:0.62+0.45*Math.max(0,sg*(a[0]*Lv[0]+a[1]*Lv[1]+a[2]*Lv[2]))}))
+  .filter(f=>f.nz>1e-6);
+ const cubes=[];
+ for(let i=0;i<n;i++)for(let j=0;j<n;j++)for(let k=0;k<n;k++){
+  const p=[(i-off)*s*(1+gap),(j-off)*s*(1+gap),(k-off)*s*(1+gap)];
+  cubes.push([i,j,k,p[0]*ex[0]+p[1]*ey[0]+p[2]*ez[0],p[0]*ex[1]+p[1]*ey[1]+p[2]*ez[1],p[0]*ex[2]+p[1]*ey[2]+p[2]*ez[2]])}
+ cubes.sort((A,B)=>A[5]-B[5]);
+ const lw=Math.max(0.5,1.3-n*0.07);ctx.lineWidth=lw;ctx.lineJoin='round';
+ ctx.strokeStyle='rgba(0,0,0,0.32)';
+ const col=(c,f)=>`rgb(${c.map(v=>Math.round(Math.min(255,v*f))).join(',')})`;
+ const cache={};
+ for(const cb of cubes){
+  const idx=[cb[0],cb[1],cb[2]];
+  for(const f of F){
+   const outer=f.sg>0?idx[f.ax]===n-1:idx[f.ax]===0;
+   const key=(outer||!hl?'o':'n')+f.ax+f.sg;
+   const fill=cache[key]||(cache[key]=col(outer||!hl?C.orig:C.neu,f.sh));
+   const cx=cb[3]+f.a[0]*h*f.sg,cy=cb[4]+f.a[1]*h*f.sg;
+   const bx=f.b[0]*h,by=f.b[1]*h,qx=f.c[0]*h,qy=f.c[1]*h;
+   ctx.beginPath();
+   ctx.moveTo(ox+(cx-bx-qx)*S,oy-(cy-by-qy)*S);
+   ctx.lineTo(ox+(cx+bx-qx)*S,oy-(cy+by-qy)*S);
+   ctx.lineTo(ox+(cx+bx+qx)*S,oy-(cy+by+qy)*S);
+   ctx.lineTo(ox+(cx-bx+qx)*S,oy-(cy-by+qy)*S);
+   ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.stroke();
+  }
+ }
+}
+function loop(t){
+ if(anim){const u=Math.min(1,(t-anim.t0)/750),e=1-(1-u)**3;gap=anim.to*e;dirty=true;if(u>=1)anim=null}
+ if(auto&&!dragging){yaw+=0.0035;dirty=true}
+ if(dirty){dirty=false;render()}
+ requestAnimationFrame(loop)}
+
+cv.addEventListener('pointerdown',e=>{dragging=true;last=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(!dragging)return;yaw+=(e.clientX-last[0])*0.01;pitch=Math.max(-1.45,Math.min(1.45,pitch+(e.clientY-last[1])*0.01));last=[e.clientX,e.clientY];dirty=true});
+const up=()=>{dragging=false};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+
+/* ---------- Werte & Balken ---------- */
+function setN(v){v=Math.max(1,Math.min(10,v));if(v===n&&anim===null&&gap===gapT)return;n=v;$('n').value=n;
+ anim=reduce?null:{t0:performance.now(),to:gapT};if(reduce)gap=gapT;update()}
+function update(){
+ const cm=unit==='cm';
+ $('nv').textContent='n = '+n;
+ $('tab').innerHTML=Array.from({length:10},(_,i)=>{const k=i+1;
+  return `<tr data-k="${k}"${k===n?' class="on"':''}><td>${k}</td><td>${sci(k**3)}</td><td>${cm?nf(6*k,0)+' cm²':6*k+'a²'}</td></tr>`}).join('');
+ $('lgNew').style.visibility=hl?'visible':'hidden';
+ dirty=true}
+
+/* ---------- Bedienung ---------- */
+$('tab').addEventListener('click',e=>{const r=e.target.closest('[data-k]');if(r)setN(+r.dataset.k)});
+$('n').addEventListener('input',e=>setN(+e.target.value));
+$('minus').onclick=()=>setN(n-1);$('plus').onclick=()=>setN(n+1);
+$('gap').addEventListener('input',e=>{gapT=+e.target.value/100*0.75;if(!anim)gap=gapT;dirty=true});
+$('hl').addEventListener('change',e=>{hl=e.target.checked;update()});
+$('auto').addEventListener('change',e=>{auto=e.target.checked});
+const setU=u=>{unit=u;$('uCm').setAttribute('aria-pressed',u==='cm');$('uA').setAttribute('aria-pressed',u==='a');update()};
+$('uCm').onclick=()=>setU('cm');$('uA').onclick=()=>setU('a');
+const fsB=$('fs'),fsLbl=()=>{const on=document.body.classList.contains('fs');fsB.textContent=on?'Vollbild beenden':'Vollbild';fsB.setAttribute('aria-pressed',on)};
+async function toggleFs(){const on=!document.body.classList.contains('fs');
+ if(on){document.body.classList.add('fs');try{await document.documentElement.requestFullscreen()}catch(e){}}
+ else{document.body.classList.remove('fs');if(document.fullscreenElement){try{await document.exitFullscreen()}catch(e){}}}
+ fsLbl();dirty=true}
+fsB.onclick=toggleFs;
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){document.body.classList.remove('fs');fsLbl()}});
+const keysEl=$('keys'),keysB=$('keysB');
+const showKeys=v=>{keysEl.hidden=!v;keysB.setAttribute('aria-pressed',v)};
+keysB.onclick=()=>showKeys(keysEl.hidden);
+const setGap=v=>{v=Math.max(0,Math.min(100,v));$('gap').value=v;gapT=v/100*0.75;if(!anim)gap=gapT;dirty=true};
+const flip=(id,ev='change')=>{const c=$(id);c.checked=!c.checked;c.dispatchEvent(new Event(ev))};
+addEventListener('keydown',e=>{
+ if(e.ctrlKey||e.metaKey||e.altKey)return;
+ const k=e.key,K=k.length===1?k.toLowerCase():k;let done=true;
+ if(k==='Escape'){if(!keysEl.hidden)showKeys(false);else if(document.body.classList.contains('fs')&&!document.fullscreenElement){document.body.classList.remove('fs');fsLbl()}else done=false}
+ else if(k==='ArrowRight'||k==='+')setN(n+1);
+ else if(k==='ArrowLeft'||k==='-')setN(n-1);
+ else if(/^[0-9]$/.test(k))setN(k==='0'?10:+k);
+ else if(k==='ArrowUp')setGap(+$('gap').value+10);
+ else if(k==='ArrowDown')setGap(+$('gap').value-10);
+ else if(k===' '){flip('auto')}
+ else if(K==='h')flip('hl');
+ else if(K==='e')setU(unit==='cm'?'a':'cm');
+ else if(K==='f')toggleFs();
+ else if(K==='r'){yaw=-0.62;pitch=0.5;dirty=true}
+ else if(K==='w'){pitch=Math.max(-1.45,pitch-0.15);dirty=true}
+ else if(K==='s'){pitch=Math.min(1.45,pitch+0.15);dirty=true}
+ else if(K==='a'){yaw-=0.2;dirty=true}
+ else if(K==='d'){yaw+=0.2;dirty=true}
+ else if(k==='?'||K==='t')showKeys(keysEl.hidden);
+ else done=false;
+ if(done){e.preventDefault();if(k===' '&&document.activeElement!==document.body)document.activeElement.blur()}
+});
+
+readColors();update();gap=gapT;requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
